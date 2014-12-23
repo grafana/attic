@@ -1,8 +1,9 @@
 define([
   'angular',
-  'lodash'
+  'lodash',
+  'kbn'
 ],
-function (angular, _) {
+function (angular, _, kbn) {
   'use strict';
 
   var module = angular.module('grafana.services');
@@ -14,6 +15,7 @@ function (angular, _) {
       this.type = 'AtlasDatasource';
       this.url = datasource.url;
       this.supportMetrics = true;
+      this.minimumInterval = datasource.minimumInterval || 1000;
     }
 
     AtlasDatasource.prototype.query = function(options) {
@@ -22,9 +24,15 @@ function (angular, _) {
       // Atlas can take multiple concatenated stack queries
       var fullQuery = _.pluck(options.targets, 'query').join(',');
 
+      var interval = options.interval;
+
+      if (kbn.interval_to_ms(interval) < this.minimumInterval) {
+        interval = kbn.secondsToHms(this.minimumInterval / 1000);
+      }
+
       var params = {
         q: fullQuery,
-        step: options.interval,
+        step: interval,
         s: options.range.from,
         e: options.range.to,
         format: 'json'
