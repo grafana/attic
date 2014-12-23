@@ -35,7 +35,7 @@ function (angular, _, kbn) {
         step: interval,
         s: options.range.from,
         e: options.range.to,
-        format: 'json'
+        format: options.format
       };
 
       var httpOptions = {
@@ -45,11 +45,22 @@ function (angular, _, kbn) {
         inspect: { type: 'atlas' }
       };
 
-      $http(httpOptions).success(function (data) {
-        deferred.resolve({
-          data: makeTimeSeries(data)
+      // Note: while Atlas supports PNGs, Grafana can only provide graphite-specific dimension params
+      // See https://github.com/grafana/grafana/issues/1273 for status
+      if (options.format === "png") {
+        var encodedParams = _.map(httpOptions.params, function (v, k) {
+          return [k, encodeURIComponent(v)].join("=");
         });
-      });
+        deferred.resolve(httpOptions.url + "?" + encodedParams.join("&"));
+      } else {
+        $http(httpOptions).success(function (data) {
+          deferred.resolve({
+            data: makeTimeSeries(data)
+          });
+        });
+      }
+
+
 
       return deferred.promise;
     };
