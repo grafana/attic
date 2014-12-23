@@ -19,8 +19,6 @@ function (angular, _, kbn) {
     }
 
     AtlasDatasource.prototype.query = function(options) {
-      var deferred = $q.defer();
-
       // Atlas can take multiple concatenated stack queries
       var fullQuery = _.pluck(options.targets, 'query').join(',');
 
@@ -35,7 +33,7 @@ function (angular, _, kbn) {
         step: interval,
         s: options.range.from,
         e: options.range.to,
-        format: options.format
+        format: options.format || 'json'
       };
 
       var httpOptions = {
@@ -45,12 +43,15 @@ function (angular, _, kbn) {
         inspect: { type: 'atlas' }
       };
 
+      var deferred = $q.defer();
+
       // Note: while Atlas supports PNGs, Grafana can only provide graphite-specific dimension params
       // See https://github.com/grafana/grafana/issues/1273 for status
       if (options.format === "png") {
         var encodedParams = _.map(httpOptions.params, function (v, k) {
           return [k, encodeURIComponent(v)].join("=");
         });
+
         deferred.resolve(httpOptions.url + "?" + encodedParams.join("&"));
       } else {
         $http(httpOptions).success(function (data) {
@@ -59,8 +60,6 @@ function (angular, _, kbn) {
           });
         });
       }
-
-
 
       return deferred.promise;
     };

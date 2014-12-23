@@ -1,6 +1,6 @@
 define([
   'helpers',
-  '../atlas.Datasource'
+  '../datasources/atlas'
 ], function(helpers) {
   'use strict';
 
@@ -59,5 +59,24 @@ define([
         expect(results.data[0].datapoints[1]).to.eql([593086.155587, 1419312000000 + 600000]);
       });
     });
+
+    describe.only('when querying for a png', function () {
+      var query = {
+        range: { from: 'now-1h', to: 'now' },
+        targets: [
+          { query: 'name,sps,:eq,:sum' },
+        ],
+        interval: '10m',
+        format: 'png'
+      };
+
+      it('should generate the correct query', function () {
+        var promise = ctx.ds.query(query);
+        promise.then(function(urlReturned) {
+          expect(urlReturned).to.match(/format=png/);
+        });
+        ctx.$rootScope.$digest();
+      });
+    })
   });
 });
