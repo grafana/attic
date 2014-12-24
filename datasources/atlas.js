@@ -23,7 +23,6 @@ function (angular, _, kbn) {
 
     AtlasDatasource.prototype.query = function(options) {
       // Atlas can take multiple concatenated stack queries
-      console.log("query fired");
       var fullQuery = _(options.targets).reject('hide').pluck('query').value().join(',');
 
       var interval = options.interval;
@@ -47,8 +46,6 @@ function (angular, _, kbn) {
         inspect: { type: 'atlas' }
       };
 
-      var deferred = $q.defer();
-
       // Note: while Atlas supports PNGs, Grafana can only provide graphite-specific dimension params
       // See https://github.com/grafana/grafana/issues/1273 for status
       if (options.format === "png") {
@@ -56,20 +53,25 @@ function (angular, _, kbn) {
           return [k, encodeURIComponent(v)].join("=");
         });
 
-        deferred.resolve(httpOptions.url + "?" + encodedParams.join("&"));
+        return $q.when(httpOptions.url + "?" + encodedParams.join("&"));
       } else {
-        $http(httpOptions).success(function (data) {
-          deferred.resolve({
-            data: makeTimeSeries(data)
+        var deferred = $q.defer();
+        $http(httpOptions)
+          .success(function (response) {
+            deferred.resolve(convertToTimeseries(response))
+          })
+          .error(function (data, status, headers, config) {
+            var error = new Error(data.message);
+            error.config = config;
+            error.data = JSON.stringify(data);
+            deferred.reject(error);
           });
-        });
+        return deferred.promise;
       }
-
-      return deferred.promise;
     };
 
-    function makeTimeSeries (result) {
-      return _.map(result.legend, function (legend, index) {
+    function convertToTimeseries (result) {
+      var timeseriesData = _.map(result.legend, function (legend, index) {
         var series = {target: legend, datapoints: []};
         var values = _.pluck(result.values, index);
 
@@ -81,6 +83,8 @@ function (angular, _, kbn) {
 
         return series;
       });
+
+      return {data: timeseriesData};
     }
 
     return AtlasDatasource;
