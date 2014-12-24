@@ -60,7 +60,7 @@ define([
       });
     });
 
-    describe.only('when querying for a png', function () {
+    describe('when querying for a png', function () {
       var query = {
         range: { from: 'now-1h', to: 'now' },
         targets: [
