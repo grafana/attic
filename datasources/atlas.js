@@ -9,18 +9,22 @@ function (angular, _, kbn) {
   var module = angular.module('grafana.services');
 
   module.factory('AtlasDatasource', function($q, $http) {
-
     function AtlasDatasource(datasource) {
       this.name = datasource.name;
       this.type = 'AtlasDatasource';
       this.url = datasource.url;
+
       this.supportMetrics = true;
+      this.partials = datasource.partials || 'plugins/grafana-plugins/partials/atlas';
+      this.editorSrc = this.partials + '/editor.html';
+
       this.minimumInterval = datasource.minimumInterval || 1000;
     }
 
     AtlasDatasource.prototype.query = function(options) {
       // Atlas can take multiple concatenated stack queries
-      var fullQuery = _.pluck(options.targets, 'query').join(',');
+      console.log("query fired");
+      var fullQuery = _(options.targets).reject('hide').pluck('query').value().join(',');
 
       var interval = options.interval;
 
