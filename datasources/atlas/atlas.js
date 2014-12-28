@@ -15,7 +15,7 @@ function (angular, _, kbn) {
       this.url = datasource.url;
 
       this.supportMetrics = true;
-      this.partials = datasource.partials || 'plugins/grafana-plugins/partials/atlas';
+      this.partials = datasource.partials || 'plugins/grafana-plugins/datasources/atlas/editor.html';
       this.editorSrc = this.partials + '/editor.html';
 
       this.minimumInterval = datasource.minimumInterval || 1000;
