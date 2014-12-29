@@ -58,29 +58,16 @@ function (angular, _) {
     // SUGGESTION QUERIES
     //////////////////////////////
 
-    //$scope.suggestMetrics = function(query, callback) {
-    //  if (!metricList) {
-    //    $scope.updateMetricList();
-    //  }
-    //  else {
-    //    $scope.sMetricLie.sMetricList.splice(indexToRemove, numberToRemove); = metricList;
-    //    callback(metricList);
-    //  }
-    //
-    //};
-
     $scope.updateMetricList = function() {
       $scope.metricListLoading = true;
       metricList = [];
       $scope.datasource.performMetricSuggestQuery().then(function(series) {
         metricList = series;
         $scope.metric.list = series;
-        if ($scope.target.metric) {
+        if ($scope.target.metric)
           $scope.metric.value = $scope.target.metric;
-        } else {
+        else 
           $scope.metric.value = "";
-        }
-        //MetricStruct = MetricListToObject(series);
         $scope.metricListLoading = false;
         return metricList;
       });

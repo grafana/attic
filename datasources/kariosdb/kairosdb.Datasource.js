@@ -26,8 +26,14 @@ function (angular, _, kbn) {
       var end = options.range.to;
 
       var queries = _.compact(_.map(options.targets, _.partial(convertTargetToQuery, options)));
-      var plotParams = _.compact(_.map(options.targets, function(target) {
-        return plotParams ?  {alias: target.alias, exouter: target.exOuter} : null;
+      var plotParams = _.compact(_.map(options.targets, function(target){
+        var alias = target.alias;
+        if (typeof target.alias == 'undefined' || target.alias == "")
+          alias = target.metric;
+        return !target.hide
+            ?  {alias: alias,
+                exouter: target.exOuter}
+            : null;
       }));
       var handleKairosDBQueryResponseAlias = _.partial(handleKairosDBQueryResponse, plotParams);
       // No valid targets, return the empty result to save a round trip.
@@ -174,7 +180,7 @@ function (angular, _, kbn) {
             datapoints[i] = [v, t];
           }
           if (plotParams[index].exouter)
-            datapoints.shift().pop();
+            datapoints = PeakFilter(datapoints, 10);
           output.push({ target: target, datapoints: datapoints });
         });
         index ++;
@@ -190,8 +196,7 @@ function (angular, _, kbn) {
       }
 
       var query = {
-        name: target.metric,
-        alias: target.alias ? target.alias : target.metric
+        name: target.metric
       };
 
       query.aggregators = [];
@@ -377,6 +382,36 @@ function (angular, _, kbn) {
 
       console.log("Date is neither string nor date");
     }
+
+    function PeakFilter(dataIn, limit) {
+      var datapoints = dataIn;
+      var arrLength = datapoints.length;
+      if (arrLength <= 3)
+        return datapoints;
+      var LastIndx = arrLength - 1;
+
+      // Check first point
+      var prvDelta = Math.abs((datapoints[1][0] - datapoints[0][0]) / datapoints[0][0]);
+      var nxtDelta = Math.abs((datapoints[1][0] - datapoints[2][0]) / datapoints[2][0]);
+      if (prvDelta >= limit && nxtDelta < limit)
+        datapoints[0][0] = datapoints[1][0];
+
+      // Check last point
+      prvDelta = Math.abs((datapoints[LastIndx - 1][0] - datapoints[LastIndx - 2][0]) / datapoints[LastIndx - 2][0]);
+      nxtDelta = Math.abs((datapoints[LastIndx - 1][0] - datapoints[LastIndx][0]) / datapoints[LastIndx][0]);
+      if (prvDelta >= limit && nxtDelta < limit)
+        datapoints[LastIndx][0] = datapoints[LastIndx - 1][0];
+
+      for (var i = 1; i < arrLength - 1; i++){
+        prvDelta = Math.abs((datapoints[i][0] - datapoints[i - 1][0]) / datapoints[i - 1][0]);
+        nxtDelta = Math.abs((datapoints[i][0] - datapoints[i + 1][0]) / datapoints[i + 1][0]);
+        if (prvDelta >= limit && nxtDelta >= limit)
+          datapoints[i][0] = (datapoints[i-1][0] + datapoints[i+1][0]) / 2;
+      }
+
+      return datapoints;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     return KairosDBDatasource;
   });
