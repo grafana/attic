@@ -13,7 +13,7 @@ function (angular, _, kbn) {
 
     function KairosDBDatasource(datasource) {
       this.type = datasource.type;
-      this.editorSrc = 'plugins/editor.html';
+      this.editorSrc = 'plugins/datasources/kairosdb/kairosdb.editor.html';
       this.url = datasource.url;
       this.name = datasource.name;
       this.supportMetrics = true;
