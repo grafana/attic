@@ -39,7 +39,7 @@ function (angular, _) {
       }
     };
     $scope.panelBlur = function() {
-      _.each($scope.panel.targets, function(target) {
+      _.each($scope.panel.targets, function(target){
         target.downsampling = $scope.panel.downsampling;
         target.sampling = $scope.panel.sampling;
       });
@@ -75,9 +75,9 @@ function (angular, _) {
       $scope.datasource.performMetricSuggestQuery().then(function(series) {
         metricList = series;
         $scope.metric.list = series;
-        if ($scope.target.metric) {
+        if ($scope.target.metric)
           $scope.metric.value = $scope.target.metric;
-        } else {
+        else {
           $scope.metric.value = "";
         }
         //MetricStruct = MetricListToObject(series);
