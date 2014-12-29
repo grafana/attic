@@ -39,7 +39,7 @@ function (angular, _) {
       }
     };
     $scope.panelBlur = function() {
-      _.each($scope.panel.targets, function(target){
+      _.each($scope.panel.targets, function(target) {
         target.downsampling = $scope.panel.downsampling;
         target.sampling = $scope.panel.sampling;
       });
@@ -58,17 +58,6 @@ function (angular, _) {
     // SUGGESTION QUERIES
     //////////////////////////////
 
-    //$scope.suggestMetrics = function(query, callback) {
-    //  if (!metricList) {
-    //    $scope.updateMetricList();
-    //  }
-    //  else {
-    //    $scope.sMetricLie.sMetricList.splice(indexToRemove, numberToRemove); = metricList;
-    //    callback(metricList);
-    //  }
-    //
-    //};
-
     $scope.updateMetricList = function() {
       $scope.metricListLoading = true;
       metricList = [];
@@ -77,10 +66,8 @@ function (angular, _) {
         $scope.metric.list = series;
         if ($scope.target.metric)
           $scope.metric.value = $scope.target.metric;
-        else {
+        else 
           $scope.metric.value = "";
-        }
-        //MetricStruct = MetricListToObject(series);
         $scope.metricListLoading = false;
         return metricList;
       });

@@ -156,26 +156,26 @@ function (angular, _, kbn) {
           //var target = result.name;
           var target = plotParams[index].alias;
           var details = " ( ";
-            _.each(result.group_by,function(element) {
-              if(element.name==="tag") {
-                _.each(element.group,function(value, key) {
-                  details+= key+"="+value+" ";
-                });
-              }
-              else if(element.name==="value") {
-                details+= 'value_group='+element.group.group_number+" ";
-              }
-              else if(element.name==="time") {
-                details+= 'time_group='+element.group.group_number+" ";
-              }
-            });
-            details+= ") ";
+          _.each(result.group_by,function(element) {
+            if(element.name==="tag") {
+              _.each(element.group,function(value, key) {
+                details+= key+"="+value+" ";
+              });
+            }
+            else if(element.name==="value") {
+              details+= 'value_group='+element.group.group_number+" ";
+            }
+            else if(element.name==="time") {
+              details+= 'time_group='+element.group.group_number+" ";
+            }
+          });
+          details+= ") ";
           if (details != " ( ) ")
             target += details;
           var datapoints = [];
 
           for (var i = 0; i < result.values.length; i++) {
-            var t = Math.floor(result.values[i][0] );
+            var t = Math.floor(result.values[i][0]);
             var v = result.values[i][1];
             datapoints[i] = [v, t];
           }
