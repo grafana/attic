@@ -27,12 +27,12 @@ function (angular, _, kbn) {
       // get from & to in seconds
       var from = kbn.parseDate(options.range.from).getTime();
       var to = kbn.parseDate(options.range.to).getTime();
-      var items = _.pluck(options.targets, 'itemid');
+      var items = _.indexBy(options.targets, 'itemid')
 
       from = Math.ceil(from/1000);
       to = Math.ceil(to/1000);
 
-      return this.performTimeSeriesQuery(items, from, to)
+      return this.performTimeSeriesQuery(_.keys(items), from, to)
         .then(_.bind(function (response) {
 
           // Response should be in the format:
@@ -49,8 +49,8 @@ function (angular, _, kbn) {
                 //  normalize to Grafana response format.
                 function (i, id) {
                   return {
-                    // TODO unroll return with itemid:alias map
-                    target: id,
+                    // Lookup itemid:alias map
+                    target: items[id].alias,
                     datapoints: _.map(i, function (p) { return [p.value, p.clock*1000];})
                   };
               })
