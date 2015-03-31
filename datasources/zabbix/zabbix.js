@@ -17,6 +17,7 @@ function (angular, _, kbn) {
       this.url              = datasource.url;
       this.auth             = datasource.auth;
       // TODO user/pass auth to get token
+      this.limitmetrics     = datasource.limitmetrics || 5000;
 
       this.partials = datasource.partials || 'plugins/grafana-plugins/datasources/zabbix';
       this.editorSrc = this.partials + '/editor.html';
@@ -71,7 +72,7 @@ function (angular, _, kbn) {
               itemids: items,
               sortfield: 'clock',
               sortorder: 'DESC',
-              limit: 1000, // Where do he defaults for this come from?
+              limit: this.limitmetrics,
               time_from: start,
           },
           auth: this.auth,
