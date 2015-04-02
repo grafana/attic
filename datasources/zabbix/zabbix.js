@@ -21,6 +21,9 @@ function (angular, _, kbn) {
 
       this.partials = datasource.partials || 'plugins/grafana-plugins/datasources/zabbix';
       this.editorSrc = this.partials + '/editor.html';
+
+      this.annotationEditorSrc = this.partials + '/annotation_editor.html';
+      this.supportAnnotations = true;
     }
 
 
@@ -85,6 +88,44 @@ function (angular, _, kbn) {
       }
 
       return $http(options);
+    };
+
+    ZabbixAPIDatasource.prototype.annotationQuery = function(annotation, rangeUnparsed) {
+      var from = kbn.parseDate(rangeUnparsed.from).getTime();
+      var to = kbn.parseDate(rangeUnparsed.to).getTime();
+      from = Math.ceil(from/1000);
+      to = Math.ceil(to/1000);
+
+      var options = {
+        method: 'POST',
+        url: this.url + '',
+        data: {
+          jsonrpc: '2.0',
+          method: 'event.get',
+          params: {
+              output: 'extend',
+              sortorder: 'DESC',
+              time_from: from,
+              time_till: to,
+              limit: this.limitmetrics,
+          },
+          auth: this.auth,
+          id: 1
+        },
+      };
+
+      return $http(options).then(function(result) {
+        var list = [];
+        _.each(result.data.result, function(e) {
+          list.push({
+            annotation: annotation,
+            time: e.clock * 1000,
+            title: e.objectid,
+            text: e.eventid,
+          });
+        });
+        return list;
+      });
     };
 
     return ZabbixAPIDatasource;
