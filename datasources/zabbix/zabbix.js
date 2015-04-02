@@ -93,38 +93,61 @@ function (angular, _, kbn) {
     ZabbixAPIDatasource.prototype.annotationQuery = function(annotation, rangeUnparsed) {
       var from = kbn.parseDate(rangeUnparsed.from).getTime();
       var to = kbn.parseDate(rangeUnparsed.to).getTime();
+      var self = this;
       from = Math.ceil(from/1000);
       to = Math.ceil(to/1000);
 
-      var options = {
+      var tid_options = {
         method: 'POST',
-        url: this.url + '',
+        url: self.url + '',
         data: {
           jsonrpc: '2.0',
-          method: 'event.get',
+          method: 'trigger.get',
           params: {
-              output: 'extend',
-              sortorder: 'DESC',
-              time_from: from,
-              time_till: to,
-              limit: this.limitmetrics,
+              output: ['triggerid', 'description'],
+              itemids: annotation.aids.split(','), // TODO: validate / pull automatically from dashboard.
+              limit: self.limitmetrics,
           },
-          auth: this.auth,
+          auth: self.auth,
           id: 1
         },
       };
 
-      return $http(options).then(function(result) {
-        var list = [];
-        _.each(result.data.result, function(e) {
-          list.push({
-            annotation: annotation,
-            time: e.clock * 1000,
-            title: e.objectid,
-            text: e.eventid,
+      return $http(tid_options).then(function(result) {
+        var obs = {};
+        obs = _.indexBy(result.data.result, 'triggerid');
+
+        var options = {
+          method: 'POST',
+          url: self.url + '',
+          data: {
+            jsonrpc: '2.0',
+            method: 'event.get',
+            params: {
+                output: 'extend',
+                sortorder: 'DESC',
+                time_from: from,
+                time_till: to,
+                objectids: _.keys(obs),
+                limit: self.limitmetrics,
+            },
+            auth: self.auth,
+            id: 1
+          },
+        };
+
+        return $http(options).then(function(result2) {
+          var list = [];
+          _.each(result2.data.result, function(e) {
+            list.push({
+              annotation: annotation,
+              time: e.clock * 1000,
+              title: obs[e.objectid].description,
+              text: e.eventid,
+            });
           });
+          return list;
         });
-        return list;
       });
     };
 
