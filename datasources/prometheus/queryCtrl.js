@@ -15,9 +15,6 @@ function (angular, _) {
       if (!$scope.target.expr) {
         $scope.target.expr = "";
       }
-      if (!$scope.target.step_factor) {
-        $scope.target.step_factor = null;
-      }
       if (!$scope.target.labels) {
         $scope.target.labels = {};
       }

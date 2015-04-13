@@ -160,14 +160,16 @@
         </li>
 
         <li class="tight-form-item" style="width: 86px">
-          Step Factor
+          Max data points
         </li>
         <li>
           <input type="text"
                  class="input-small tight-form-input"
-                 ng-model="target.step_factor"
+                 ng-model="panel.maxDataPoints"
+                 bs-tooltip="'Override max data points, automatically set to graph width in pixels.'"
+                 data-placement="right"
                  spellcheck='false'
-                 placeholder="series step factor"
+                 placeholder="auto"
                  data-min-length=0 data-items=100
                  ng-blur="refreshMetricData()"
                  />
