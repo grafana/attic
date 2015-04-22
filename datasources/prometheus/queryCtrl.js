@@ -15,9 +15,6 @@ function (angular, _) {
       if (!$scope.target.expr) {
         $scope.target.expr = "";
       }
-      if (!$scope.target.labels) {
-        $scope.target.labels = {};
-      }
       $scope.target.metric = "";
 
       $scope.$on('typeahead-updated', function() {
@@ -56,38 +53,8 @@ function (angular, _) {
         .then(callback);
     };
 
-    $scope.addLabel = function() {
-      if (!$scope.addLabelMode) {
-        $scope.addLabelMode = true;
-        return;
-      }
-
-      if (!$scope.target.labels) {
-        $scope.target.labels = {};
-      }
-
-      $scope.target.errors = validateTarget($scope.target);
-
-      if (!$scope.target.errors.labels) {
-        $scope.target.labels[$scope.target.currentLabelKey] = true;
-        $scope.target.currentLabelKey = '';
-        $scope.refreshMetricData();
-      }
-
-      $scope.addLabelMode = false;
-    };
-
-    $scope.removeLabel = function(key) {
-      delete $scope.target.labels[key];
-      $scope.refreshMetricData();
-    };
-
     function validateTarget(target) {
       var errs = {};
-
-      if (target.labels && _.has(target.labels, target.currentLabelKey)) {
-        errs.labels = "Duplicate label key '" + target.currentLabelKey + "'.";
-      }
 
       return errs;
     }

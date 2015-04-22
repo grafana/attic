@@ -26,7 +26,6 @@ function (angular, _, kbn) {
       var range = convertToPrometheusRange(options.range.from, options.range.to);
 
       var queries = [];
-      var groupByLabels = {};
       _.each(options.targets, function(target) {
         if (!target.expr || target.hide) {
           return;
@@ -42,7 +41,6 @@ function (angular, _, kbn) {
         query.maxDataPoints = maxDataPoints;
 
         queries.push(query);
-        groupByLabels = _.extend(groupByLabels, target.labels);
       });
 
       // No valid targets, return the empty result to save a round trip.
@@ -66,7 +64,7 @@ function (angular, _, kbn) {
             }
 
             _.each(response.data.value, function(metricData) {
-              result.push(transformMetricData(metricData, groupByLabels, options.targets[index]));
+              result.push(transformMetricData(metricData, options.targets[index]));
             });
           });
 
@@ -108,7 +106,7 @@ function (angular, _, kbn) {
       });
     };
 
-    function transformMetricData(md, groupByLabels, options) {
+    function transformMetricData(md, options) {
       var dps = [],
           metricLabel = null;
 

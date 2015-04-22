@@ -118,48 +118,6 @@
         </li>
 
         <li class="tight-form-item" style="width: 86px">
-          Labels
-        </li>
-        <li ng-repeat="(key, flag) in target.labels track by $index" class="tight-form-item">
-          {{key}}
-          <a ng-click="removeLabel(key)">
-            <i class="fa fa-remove"></i>
-          </a>
-        </li>
-
-        <li class="tight-form-item" ng-hide="addLabelMode">
-          <a ng-click="addLabel()">
-            <i class="fa fa-plus"></i>
-          </a>
-        </li>
-
-        <li ng-show="addLabelMode">
-            <input type="text"
-                   class="input-small tight-form-input"
-                   spellcheck='false'
-                   data-min-length=0 data-items=100
-                   ng-model="target.currentLabelKey"
-                   placeholder="label key">
-            <a ng-click="addLabel()">
-              add label
-            </a>
-            <a bs-tooltip="target.errors.labels"
-               style="color: rgb(229, 189, 28)"
-               ng-show="target.errors.labels">
-              <i class="fa fa-warning"></i>
-            </a>
-        </li>
-      </ul>
-      <div class="clearfix"></div>
-    </div>
-
-    <div class="tight-form">
-      <ul class="tight-form-list" role="menu">
-        <li class="tight-form-item">
-          <i class="fa fa-eye invisible"></i>
-        </li>
-
-        <li class="tight-form-item" style="width: 86px">
           Max data points
         </li>
         <li>
