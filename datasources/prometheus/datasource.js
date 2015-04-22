@@ -110,20 +110,11 @@ function (angular, _, kbn) {
 
     function transformMetricData(md, groupByLabels, options) {
       var dps = [],
-          labelData = [],
           metricLabel = null;
 
       var metricName = md.metric.__name__;
-      if (!_.isEmpty(md.metric)) {
-        _.each(_.pairs(md.metric), function(label) {
-          if (label[0] === "__name__") {
-            return;
-          }
-          if (_.has(groupByLabels, label[0])) {
-            labelData.push(label[0] + "=" + label[1]);
-          }
-        });
-      }
+      var labelData = md.metric;
+      delete labelData.__name__;
 
       metricLabel = createMetricLabel(metricName, labelData, options);
 
@@ -134,16 +125,25 @@ function (angular, _, kbn) {
       return { target: metricLabel, datapoints: dps };
     }
 
-    function createMetricLabel(metric, labelData, options) {
-      if (!_.isUndefined(options) && options.alias) {
-        metric = options.alias;
+    function createMetricLabel(metricName, labelData, options) {
+      if (_.isUndefined(options) || _.isEmpty(options.alias)) {
+        var labelPart = _.map(_.pairs(labelData), function(label) {
+          return label[0] + '="' + label[1] + '"';
+        }).join(',');
+        return metricName + '{' + labelPart + '}';
       }
 
-      if (!_.isEmpty(labelData)) {
-        metric += "{" + labelData.join(", ") + "}";
-      }
+      var originalSettings = _.templateSettings;
+      _.templateSettings = {
+        interpolate: /\{\{(.+?)\}\}/g
+      };
 
-      return metric;
+      var template = _.template(options.alias);
+      metricName = template(labelData);
+
+      _.templateSettings = originalSettings;
+
+      return metricName;
     }
 
     function convertToPrometheusRange(from, to) {
