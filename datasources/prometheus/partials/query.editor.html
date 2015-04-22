@@ -92,20 +92,30 @@
           </a>
         </li>
 
+      </ul>
+
+      <div class="clearfix"></div>
+    </div>
+
+    <div class="tight-form">
+      <ul class="tight-form-list" role="menu">
         <li class="tight-form-item">
-          Alias:
+          <i class="fa fa-eye invisible"></i>
+        </li>
+
+        <li class="tight-form-item" style="width: 86px">
+          Alias
         </li>
         <li>
           <input type="text"
-                 class="tight-form-input input-medium"
+                 class="tight-form-input input-xxlarge"
                  ng-model="target.alias"
                  spellcheck='false'
                  placeholder="series alias"
-                 data-min-length=0 data-items=100
+                 data-min-length=0 data-items=1000
                  ng-blur="refreshMetricData()"
                  />
         </li>
-
       </ul>
 
       <div class="clearfix"></div>
