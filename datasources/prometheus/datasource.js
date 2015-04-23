@@ -34,7 +34,7 @@ function (angular, _, kbn) {
         var query = {};
         query.expr = templateSrv.replace(target.expr);
 
-        var maxDataPoints = parseInt(options.maxDataPoints, 10);
+        var maxDataPoints = parseInt(target.maxDataPoints || options.maxDataPoints, 10);
         if (_.isNaN(maxDataPoints)) {
           throw "max data points is not number";
         }
