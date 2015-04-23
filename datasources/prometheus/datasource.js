@@ -124,7 +124,7 @@ function (angular, _, kbn) {
     }
 
     function createMetricLabel(metricName, labelData, options) {
-      if (_.isUndefined(options) || _.isEmpty(options.alias)) {
+      if (_.isUndefined(options) || _.isEmpty(options.legendFormat)) {
         var labelPart = _.map(_.pairs(labelData), function(label) {
           return label[0] + '="' + label[1] + '"';
         }).join(',');
@@ -136,7 +136,7 @@ function (angular, _, kbn) {
         interpolate: /\{\{(.+?)\}\}/g
       };
 
-      var template = _.template(options.alias);
+      var template = _.template(options.legendFormat);
       metricName = template(labelData);
 
       _.templateSettings = originalSettings;
