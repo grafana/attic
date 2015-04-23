@@ -110,7 +110,7 @@ function (angular, _, kbn) {
       var dps = [],
           metricLabel = null;
 
-      var metricName = md.metric.__name__;
+      var metricName = md.metric.__name__ || '';
       var labelData = md.metric;
       delete labelData.__name__;
 
