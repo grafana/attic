@@ -122,7 +122,7 @@ function (angular, _, kbn) {
       metricLabel = createMetricLabel(metricName, labelData, options);
 
       dps = _.map(md.values, function(value) {
-        return [parseInt(value[1]), value[0] * 1000];
+        return [parseFloat(value[1]), value[0] * 1000];
       });
 
       return { target: metricLabel, datapoints: dps };
