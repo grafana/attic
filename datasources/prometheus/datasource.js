@@ -15,9 +15,15 @@ function (angular, _, kbn) {
     function PrometheusDatasource(datasource) {
       this.type = 'prometheus';
       this.editorSrc = 'app/features/prometheus/partials/query.editor.html';
-      this.url = datasource.url;
       this.name = datasource.name;
       this.supportMetrics = true;
+
+      var url = datasource.url;
+      if (url[url.length-1] === '/') {
+        // remove trailing slash
+        url = url.substr(0, url.length - 1);
+      }
+      this.url = url;
     }
 
     // Called once per panel (graph)
