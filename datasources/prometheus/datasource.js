@@ -112,7 +112,6 @@ function (angular, _, kbn) {
 
       var metricName = md.metric.__name__ || '';
       var labelData = md.metric;
-      delete labelData.__name__;
 
       metricLabel = createMetricLabel(metricName, labelData, options);
 
