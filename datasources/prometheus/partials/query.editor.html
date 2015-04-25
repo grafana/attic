@@ -65,7 +65,8 @@
                  spellcheck='false'
                  placeholder="query expression"
                  data-min-length=0 data-items=100
-                 ng-blur="refreshMetricData()"
+                 ng-model-onblur
+                 ng-change="refreshMetricData()"
                  >
           <a bs-tooltip="target.errors.query"
              style="color: rgb(229, 189, 28)"
@@ -113,7 +114,8 @@
                  spellcheck='false'
                  placeholder="legend format"
                  data-min-length=0 data-items=1000
-                 ng-blur="refreshMetricData()"
+                 ng-model-onblur
+                 ng-change="refreshMetricData()"
                  />
         </li>
       </ul>
@@ -139,7 +141,8 @@
                  spellcheck='false'
                  placeholder="auto"
                  data-min-length=0 data-items=100
-                 ng-blur="refreshMetricData()"
+                 ng-model-onblur
+                 ng-change="refreshMetricData()"
                  />
         </li>
 
