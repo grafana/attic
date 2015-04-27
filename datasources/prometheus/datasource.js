@@ -130,6 +130,7 @@ function (angular, _, kbn) {
 
     function createMetricLabel(metricName, labelData, options) {
       if (_.isUndefined(options) || _.isEmpty(options.legendFormat)) {
+        delete labelData.__name__;
         var labelPart = _.map(_.pairs(labelData), function(label) {
           return label[0] + '="' + label[1] + '"';
         }).join(',');
