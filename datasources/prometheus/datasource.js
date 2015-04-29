@@ -112,6 +112,25 @@ function (angular, _, kbn) {
       });
     };
 
+    PrometheusDatasource.prototype.metricFindQuery = function(query) {
+      var url = this.url + '/api/query?expr=' + encodeURIComponent(query)
+
+      var options = {
+        method: 'GET',
+        url: url,
+      };
+
+      return $http(options)
+        .then(function(result) {
+          return _.map(result.data.value, function(metric) {
+            return {
+              text: _.values(metric.metric),
+              expandable: true
+            };
+          });
+        });
+    };
+
     function transformMetricData(md, options) {
       var dps = [],
           metricLabel = null;
