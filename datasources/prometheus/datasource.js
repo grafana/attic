@@ -15,9 +15,15 @@ function (angular, _, kbn) {
     function PrometheusDatasource(datasource) {
       this.type = 'prometheus';
       this.editorSrc = 'app/features/prometheus/partials/query.editor.html';
-      this.url = datasource.url;
       this.name = datasource.name;
       this.supportMetrics = true;
+
+      var url = datasource.url;
+      if (url[url.length-1] === '/') {
+        // remove trailing slash
+        url = url.substr(0, url.length - 1);
+      }
+      this.url = url;
     }
 
     // Called once per panel (graph)
@@ -26,7 +32,6 @@ function (angular, _, kbn) {
       var range = convertToPrometheusRange(options.range.from, options.range.to);
 
       var queries = [];
-      var groupByLabels = {};
       _.each(options.targets, function(target) {
         if (!target.expr || target.hide) {
           return;
@@ -35,14 +40,13 @@ function (angular, _, kbn) {
         var query = {};
         query.expr = templateSrv.replace(target.expr);
 
-        var maxDataPoints = parseInt(options.maxDataPoints, 10);
+        var maxDataPoints = parseInt(target.maxDataPoints || options.maxDataPoints, 10);
         if (_.isNaN(maxDataPoints)) {
           throw "max data points is not number";
         }
         query.maxDataPoints = maxDataPoints;
 
         queries.push(query);
-        groupByLabels = _.extend(groupByLabels, target.labels);
       });
 
       // No valid targets, return the empty result to save a round trip.
@@ -66,7 +70,7 @@ function (angular, _, kbn) {
             }
 
             _.each(response.data.value, function(metricData) {
-              result.push(transformMetricData(metricData, groupByLabels, options.targets[index]));
+              result.push(transformMetricData(metricData, options.targets[index]));
             });
           });
 
@@ -108,42 +112,42 @@ function (angular, _, kbn) {
       });
     };
 
-    function transformMetricData(md, groupByLabels, options) {
+    function transformMetricData(md, options) {
       var dps = [],
-          labelData = [],
           metricLabel = null;
 
-      var metricName = md.metric.__name__;
-      if (!_.isEmpty(md.metric)) {
-        _.each(_.pairs(md.metric), function(label) {
-          if (label[0] === "__name__") {
-            return;
-          }
-          if (_.has(groupByLabels, label[0])) {
-            labelData.push(label[0] + "=" + label[1]);
-          }
-        });
-      }
+      var metricName = md.metric.__name__ || '';
+      var labelData = md.metric;
 
       metricLabel = createMetricLabel(metricName, labelData, options);
 
       dps = _.map(md.values, function(value) {
-        return [parseInt(value[1]), value[0] * 1000];
+        return [parseFloat(value[1]), value[0] * 1000];
       });
 
       return { target: metricLabel, datapoints: dps };
     }
 
-    function createMetricLabel(metric, labelData, options) {
-      if (!_.isUndefined(options) && options.alias) {
-        metric = options.alias;
+    function createMetricLabel(metricName, labelData, options) {
+      if (_.isUndefined(options) || _.isEmpty(options.legendFormat)) {
+        delete labelData.__name__;
+        var labelPart = _.map(_.pairs(labelData), function(label) {
+          return label[0] + '="' + label[1] + '"';
+        }).join(',');
+        return metricName + '{' + labelPart + '}';
       }
 
-      if (!_.isEmpty(labelData)) {
-        metric += "{" + labelData.join(", ") + "}";
-      }
+      var originalSettings = _.templateSettings;
+      _.templateSettings = {
+        interpolate: /\{\{(.+?)\}\}/g
+      };
 
-      return metric;
+      var template = _.template(options.legendFormat);
+      metricName = template(labelData);
+
+      _.templateSettings = originalSettings;
+
+      return metricName;
     }
 
     function convertToPrometheusRange(from, to) {
