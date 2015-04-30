@@ -82,7 +82,7 @@
                         ng-change="selectItem()"
                         ng-model="metric.item"
                         bs-tooltip="metricValue.length > 40 ? metricValue : ''"
-                        ng-options="item.name for item in metric.itemlist" >
+                        ng-options="item.name + ' (' + item.key_ + ')' for item in metric.itemlist" >
                     <option value="">--select item--</option>
                 </select>
                 <a bs-tooltip="target.errors.metric"

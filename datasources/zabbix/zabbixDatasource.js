@@ -155,7 +155,7 @@ function (angular, _, kbn) {
           jsonrpc: '2.0',
           method: 'item.get',
           params: {
-            output: ['name', 'value_type'],
+            output: ['name', 'key_', 'value_type'],
             sortfield: 'name',
             hostids: hostid
           },

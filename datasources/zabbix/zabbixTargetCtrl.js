@@ -10,6 +10,7 @@ function (angular, _) {
   var metricList = null;
   var hostList = null;
   var itemList = null;
+  var targetLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
 
   module.controller('ZabbixAPITargetCtrl', function($scope) {
 
@@ -21,6 +22,7 @@ function (angular, _) {
         item: "Loading..."
       };
 
+      $scope.targetLetters = targetLetters;
       $scope.updateHostList();
       $scope.updateItemList($scope.target.host.hostid);
 
