@@ -60,9 +60,36 @@
                 <input type="text" class="input-medium grafana-target-text-input" ng-model="target.alias"
                        spellcheck='false' placeholder="alias" ng-blur="targetBlur()">
             </li>
+            <!-- Select Host -->
             <li>
-                <input type="text" class="input-medium grafana-target-text-input" ng-model="target.itemid"
-                       spellcheck='false' placeholder="Item id" ng-blur="targetBlur()">
+                <select style="width: 20em"
+                        class="input-medium grafana-target-segment-input"
+                        ng-change="selectHost()"
+                        ng-model="metric.host"
+                        ng-options="host.name for host in metric.hostlist" >
+                    <option value="">--select host--</option>
+                </select>
+                <a bs-tooltip="target.errors.metric"
+                   style="color: rgb(229, 189, 28)"
+                   ng-show="target.errors.metric">
+                    <i class="icon-warning-sign"></i>
+                </a>
+            </li>
+            <!-- Select Item -->
+            <li>
+                <select style="width: 20em"
+                        class="input-medium grafana-target-segment-input"
+                        ng-change="selectItem()"
+                        ng-model="metric.item"
+                        bs-tooltip="metricValue.length > 40 ? metricValue : ''"
+                        ng-options="item.name for item in metric.itemlist" >
+                    <option value="">--select item--</option>
+                </select>
+                <a bs-tooltip="target.errors.metric"
+                   style="color: rgb(229, 189, 28)"
+                   ng-show="target.errors.metric">
+                    <i class="icon-warning-sign"></i>
+                </a>
             </li>
         </ul>
 

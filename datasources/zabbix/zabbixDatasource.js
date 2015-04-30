@@ -15,28 +15,52 @@ function (angular, _, kbn) {
       this.type             = 'ZabbixAPIDatasource';
       this.supportMetrics   = true;
       this.url              = datasource.url;
-      this.auth             = datasource.auth;
-      // TODO user/pass auth to get token
+      this.username         = datasource.username;
+      this.password         = datasource.password;
       this.limitmetrics     = datasource.limitmetrics || 5000;
 
-      this.partials = datasource.partials || 'plugins/grafana-plugins/datasources/zabbix';
+      this.partials = datasource.partials || 'plugins/datasources/zabbix';
       this.editorSrc = this.partials + '/editor.html';
 
       this.annotationEditorSrc = this.partials + '/annotation_editor.html';
       this.supportAnnotations = true;
+
+      // Get authentication token
+      var authRequestData = {
+        jsonrpc: '2.0',
+        method: 'user.login',
+        params: {
+            user: this.username,
+            password: this.password
+        },
+        auth: null,
+        id: 1
+      };
+      var zabbixDataSource = this;
+      $http.post(this.url, authRequestData)
+        .then(function (response) {
+          zabbixDataSource.auth = response.data.result;
+        });
     }
+
+
+    ///////////////////////////////////////////////////////////////////////
+    /// Query methods
+    ///////////////////////////////////////////////////////////////////////
 
 
     ZabbixAPIDatasource.prototype.query = function(options) {
       // get from & to in seconds
       var from = kbn.parseDate(options.range.from).getTime();
       var to = kbn.parseDate(options.range.to).getTime();
-      var items = _.indexBy(options.targets, 'itemid')
+      var targets = _.indexBy(options.targets, function (target) {
+        return target.item.itemid;
+      });
 
       from = Math.ceil(from/1000);
       to = Math.ceil(to/1000);
 
-      return this.performTimeSeriesQuery(_.keys(items), from, to)
+      return this.performTimeSeriesQuery(_.values(targets), from, to)
         .then(_.bind(function (response) {
 
           // Response should be in the format:
@@ -54,7 +78,8 @@ function (angular, _, kbn) {
                 function (i, id) {
                   return {
                     // Lookup itemid:alias map
-                    target: items[id].alias,
+                    //target: items[id].alias,
+                    target: targets[id].alias,
                     datapoints: _.map(i, function (p) { return [p.value, p.clock*1000];})
                   };
               })
@@ -62,17 +87,22 @@ function (angular, _, kbn) {
         },options));
     };
 
-    ZabbixAPIDatasource.prototype.performTimeSeriesQuery = function(items, start, end) {
+
+    ZabbixAPIDatasource.prototype.performTimeSeriesQuery = function(targets, start, end) {
+      var item_ids = targets.map(function (target, index, array) {
+        return target.item.itemid;
+      });
+      var hystory_type = targets.pop().item.value_type;
       var options = {
         method: 'POST',
-        url: this.url + '',
+        url: this.url,
         data: {
           jsonrpc: '2.0',
           method: 'history.get',
           params: {
               output: 'extend',
-              history: 0, // TODO this needs to be exposed
-              itemids: items,
+              history: hystory_type,
+              itemids: item_ids,
               sortfield: 'clock',
               sortorder: 'DESC',
               limit: this.limitmetrics,
@@ -89,6 +119,58 @@ function (angular, _, kbn) {
 
       return $http(options);
     };
+
+
+    // Gets the list of hosts
+    ZabbixAPIDatasource.prototype.performHostSuggestQuery = function() {
+      var options = {
+        url : this.url,
+        method : 'POST',
+        data: {
+          jsonrpc: '2.0',
+          method: 'host.get',
+          params: {
+            output: ['name'],
+            sortfield: 'name'
+          },
+          auth: this.auth,
+          id: 1
+        },
+      };
+      return $http(options).then(function (result) {
+        if (!result.data) {
+          return [];
+        }
+        return result.data.result;
+      });
+    };
+
+
+    // Gets the list of host items
+    ZabbixAPIDatasource.prototype.performItemSuggestQuery = function(hostid) {
+      var options = {
+        url : this.url,
+        method : 'POST',
+        data: {
+          jsonrpc: '2.0',
+          method: 'item.get',
+          params: {
+            output: ['name', 'value_type'],
+            sortfield: 'name',
+            hostids: hostid
+          },
+          auth: this.auth,
+          id: 1
+        },
+      };
+      return $http(options).then(function (result) {
+        if (!result.data) {
+          return [];
+        }
+        return result.data.result;
+      });
+    };
+
 
     ZabbixAPIDatasource.prototype.annotationQuery = function(annotation, rangeUnparsed) {
       var from = kbn.parseDate(rangeUnparsed.from).getTime();
