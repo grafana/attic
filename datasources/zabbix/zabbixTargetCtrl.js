@@ -68,6 +68,9 @@ function (angular, _) {
         $scope.updateItemList($scope.target.host.hostid, null);
       }
 
+      // Update application list
+      $scope.updateAppList($scope.target.host.hostid);
+
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
