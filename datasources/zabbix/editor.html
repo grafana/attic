@@ -60,6 +60,22 @@
                 <input type="text" class="input-medium grafana-target-text-input" ng-model="target.alias"
                        spellcheck='false' placeholder="alias" ng-blur="targetBlur()">
             </li>
+            <!-- Select Host Group -->
+            <li>
+                <select style="width: 10em"
+                        class="input-medium grafana-target-segment-input"
+                        ng-change="selectHostGroup()"
+                        ng-model="target.hostGroup"
+                        bs-tooltip="target.hostGroup.name.length > 25 ? target.hostGroup.name : ''"
+                        ng-options="hostgroup.name for hostgroup in metric.hostGroupList" >
+                    <option value="">All</option>
+                </select>
+                <a bs-tooltip="target.errors.metric"
+                   style="color: rgb(229, 189, 28)"
+                   ng-show="target.errors.metric">
+                    <i class="icon-warning-sign"></i>
+                </a>
+            </li>
             <!-- Select Host -->
             <li>
                 <select style="width: 15em"
@@ -67,8 +83,8 @@
                         ng-change="selectHost()"
                         ng-model="target.host"
                         bs-tooltip="target.host.name.length > 25 ? target.host.name : ''"
-                        ng-options="host.name for host in metric.hostlist" >
-                    <option value="">--select host--</option>
+                        ng-options="host.name for host in metric.hostList" >
+                    <option value="">-- select host --</option>
                 </select>
                 <a bs-tooltip="target.errors.metric"
                    style="color: rgb(229, 189, 28)"
@@ -82,8 +98,8 @@
                         class="input-medium grafana-target-segment-input"
                         ng-change="selectItem()"
                         ng-model="target.item"
-                        bs-tooltip="target.item.name.length > 50 ? target.item.name + ' (key: ' + target.item.key_ + ')' : ''"
-                        ng-options="item.name + ' (' + item.key_ + ')' for item in metric.itemlist" >
+                        bs-tooltip="target.item.name.length + target.item.key_.length > 50 ? target.item.name + ' (key: ' + target.item.key_ + ')' : ''"
+                        ng-options="item.name + ' (' + item.key_ + ')' for item in metric.itemList" >
                     <option value="">--select item--</option>
                 </select>
                 <a bs-tooltip="target.errors.metric"
