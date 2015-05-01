@@ -7,24 +7,19 @@ function (angular, _) {
 
   var module = angular.module('grafana.controllers');
 
-  var metricList = null;
-  var hostList = null;
-  var itemList = null;
-  var targetLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
-
   module.controller('ZabbixAPITargetCtrl', function($scope) {
 
     $scope.init = function() {
+      $scope.targetLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
       $scope.metric = {
         hostlist: ["Loading..."],
-        itemlist: ["Loading..."],
-        host: "Loading...",
-        item: "Loading..."
+        itemlist: ["Loading..."]
       };
 
-      $scope.targetLetters = targetLetters;
       $scope.updateHostList();
-      $scope.updateItemList($scope.target.host.hostid);
+      if ($scope.target.host.hostid) {
+        $scope.updateItemList($scope.target.host.hostid);
+      }
 
       $scope.target.errors = validateTarget($scope.target);
     };
@@ -40,8 +35,8 @@ function (angular, _) {
 
     // Call when host selected
     $scope.selectHost = function() {
-      $scope.target.host = $scope.metric.host;
-      $scope.updateItemList($scope.metric.host.hostid);
+      // Update item list
+      $scope.updateItemList($scope.target.host.hostid);
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
@@ -52,7 +47,6 @@ function (angular, _) {
 
     // Call when item selected
     $scope.selectItem = function() {
-      $scope.target.item = $scope.metric.item;
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
@@ -75,43 +69,27 @@ function (angular, _) {
     // SUGGESTION QUERIES
     //////////////////////////////
 
+    // Update list of hosts
     $scope.updateHostList = function() {
-      $scope.metricListLoading = true;
-      hostList = [];
       $scope.datasource.performHostSuggestQuery().then(function (series) {
-        hostList = series;
         $scope.metric.hostlist = series;
-        if ($scope.target.host)
-          // Set selected host
-          $scope.metric.host = $scope.metric.hostlist.filter(function (item, index, array) {
+        $scope.target.host = $scope.metric.hostlist.filter(function (item, index, array) {
             // Find selected host in metric.hostlist
             return (item.hostid == $scope.target.host.hostid);
           }).pop();
-        else
-          $scope.metric.host = "";
-        $scope.metricListLoading = false;
-        return hostList;
       });
     };
 
-
+    // Update list of items
     $scope.updateItemList = function(hostid) {
-      $scope.metricListLoading = true;
-      itemList = [];
+      // Update only if host selected
       if (hostid) {
         $scope.datasource.performItemSuggestQuery(hostid).then(function (series) {
-          itemList = series;
           $scope.metric.itemlist = series;
-          if ($scope.target.item)
-            // Set selected item
-            $scope.metric.item = $scope.metric.itemlist.filter(function (item, index, array) {
-              // Find selected item in metric.hostlist
-              return (item.itemid == $scope.target.item.itemid);
-            }).pop();
-          else
-            $scope.metric.item = "";
-          $scope.metricListLoading = false;
-          return itemList;
+          $scope.target.item = $scope.metric.itemlist.filter(function (item, index, array) {
+            // Find selected item in metric.hostlist
+            return (item.itemid == $scope.target.item.itemid);
+          }).pop();
         });
       }
     };
