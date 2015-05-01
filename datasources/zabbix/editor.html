@@ -94,12 +94,12 @@
             </li>
             <!-- Select Item -->
             <li>
-                <select style="width: 25em"
+                <select style="width: 20em"
                         class="input-medium grafana-target-segment-input"
                         ng-change="selectItem()"
                         ng-model="target.item"
-                        bs-tooltip="target.item.name.length + target.item.key_.length > 50 ? target.item.name + ' (key: ' + target.item.key_ + ')' : ''"
-                        ng-options="item.name + ' (' + item.key_ + ')' for item in metric.itemList" >
+                        bs-tooltip="target.expandedName.length > 30 ? target.expandedName : ''"
+                        ng-options="item.expandedName for item in metric.itemList" >
                     <option value="">--select item--</option>
                 </select>
                 <a bs-tooltip="target.errors.metric"
