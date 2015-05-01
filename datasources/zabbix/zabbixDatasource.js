@@ -10,6 +10,7 @@ function (angular, _, kbn) {
   var module = angular.module('grafana.services');
 
   module.factory('ZabbixAPIDatasource', function($q, $http, templateSrv) {
+
     function ZabbixAPIDatasource(datasource) {
       this.name             = datasource.name;
       this.type             = 'ZabbixAPIDatasource';
@@ -74,30 +75,38 @@ function (angular, _, kbn) {
       to = Math.ceil(to/1000);
 
       return this.performTimeSeriesQuery(_.values(targets), from, to)
-        .then(_.bind(function (response) {
+        .then(function (response) {
 
           // Response should be in the format:
           //[{
           //  target: "Metric name",
           //  datapoints: [[<value>, <unixtime>], ...]
           //},]
+          var series = _.map(
+            // Index returned datapoints by item/metric id
+            _.groupBy(response.data.result, function (p) {
+                return p.itemid
+            }),
+              // Foreach itemid index: iterate over the data points and
+              //  normalize to Grafana response format.
+              function (i, id) {
+                return {
+                  // Lookup itemid:alias map
+                  target: targets[id].alias,
+                  datapoints: _.map(i, function (p) {
 
-          return {
-            data: _.map(
-              // Index returned datapoints by item/metric id
-              _.groupBy(response.data.result, function (p) { return p.itemid }),
-                // Foreach itemid index: iterate over the data points and
-                //  normalize to Grafana response format.
-                function (i, id) {
-                  return {
-                    // Lookup itemid:alias map
-                    //target: items[id].alias,
-                    target: targets[id].alias,
-                    datapoints: _.map(i, function (p) { return [p.value, p.clock*1000];})
-                  };
-              })
-          };
-        },options));
+                    // Value must be a number for properly work
+                    var value = Number(p.value);
+
+                    // Round time to minutes
+                    // Need for stacking values ???
+                    var clock = Math.round(Number(p.clock) / 60) * 60;
+                    return [value, clock * 1000];
+                  })
+                };
+            })
+          return $q.when({data: series});
+        });
     };
 
 
@@ -222,7 +231,7 @@ function (angular, _, kbn) {
           jsonrpc: '2.0',
           method: 'item.get',
           params: {
-            output: ['name', 'key_', 'value_type'],
+            output: ['name', 'key_', 'value_type', 'delay'],
             sortfield: 'name',
             hostids: hostid
           },
