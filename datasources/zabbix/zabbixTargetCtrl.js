@@ -21,7 +21,7 @@ function (angular, _) {
       // Update host group, host, application and item lists
       $scope.updateHostGroupList();
       $scope.updateHostList();
-      if ($scope.target.host.hostid) {
+      if ($scope.target.host) {
         $scope.updateAppList($scope.target.host.hostid);
         if ($scope.target.application) {
           $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);

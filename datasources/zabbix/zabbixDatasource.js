@@ -64,8 +64,10 @@ function (angular, _, kbn) {
         });
       } else {
 
-        // TODO: return empty dataset if targets undefined
-        return {};
+        // No valid targets, return the empty dataset
+        var d = $q.defer();
+        d.resolve({ data: [] });
+        return d.promise;
       }
 
       from = Math.ceil(from/1000);
