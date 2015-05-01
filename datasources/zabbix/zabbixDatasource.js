@@ -121,8 +121,33 @@ function (angular, _, kbn) {
     };
 
 
+    // Gets the list of host groups
+    ZabbixAPIDatasource.prototype.performHostGroupSuggestQuery = function() {
+      var options = {
+        url : this.url,
+        method : 'POST',
+        data: {
+          jsonrpc: '2.0',
+          method: 'hostgroup.get',
+          params: {
+            output: ['name'],
+            sortfield: 'name'
+          },
+          auth: this.auth,
+          id: 1
+        },
+      };
+      return $http(options).then(function (result) {
+        if (!result.data) {
+          return [];
+        }
+        return result.data.result;
+      });
+    };
+
+
     // Gets the list of hosts
-    ZabbixAPIDatasource.prototype.performHostSuggestQuery = function() {
+    ZabbixAPIDatasource.prototype.performHostSuggestQuery = function(groupid) {
       var options = {
         url : this.url,
         method : 'POST',
@@ -137,6 +162,9 @@ function (angular, _, kbn) {
           id: 1
         },
       };
+      if (groupid) {
+        options.data.params.groupids = groupid;
+      }
       return $http(options).then(function (result) {
         if (!result.data) {
           return [];

@@ -7,24 +7,22 @@ function (angular, _) {
 
   var module = angular.module('grafana.controllers');
 
-  var metricList = null;
-  var hostList = null;
-  var itemList = null;
-  var targetLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
-
   module.controller('ZabbixAPITargetCtrl', function($scope) {
 
     $scope.init = function() {
+      $scope.targetLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
       $scope.metric = {
-        hostlist: ["Loading..."],
-        itemlist: ["Loading..."],
-        host: "Loading...",
-        item: "Loading..."
+        hostGroupList: ["Loading..."],
+        hostList: ["Loading..."],
+        itemList: ["Loading..."]
       };
 
-      $scope.targetLetters = targetLetters;
+      // Update host group, host and item lists
+      $scope.updateHostGroupList();
       $scope.updateHostList();
-      $scope.updateItemList($scope.target.host.hostid);
+      if ($scope.target.host.hostid) {
+        $scope.updateItemList($scope.target.host.hostid);
+      }
 
       $scope.target.errors = validateTarget($scope.target);
     };
@@ -37,11 +35,29 @@ function (angular, _) {
       }
     };
 
+    // Call when host group selected
+    $scope.selectHostGroup = function() {
+
+      // Update host list
+      if ($scope.target.hostGroup) {
+        $scope.updateHostList($scope.target.hostGroup.groupid);
+      } else {
+        $scope.updateHostList('');
+      }
+
+      $scope.target.errors = validateTarget($scope.target);
+      if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
+        $scope.oldTarget = angular.copy($scope.target);
+        $scope.get_data();
+      }
+    };
 
     // Call when host selected
     $scope.selectHost = function() {
-      $scope.target.host = $scope.metric.host;
-      $scope.updateItemList($scope.metric.host.hostid);
+
+      // Update item list
+      $scope.updateItemList($scope.target.host.hostid);
+
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
@@ -52,7 +68,6 @@ function (angular, _) {
 
     // Call when item selected
     $scope.selectItem = function() {
-      $scope.target.item = $scope.metric.item;
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
@@ -75,45 +90,87 @@ function (angular, _) {
     // SUGGESTION QUERIES
     //////////////////////////////
 
-    $scope.updateHostList = function() {
-      $scope.metricListLoading = true;
-      hostList = [];
-      $scope.datasource.performHostSuggestQuery().then(function (series) {
-        hostList = series;
-        $scope.metric.hostlist = series;
-        if ($scope.target.host)
-          // Set selected host
-          $scope.metric.host = $scope.metric.hostlist.filter(function (item, index, array) {
-            // Find selected host in metric.hostlist
-            return (item.hostid == $scope.target.host.hostid);
+
+    /**
+     * Update list of host groups
+     */
+    $scope.updateHostGroupList = function() {
+      $scope.datasource.performHostGroupSuggestQuery().then(function (series) {
+        $scope.metric.hostGroupList = series;
+        if ($scope.target.hostGroup) {
+          $scope.target.hostGroup = $scope.metric.hostGroupList.filter(function (item, index, array) {
+
+            // Find selected host in metric.hostList
+            return (item.groupid == $scope.target.hostGroup.groupid);
           }).pop();
-        else
-          $scope.metric.host = "";
-        $scope.metricListLoading = false;
-        return hostList;
+        }
       });
     };
 
 
+    /**
+     * Update list of hosts
+     */
+    $scope.updateHostList = function(groupid) {
+      $scope.datasource.performHostSuggestQuery(groupid).then(function (series) {
+        $scope.metric.hostList = series;
+        $scope.target.host = $scope.metric.hostList.filter(function (item, index, array) {
+
+          // Find selected host in metric.hostList
+          return (item.hostid == $scope.target.host.hostid);
+        }).pop();
+      });
+    };
+
+
+    /**
+     * Update list of items
+     */
     $scope.updateItemList = function(hostid) {
-      $scope.metricListLoading = true;
-      itemList = [];
+
+      // Update only if host selected
       if (hostid) {
         $scope.datasource.performItemSuggestQuery(hostid).then(function (series) {
-          itemList = series;
-          $scope.metric.itemlist = series;
-          if ($scope.target.item)
-            // Set selected item
-            $scope.metric.item = $scope.metric.itemlist.filter(function (item, index, array) {
-              // Find selected item in metric.hostlist
-              return (item.itemid == $scope.target.item.itemid);
-            }).pop();
-          else
-            $scope.metric.item = "";
-          $scope.metricListLoading = false;
-          return itemList;
+          $scope.metric.itemList = series;
+
+          // Expand item parameters
+          $scope.metric.itemList.forEach(function (item, index, array) {
+            if (item && item.key_ && item.name) {
+              item.expandedName = expandItemName(item);
+            }
+          });
+          $scope.target.item = $scope.metric.itemList.filter(function (item, index, array) {
+
+            // Find selected item in metric.hostList
+            return (item.itemid == $scope.target.item.itemid);
+          }).pop();
         });
+      } else {
+        $scope.metric.itemList = [];
       }
+    };
+
+
+    /**
+     * Expand item parameters, for example:
+     * CPU $2 time ($3) --> CPU system time (avg1)
+     *
+     * @param item: zabbix api item object
+     * @return: expanded item name (string)
+     */
+    function expandItemName(item) {
+      var name = item.name;
+      var key = item.key_;
+
+      // extract params from key:
+      // "system.cpu.util[,system,avg1]" --> ["", "system", "avg1"]
+      var key_params = key.substring(key.indexOf('[') + 1, key.lastIndexOf(']')).split(',');
+
+      // replace item parameters
+      for (var i = key_params.length; i >= 1; i--) {
+        name = name.replace('$' + i, key_params[i - 1]);
+      };
+      return name;
     };
 
 
