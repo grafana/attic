@@ -62,10 +62,11 @@
             </li>
             <!-- Select Host -->
             <li>
-                <select style="width: 20em"
+                <select style="width: 15em"
                         class="input-medium grafana-target-segment-input"
                         ng-change="selectHost()"
                         ng-model="metric.host"
+                        bs-tooltip="target.host.name.length > 25 ? target.host.name : ''"
                         ng-options="host.name for host in metric.hostlist" >
                     <option value="">--select host--</option>
                 </select>
@@ -77,11 +78,11 @@
             </li>
             <!-- Select Item -->
             <li>
-                <select style="width: 20em"
+                <select style="width: 25em"
                         class="input-medium grafana-target-segment-input"
                         ng-change="selectItem()"
                         ng-model="metric.item"
-                        bs-tooltip="metricValue.length > 40 ? metricValue : ''"
+                        bs-tooltip="target.item.name.length > 50 ? target.item.name + ' (key: ' + target.item.key_ + ')' : ''"
                         ng-options="item.name + ' (' + item.key_ + ')' for item in metric.itemlist" >
                     <option value="">--select item--</option>
                 </select>
