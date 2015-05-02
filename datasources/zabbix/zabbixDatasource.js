@@ -54,15 +54,16 @@ function (angular, _, kbn) {
       // get from & to in seconds
       var from = kbn.parseDate(options.range.from).getTime();
       var to = kbn.parseDate(options.range.to).getTime();
+      // Need for find target alias
+      var targets = options.targets;
 
+      // Check that all targets defined
       var targetsDefined = options.targets.every(function (target, index, array) {
         return target.item;
       });
-      var targets = {};
       if (targetsDefined) {
-        var targets = _.indexBy(options.targets, function (target) {
-          return target.item.itemid;
-        });
+        // Extract zabbix api item objects from targets
+        var target_items = _.map(options.targets, 'item');
       } else {
 
         // No valid targets, return the empty dataset
@@ -74,7 +75,7 @@ function (angular, _, kbn) {
       from = Math.ceil(from/1000);
       to = Math.ceil(to/1000);
 
-      return this.performTimeSeriesQuery(_.values(targets), from, to)
+      return this.performTimeSeriesQuery(target_items, from, to)
         .then(function (response) {
           // Response should be in the format:
           // data: [
@@ -93,29 +94,36 @@ function (angular, _, kbn) {
             return history_item.itemid;
           });
 
-          // Reduce timeseries to the same size for properly stacking and tooltip work
+          // Reduce timeseries to the same size for stacking and tooltip work properly
           var min_length = _.min(_.map(indexed_result, function (history) {
             return history.length;
           }));
           _.each(indexed_result, function (item) {
             item.splice(0, item.length - min_length);
           });
-          var series = _.map(indexed_result,
+
+          // Sort result as the same as targets for display
+          // stacked timeseries in proper order
+          var sorted_history = _.sortBy(indexed_result, function (value, key, list) {
+            return _.indexOf(_.map(target_items, 'itemid'), key);
+          });
+
+          var series = _.map(sorted_history,
               // Foreach itemid index: iterate over the data points and
               // normalize to Grafana response format.
-              function (history, itemid) {
+              function (history, index) {
                 return {
                   // Lookup itemid:alias map
-                  target: targets[itemid].alias,
+                  //target: targets[itemid].alias,
+                  target: targets[index].alias,
 
                   datapoints: _.map(history, function (p) {
 
                     // Value must be a number for properly work
                     var value = Number(p.value);
 
-                    // Round time to minutes
-                    // Need for stacking values
-                    var clock = Math.round(Number(p.clock) / 60) * 60;
+                    // TODO: Correct time for proper stacking
+                    //var clock = Math.round(Number(p.clock) / 60) * 60;
                     return [value, p.clock * 1000];
                   })
                 };
@@ -125,11 +133,18 @@ function (angular, _, kbn) {
     };
 
 
-    ZabbixAPIDatasource.prototype.performTimeSeriesQuery = function(targets, start, end) {
-      var item_ids = targets.map(function (target, index, array) {
-        return target.item.itemid;
+    /**
+     * Perform time series query to Zabbix API
+     *
+     * @param items: array of zabbix api item objects
+     */
+    ZabbixAPIDatasource.prototype.performTimeSeriesQuery = function(items, start, end) {
+      var item_ids = items.map(function (item, index, array) {
+        return item.itemid;
       });
-      var hystory_type = targets.pop().item.value_type;
+      // TODO: if different value types passed?
+      //       Perform multiple api request.
+      var hystory_type = items[0].value_type;
       var options = {
         method: 'POST',
         url: this.url,
