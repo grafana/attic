@@ -92,6 +92,22 @@
                     <i class="icon-warning-sign"></i>
                 </a>
             </li>
+            <!-- Select Application -->
+            <li>
+                <select style="width: 10em"
+                        class="input-medium grafana-target-segment-input"
+                        ng-change="selectApplication()"
+                        ng-model="target.application"
+                        bs-tooltip="target.application.name.length > 15 ? target.application.name : ''"
+                        ng-options="app.name for app in metric.applicationList" >
+                    <option value="">All</option>
+                </select>
+                <a bs-tooltip="target.errors.metric"
+                   style="color: rgb(229, 189, 28)"
+                   ng-show="target.errors.metric">
+                    <i class="icon-warning-sign"></i>
+                </a>
+            </li>
             <!-- Select Item -->
             <li>
                 <select style="width: 20em"

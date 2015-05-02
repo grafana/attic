@@ -10,6 +10,7 @@ function (angular, _, kbn) {
   var module = angular.module('grafana.services');
 
   module.factory('ZabbixAPIDatasource', function($q, $http, templateSrv) {
+
     function ZabbixAPIDatasource(datasource) {
       this.name             = datasource.name;
       this.type             = 'ZabbixAPIDatasource';
@@ -53,38 +54,74 @@ function (angular, _, kbn) {
       // get from & to in seconds
       var from = kbn.parseDate(options.range.from).getTime();
       var to = kbn.parseDate(options.range.to).getTime();
-      var targets = _.indexBy(options.targets, function (target) {
-        return target.item.itemid;
+
+      var targetsDefined = options.targets.every(function (target, index, array) {
+        return target.item;
       });
+      var targets = {};
+      if (targetsDefined) {
+        var targets = _.indexBy(options.targets, function (target) {
+          return target.item.itemid;
+        });
+      } else {
+
+        // No valid targets, return the empty dataset
+        var d = $q.defer();
+        d.resolve({ data: [] });
+        return d.promise;
+      }
 
       from = Math.ceil(from/1000);
       to = Math.ceil(to/1000);
 
       return this.performTimeSeriesQuery(_.values(targets), from, to)
-        .then(_.bind(function (response) {
-
+        .then(function (response) {
           // Response should be in the format:
-          //[{
-          //  target: "Metric name",
-          //  datapoints: [[<value>, <unixtime>], ...]
-          //},]
+          // data: [
+          //          {
+          //             target: "Metric name",
+          //             datapoints: [[<value>, <unixtime>], ...]
+          //          },
+          //          {
+          //             target: "Metric name",
+          //             datapoints: [[<value>, <unixtime>], ...]
+          //          },
+          //       ]
 
-          return {
-            data: _.map(
-              // Index returned datapoints by item/metric id
-              _.groupBy(response.data.result, function (p) { return p.itemid }),
-                // Foreach itemid index: iterate over the data points and
-                //  normalize to Grafana response format.
-                function (i, id) {
-                  return {
-                    // Lookup itemid:alias map
-                    //target: items[id].alias,
-                    target: targets[id].alias,
-                    datapoints: _.map(i, function (p) { return [p.value, p.clock*1000];})
-                  };
-              })
-          };
-        },options));
+          // Index returned datapoints by item/metric id
+          var indexed_result = _.groupBy(response.data.result, function (history_item) {
+            return history_item.itemid;
+          });
+
+          // Reduce timeseries to the same size for properly stacking and tooltip work
+          var min_length = _.min(_.map(indexed_result, function (history) {
+            return history.length;
+          }));
+          _.each(indexed_result, function (item) {
+            item.splice(0, item.length - min_length);
+          });
+          var series = _.map(indexed_result,
+              // Foreach itemid index: iterate over the data points and
+              // normalize to Grafana response format.
+              function (history, itemid) {
+                return {
+                  // Lookup itemid:alias map
+                  target: targets[itemid].alias,
+
+                  datapoints: _.map(history, function (p) {
+
+                    // Value must be a number for properly work
+                    var value = Number(p.value);
+
+                    // Round time to minutes
+                    // Need for stacking values
+                    var clock = Math.round(Number(p.clock) / 60) * 60;
+                    return [value, p.clock * 1000];
+                  })
+                };
+            })
+          return $q.when({data: series});
+        });
     };
 
 
@@ -104,7 +141,7 @@ function (angular, _, kbn) {
               history: hystory_type,
               itemids: item_ids,
               sortfield: 'clock',
-              sortorder: 'DESC',
+              sortorder: 'ASC',
               limit: this.limitmetrics,
               time_from: start,
           },
@@ -121,7 +158,7 @@ function (angular, _, kbn) {
     };
 
 
-    // Gets the list of host groups
+    // Get the list of host groups
     ZabbixAPIDatasource.prototype.performHostGroupSuggestQuery = function() {
       var options = {
         url : this.url,
@@ -146,7 +183,7 @@ function (angular, _, kbn) {
     };
 
 
-    // Gets the list of hosts
+    // Get the list of hosts
     ZabbixAPIDatasource.prototype.performHostSuggestQuery = function(groupid) {
       var options = {
         url : this.url,
@@ -174,16 +211,16 @@ function (angular, _, kbn) {
     };
 
 
-    // Gets the list of host items
-    ZabbixAPIDatasource.prototype.performItemSuggestQuery = function(hostid) {
+    // Get the list of applications
+    ZabbixAPIDatasource.prototype.performAppSuggestQuery = function(hostid) {
       var options = {
         url : this.url,
         method : 'POST',
         data: {
           jsonrpc: '2.0',
-          method: 'item.get',
+          method: 'application.get',
           params: {
-            output: ['name', 'key_', 'value_type'],
+            output: ['name'],
             sortfield: 'name',
             hostids: hostid
           },
@@ -191,6 +228,36 @@ function (angular, _, kbn) {
           id: 1
         },
       };
+      return $http(options).then(function (result) {
+        if (!result.data) {
+          return [];
+        }
+        return result.data.result;
+      });
+    };
+
+
+    // Get the list of host items
+    ZabbixAPIDatasource.prototype.performItemSuggestQuery = function(hostid, applicationid) {
+      var options = {
+        url : this.url,
+        method : 'POST',
+        data: {
+          jsonrpc: '2.0',
+          method: 'item.get',
+          params: {
+            output: ['name', 'key_', 'value_type', 'delay'],
+            sortfield: 'name',
+            hostids: hostid
+          },
+          auth: this.auth,
+          id: 1
+        },
+      };
+      // If application selected return only relative items
+      if (applicationid) {
+        options.data.params.applicationids = applicationid;
+      }
       return $http(options).then(function (result) {
         if (!result.data) {
           return [];

@@ -14,14 +14,20 @@ function (angular, _) {
       $scope.metric = {
         hostGroupList: ["Loading..."],
         hostList: ["Loading..."],
+        applicationList: ["Loading..."],
         itemList: ["Loading..."]
       };
 
-      // Update host group, host and item lists
+      // Update host group, host, application and item lists
       $scope.updateHostGroupList();
       $scope.updateHostList();
-      if ($scope.target.host.hostid) {
-        $scope.updateItemList($scope.target.host.hostid);
+      if ($scope.target.host) {
+        $scope.updateAppList($scope.target.host.hostid);
+        if ($scope.target.application) {
+          $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);
+        } else {
+          $scope.updateItemList($scope.target.host.hostid, null);
+        }
       }
 
       $scope.target.errors = validateTarget($scope.target);
@@ -56,7 +62,32 @@ function (angular, _) {
     $scope.selectHost = function() {
 
       // Update item list
-      $scope.updateItemList($scope.target.host.hostid);
+      if ($scope.target.application) {
+        $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);
+      } else {
+        $scope.updateItemList($scope.target.host.hostid, null);
+      }
+
+      // Update application list
+      $scope.updateAppList($scope.target.host.hostid);
+
+      $scope.target.errors = validateTarget($scope.target);
+      if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
+        $scope.oldTarget = angular.copy($scope.target);
+        $scope.get_data();
+      }
+    };
+
+
+    // Call when application selected
+    $scope.selectApplication = function() {
+
+      // Update item list
+      if ($scope.target.application) {
+        $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);
+      } else {
+        $scope.updateItemList($scope.target.host.hostid, null);
+      }
 
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -124,13 +155,30 @@ function (angular, _) {
 
 
     /**
+     * Update list of host applications
+     */
+    $scope.updateAppList = function(hostid) {
+      $scope.datasource.performAppSuggestQuery(hostid).then(function (series) {
+        $scope.metric.applicationList = series;
+        if ($scope.target.application) {
+          $scope.target.application = $scope.metric.applicationList.filter(function (item, index, array) {
+
+            // Find selected application in metric.hostList
+            return (item.applicationid == $scope.target.application.applicationid);
+          }).pop();
+        }
+      });
+    };
+
+
+    /**
      * Update list of items
      */
-    $scope.updateItemList = function(hostid) {
+    $scope.updateItemList = function(hostid, applicationid) {
 
       // Update only if host selected
       if (hostid) {
-        $scope.datasource.performItemSuggestQuery(hostid).then(function (series) {
+        $scope.datasource.performItemSuggestQuery(hostid, applicationid).then(function (series) {
           $scope.metric.itemList = series;
 
           // Expand item parameters
