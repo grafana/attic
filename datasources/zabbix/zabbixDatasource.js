@@ -76,32 +76,47 @@ function (angular, _, kbn) {
 
       return this.performTimeSeriesQuery(_.values(targets), from, to)
         .then(function (response) {
-
           // Response should be in the format:
-          //[{
-          //  target: "Metric name",
-          //  datapoints: [[<value>, <unixtime>], ...]
-          //},]
-          var series = _.map(
-            // Index returned datapoints by item/metric id
-            _.groupBy(response.data.result, function (p) {
-                return p.itemid
-            }),
+          // data: [
+          //          {
+          //             target: "Metric name",
+          //             datapoints: [[<value>, <unixtime>], ...]
+          //          },
+          //          {
+          //             target: "Metric name",
+          //             datapoints: [[<value>, <unixtime>], ...]
+          //          },
+          //       ]
+
+          // Index returned datapoints by item/metric id
+          var indexed_result = _.groupBy(response.data.result, function (history_item) {
+            return history_item.itemid;
+          });
+
+          // Reduce timeseries to the same size for properly stacking and tooltip work
+          var min_length = _.min(_.map(indexed_result, function (history) {
+            return history.length;
+          }));
+          _.each(indexed_result, function (item) {
+            item.splice(0, item.length - min_length);
+          });
+          var series = _.map(indexed_result,
               // Foreach itemid index: iterate over the data points and
-              //  normalize to Grafana response format.
-              function (i, id) {
+              // normalize to Grafana response format.
+              function (history, itemid) {
                 return {
                   // Lookup itemid:alias map
-                  target: targets[id].alias,
-                  datapoints: _.map(i, function (p) {
+                  target: targets[itemid].alias,
+
+                  datapoints: _.map(history, function (p) {
 
                     // Value must be a number for properly work
                     var value = Number(p.value);
 
                     // Round time to minutes
-                    // Need for stacking values ???
+                    // Need for stacking values
                     var clock = Math.round(Number(p.clock) / 60) * 60;
-                    return [value, clock * 1000];
+                    return [value, p.clock * 1000];
                   })
                 };
             })
@@ -126,7 +141,7 @@ function (angular, _, kbn) {
               history: hystory_type,
               itemids: item_ids,
               sortfield: 'clock',
-              sortorder: 'DESC',
+              sortorder: 'ASC',
               limit: this.limitmetrics,
               time_from: start,
           },
