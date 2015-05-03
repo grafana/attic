@@ -65,7 +65,7 @@ function (angular, _, kbn) {
           var result = [];
 
           _.each(allResponse, function(response, index) {
-            if (response.data.type === "error") {
+            if (response.data.type === 'error') {
               throw response.data.value;
             }
 
@@ -113,7 +113,7 @@ function (angular, _, kbn) {
     };
 
     PrometheusDatasource.prototype.metricFindQuery = function(query) {
-      var url = this.url + '/api/query?expr=' + encodeURIComponent(query)
+      var url = this.url + '/api/query?expr=' + encodeURIComponent(query);
 
       var options = {
         method: 'GET',
