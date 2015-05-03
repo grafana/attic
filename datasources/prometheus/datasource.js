@@ -40,11 +40,11 @@ function (angular, _, kbn) {
         var query = {};
         query.expr = templateSrv.replace(target.expr);
 
-        var maxDataPoints = parseInt(target.maxDataPoints || options.maxDataPoints, 10);
-        if (_.isNaN(maxDataPoints)) {
-          throw "max data points is not number";
+        var step = kbn.interval_to_seconds(target.interval || options.interval);
+        if (step < 1) {
+          step = 1; // lowest step is 1 second
         }
-        query.maxDataPoints = maxDataPoints;
+        query.step = step;
 
         queries.push(query);
       });
@@ -81,7 +81,7 @@ function (angular, _, kbn) {
     PrometheusDatasource.prototype.performTimeSeriesQuery = function(query, range, end) {
       var url = this.url + '/api/query_range?expr=' + encodeURIComponent(query.expr) + '&range=' + range + '&end=' + end;
 
-      var step = Math.ceil(range / query.maxDataPoints);
+      var step = query.step;
       // Prometheus drop query if range/step > 11000
       // calibrate step if it is too big
       if (step !== 0 && range / step > 11000) {

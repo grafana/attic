@@ -130,16 +130,16 @@
         </li>
 
         <li class="tight-form-item" style="width: 100px">
-          Max points
+          Step
         </li>
         <li>
           <input type="text"
                  class="input-small tight-form-input"
-                 ng-model="target.maxDataPoints"
-                 bs-tooltip="'Override max data points, automatically set to graph width in pixels.'"
+                 ng-model="target.interval"
+                 bs-tooltip="'Leave blank for auto handling based on time range and panel width'"
                  data-placement="right"
                  spellcheck='false'
-                 placeholder="auto"
+                 placeholder="{{target.calculated_interval}}"
                  data-min-length=0 data-items=100
                  ng-model-onblur
                  ng-change="refreshMetricData()"

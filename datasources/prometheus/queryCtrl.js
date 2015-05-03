@@ -18,6 +18,7 @@ function (angular, _, kbn) {
       }
       $scope.target.metric = "";
       $scope.target.prometheus_link = $scope.linkToPrometheus();
+      $scope.target.calculated_interval = calculateInterval($scope.interval);
 
       $scope.$on('typeahead-updated', function() {
         $scope.$apply($scope.inputMetric);
@@ -28,6 +29,7 @@ function (angular, _, kbn) {
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
       $scope.target.prometheus_link = $scope.linkToPrometheus();
+      $scope.target.calculated_interval = calculateInterval($scope.interval);
 
       // this does not work so good
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -98,6 +100,16 @@ function (angular, _, kbn) {
       var errs = {};
 
       return errs;
+    }
+
+    function calculateInterval(interval) {
+      var sec = kbn.interval_to_seconds(interval);
+
+      if (sec < 1) {
+        interval = '1s';
+      }
+
+      return interval;
     }
 
   });
