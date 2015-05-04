@@ -42,11 +42,7 @@ function (angular, _, kbn) {
 
         var interval = target.interval || options.interval;
         var intervalFactor = target.intervalFactor || 1;
-        var step = this.calculateInterval(interval, intervalFactor);
-        if (step < 1) {
-          step = 1; // lowest step is 1 second
-        }
-        query.step = step;
+        query.step = this.calculateInterval(interval, intervalFactor);
 
         queries.push(query);
       }, this));

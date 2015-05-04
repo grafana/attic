@@ -17,7 +17,6 @@ function (angular, _, kbn) {
         $scope.target.expr = '';
       }
       $scope.target.metric = '';
-      $scope.target.prometheusLink = $scope.linkToPrometheus();
 
       $scope.resolutions = [
         { factor:  1, },
@@ -38,6 +37,7 @@ function (angular, _, kbn) {
       $scope.$on('render', function() {
         $scope.calculateInterval(); // re-calculate interval when time range is updated
       });
+      $scope.target.prometheusLink = $scope.linkToPrometheus();
 
       $scope.$on('typeahead-updated', function() {
         $scope.$apply($scope.inputMetric);
@@ -47,8 +47,8 @@ function (angular, _, kbn) {
 
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
-      $scope.target.prometheusLink = $scope.linkToPrometheus();
       $scope.calculateInterval();
+      $scope.target.prometheusLink = $scope.linkToPrometheus();
 
       // this does not work so good
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -94,8 +94,7 @@ function (angular, _, kbn) {
       var d = new Date(to);
       var endTime = [d.getFullYear(), d.getMonth() + 1, d.getDate()].join('-') + ' ' + d.getUTCHours() + ':' + d.getUTCMinutes();
 
-      var maxDataPoints = $scope.target.maxDataPoints || $scope.resolution;
-      var step = Math.ceil(range / maxDataPoints);
+      var step = kbn.interval_to_seconds(this.target.calculatedInterval);
       if (step !== 0 && range / step > 11000) {
         step = Math.floor(range / 11000);
       }
