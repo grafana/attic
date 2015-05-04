@@ -134,7 +134,7 @@
         </li>
         <li>
           <input type="text"
-                 class="input-small tight-form-input"
+                 class="input-mini tight-form-input"
                  ng-model="target.interval"
                  bs-tooltip="'Leave blank for auto handling based on time range and panel width'"
                  data-placement="right"
@@ -151,7 +151,7 @@
         </li>
         <li>
           <select ng-model="target.intervalFactor"
-                 class="tight-form-input input-small"
+                 class="tight-form-input input-mini"
                  ng-options="r.factor as r.label for r in resolutions"
                  ng-change="refreshMetricData()">
           </select>
