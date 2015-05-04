@@ -14,10 +14,10 @@ function (angular, _, kbn) {
       $scope.target.errors = validateTarget();
 
       if (!$scope.target.expr) {
-        $scope.target.expr = "";
+        $scope.target.expr = '';
       }
-      $scope.target.metric = "";
-      $scope.target.prometheus_link = $scope.linkToPrometheus();
+      $scope.target.metric = '';
+      $scope.target.prometheusLink = $scope.linkToPrometheus();
 
       $scope.resolutions = [
         { factor:  1, },
@@ -47,7 +47,7 @@ function (angular, _, kbn) {
 
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
-      $scope.target.prometheus_link = $scope.linkToPrometheus();
+      $scope.target.prometheusLink = $scope.linkToPrometheus();
       $scope.calculateInterval();
 
       // this does not work so good
@@ -59,7 +59,7 @@ function (angular, _, kbn) {
 
     $scope.inputMetric = function() {
       $scope.target.expr += $scope.target.metric;
-      $scope.target.metric = "";
+      $scope.target.metric = '';
     };
 
     $scope.moveMetricQuery = function(fromIndex, toIndex) {
