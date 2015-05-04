@@ -18,13 +18,12 @@ function (angular, _, kbn) {
       this.url              = datasource.url;
       this.username         = datasource.username;
       this.password         = datasource.password;
-      // No limit by default
+      // No datapoints limit by default
       this.limitmetrics     = datasource.limitmetrics || 0;
 
-      this.partials = datasource.partials || 'plugins/datasources/zabbix';
-      this.editorSrc = this.partials + '/editor.html';
-
-      this.annotationEditorSrc = this.partials + '/annotation_editor.html';
+      this.partials = datasource.partials || 'plugins/datasource/zabbix/partials';
+      this.editorSrc = this.partials + '/query.editor.html';
+      this.annotationEditorSrc = this.partials + '/annotations.editor.html';
       this.supportAnnotations = true;
 
       // Get authentication token
@@ -44,11 +43,6 @@ function (angular, _, kbn) {
           zabbixDataSource.auth = response.data.result;
         });
     }
-
-
-    ///////////////////////////////////////////////////////////////////////
-    /// Query methods
-    ///////////////////////////////////////////////////////////////////////
 
 
     ZabbixAPIDatasource.prototype.query = function(options) {
@@ -78,17 +72,19 @@ function (angular, _, kbn) {
 
       return this.performTimeSeriesQuery(target_items, from, to)
         .then(function (response) {
-          // Response should be in the format:
-          // data: [
-          //          {
-          //             target: "Metric name",
-          //             datapoints: [[<value>, <unixtime>], ...]
-          //          },
-          //          {
-          //             target: "Metric name",
-          //             datapoints: [[<value>, <unixtime>], ...]
-          //          },
-          //       ]
+          /**
+           * Response should be in the format:
+           * data: [
+           *          {
+           *             target: "Metric name",
+           *             datapoints: [[<value>, <unixtime>], ...]
+           *          },
+           *          {
+           *             target: "Metric name",
+           *             datapoints: [[<value>, <unixtime>], ...]
+           *          },
+           *       ]
+           */
 
           // Index returned datapoints by item/metric id
           var indexed_result = _.groupBy(response.data.result, function (history_item) {
@@ -132,6 +128,11 @@ function (angular, _, kbn) {
           return $q.when({data: series});
         });
     };
+
+
+    ///////////////////////////////////////////////////////////////////////
+    /// Query methods
+    ///////////////////////////////////////////////////////////////////////
 
 
     /**
