@@ -18,7 +18,8 @@ function (angular, _, kbn) {
       this.url              = datasource.url;
       this.username         = datasource.username;
       this.password         = datasource.password;
-      this.limitmetrics     = datasource.limitmetrics || 5000;
+      // No limit by default
+      this.limitmetrics     = datasource.limitmetrics || 0;
 
       this.partials = datasource.partials || 'plugins/datasources/zabbix';
       this.editorSrc = this.partials + '/editor.html';
