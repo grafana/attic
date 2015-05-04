@@ -14,10 +14,30 @@ function (angular, _, kbn) {
       $scope.target.errors = validateTarget();
 
       if (!$scope.target.expr) {
-        $scope.target.expr = "";
+        $scope.target.expr = '';
       }
-      $scope.target.metric = "";
-      $scope.target.prometheus_link = $scope.linkToPrometheus();
+      $scope.target.metric = '';
+
+      $scope.resolutions = [
+        { factor:  1, },
+        { factor:  2, },
+        { factor:  3, },
+        { factor:  5, },
+        { factor: 10, },
+      ];
+      $scope.resolutions = _.map($scope.resolutions, function(r) {
+        r.label = '1/' + r.factor;
+        return r;
+      });
+      if (!$scope.target.intervalFactor) {
+        $scope.target.intervalFactor = 2; // default resolution is 1/2
+      }
+
+      $scope.calculateInterval();
+      $scope.$on('render', function() {
+        $scope.calculateInterval(); // re-calculate interval when time range is updated
+      });
+      $scope.target.prometheusLink = $scope.linkToPrometheus();
 
       $scope.$on('typeahead-updated', function() {
         $scope.$apply($scope.inputMetric);
@@ -27,7 +47,8 @@ function (angular, _, kbn) {
 
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
-      $scope.target.prometheus_link = $scope.linkToPrometheus();
+      $scope.calculateInterval();
+      $scope.target.prometheusLink = $scope.linkToPrometheus();
 
       // this does not work so good
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -38,7 +59,7 @@ function (angular, _, kbn) {
 
     $scope.inputMetric = function() {
       $scope.target.expr += $scope.target.metric;
-      $scope.target.metric = "";
+      $scope.target.metric = '';
     };
 
     $scope.moveMetricQuery = function(fromIndex, toIndex) {
@@ -73,8 +94,7 @@ function (angular, _, kbn) {
       var d = new Date(to);
       var endTime = [d.getFullYear(), d.getMonth() + 1, d.getDate()].join('-') + ' ' + d.getUTCHours() + ':' + d.getUTCMinutes();
 
-      var maxDataPoints = $scope.target.maxDataPoints || $scope.resolution;
-      var step = Math.ceil(range / maxDataPoints);
+      var step = kbn.interval_to_seconds(this.target.calculatedInterval);
       if (step !== 0 && range / step > 11000) {
         step = Math.floor(range / 11000);
       }
@@ -91,6 +111,12 @@ function (angular, _, kbn) {
 
       var hash = encodeURIComponent(JSON.stringify([expr]));
       return $scope.datasource.url + '/graph#' + hash;
+    };
+
+    $scope.calculateInterval = function() {
+      var interval = $scope.target.interval || $scope.interval;
+      var calculatedInterval = $scope.datasource.calculateInterval(interval, $scope.target.intervalFactor);
+      $scope.target.calculatedInterval = kbn.secondsToHms(calculatedInterval);
     };
 
     // TODO: validate target

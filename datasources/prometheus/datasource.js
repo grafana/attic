@@ -32,7 +32,7 @@ function (angular, _, kbn) {
       var range = convertToPrometheusRange(options.range.from, options.range.to);
 
       var queries = [];
-      _.each(options.targets, function(target) {
+      _.each(options.targets, _.bind(function(target) {
         if (!target.expr || target.hide) {
           return;
         }
@@ -40,14 +40,12 @@ function (angular, _, kbn) {
         var query = {};
         query.expr = templateSrv.replace(target.expr);
 
-        var maxDataPoints = parseInt(target.maxDataPoints || options.maxDataPoints, 10);
-        if (_.isNaN(maxDataPoints)) {
-          throw "max data points is not number";
-        }
-        query.maxDataPoints = maxDataPoints;
+        var interval = target.interval || options.interval;
+        var intervalFactor = target.intervalFactor || 1;
+        query.step = this.calculateInterval(interval, intervalFactor);
 
         queries.push(query);
-      });
+      }, this));
 
       // No valid targets, return the empty result to save a round trip.
       if (_.isEmpty(queries)) {
@@ -65,7 +63,7 @@ function (angular, _, kbn) {
           var result = [];
 
           _.each(allResponse, function(response, index) {
-            if (response.data.type === "error") {
+            if (response.data.type === 'error') {
               throw response.data.value;
             }
 
@@ -81,7 +79,7 @@ function (angular, _, kbn) {
     PrometheusDatasource.prototype.performTimeSeriesQuery = function(query, range, end) {
       var url = this.url + '/api/query_range?expr=' + encodeURIComponent(query.expr) + '&range=' + range + '&end=' + end;
 
-      var step = Math.ceil(range / query.maxDataPoints);
+      var step = query.step;
       // Prometheus drop query if range/step > 11000
       // calibrate step if it is too big
       if (step !== 0 && range / step > 11000) {
@@ -113,7 +111,7 @@ function (angular, _, kbn) {
     };
 
     PrometheusDatasource.prototype.metricFindQuery = function(query) {
-      var url = this.url + '/api/query?expr=' + encodeURIComponent(query)
+      var url = this.url + '/api/query?expr=' + encodeURIComponent(query);
 
       var options = {
         method: 'GET',
@@ -129,6 +127,16 @@ function (angular, _, kbn) {
             };
           });
         });
+    };
+
+    PrometheusDatasource.prototype.calculateInterval = function(interval, intervalFactor) {
+      var sec = kbn.interval_to_seconds(interval);
+
+      if (sec < 1) {
+        sec = 1;
+      }
+
+      return sec * intervalFactor;
     };
 
     function transformMetricData(md, options) {
