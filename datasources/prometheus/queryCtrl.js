@@ -18,7 +18,26 @@ function (angular, _, kbn) {
       }
       $scope.target.metric = "";
       $scope.target.prometheus_link = $scope.linkToPrometheus();
-      $scope.target.calculated_interval = calculateInterval($scope.interval);
+
+      $scope.resolutions = [
+        { factor:  1, },
+        { factor:  2, },
+        { factor:  3, },
+        { factor:  5, },
+        { factor: 10, },
+      ];
+      $scope.resolutions = _.map($scope.resolutions, function(r) {
+        r.label = '1/' + r.factor;
+        return r;
+      });
+      if (!$scope.target.intervalFactor) {
+        $scope.target.intervalFactor = 2; // default resolution is 1/2
+      }
+
+      $scope.calculateInterval();
+      $scope.$on('render', function() {
+        $scope.calculateInterval(); // re-calculate interval when time range is updated
+      });
 
       $scope.$on('typeahead-updated', function() {
         $scope.$apply($scope.inputMetric);
@@ -29,7 +48,7 @@ function (angular, _, kbn) {
     $scope.refreshMetricData = function() {
       $scope.target.errors = validateTarget($scope.target);
       $scope.target.prometheus_link = $scope.linkToPrometheus();
-      $scope.target.calculated_interval = calculateInterval($scope.interval);
+      $scope.calculateInterval();
 
       // this does not work so good
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -95,21 +114,17 @@ function (angular, _, kbn) {
       return $scope.datasource.url + '/graph#' + hash;
     };
 
+    $scope.calculateInterval = function() {
+      var interval = $scope.target.interval || $scope.interval;
+      var calculatedInterval = $scope.datasource.calculateInterval(interval, $scope.target.intervalFactor);
+      $scope.target.calculatedInterval = kbn.secondsToHms(calculatedInterval);
+    };
+
     // TODO: validate target
     function validateTarget() {
       var errs = {};
 
       return errs;
-    }
-
-    function calculateInterval(interval) {
-      var sec = kbn.interval_to_seconds(interval);
-
-      if (sec < 1) {
-        interval = '1s';
-      }
-
-      return interval;
     }
 
   });

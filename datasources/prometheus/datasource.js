@@ -32,7 +32,7 @@ function (angular, _, kbn) {
       var range = convertToPrometheusRange(options.range.from, options.range.to);
 
       var queries = [];
-      _.each(options.targets, function(target) {
+      _.each(options.targets, _.bind(function(target) {
         if (!target.expr || target.hide) {
           return;
         }
@@ -40,14 +40,16 @@ function (angular, _, kbn) {
         var query = {};
         query.expr = templateSrv.replace(target.expr);
 
-        var step = kbn.interval_to_seconds(target.interval || options.interval);
+        var interval = target.interval || options.interval;
+        var intervalFactor = target.intervalFactor || 1;
+        var step = this.calculateInterval(interval, intervalFactor);
         if (step < 1) {
           step = 1; // lowest step is 1 second
         }
         query.step = step;
 
         queries.push(query);
-      });
+      }, this));
 
       // No valid targets, return the empty result to save a round trip.
       if (_.isEmpty(queries)) {
@@ -129,6 +131,16 @@ function (angular, _, kbn) {
             };
           });
         });
+    };
+
+    PrometheusDatasource.prototype.calculateInterval = function(interval, intervalFactor) {
+      var sec = kbn.interval_to_seconds(interval);
+
+      if (sec < 1) {
+        sec = 1;
+      }
+
+      return sec * intervalFactor;
     };
 
     function transformMetricData(md, options) {

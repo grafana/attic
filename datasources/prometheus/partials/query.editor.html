@@ -139,11 +139,22 @@
                  bs-tooltip="'Leave blank for auto handling based on time range and panel width'"
                  data-placement="right"
                  spellcheck='false'
-                 placeholder="{{target.calculated_interval}}"
+                 placeholder="{{target.calculatedInterval}}"
                  data-min-length=0 data-items=100
                  ng-model-onblur
                  ng-change="refreshMetricData()"
                  />
+        </li>
+
+        <li class="tight-form-item">
+          Resolution
+        </li>
+        <li>
+          <select ng-model="target.intervalFactor"
+                 class="tight-form-input input-small"
+                 ng-options="r.factor as r.label for r in resolutions"
+                 ng-change="refreshMetricData()">
+          </select>
         </li>
 
         <li class="tight-form-item">
