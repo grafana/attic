@@ -124,9 +124,9 @@ function (angular, _, kbn) {
 
       return $http(options)
         .then(function(result) {
-          return _.map(result.data.value, function(metric) {
+          return _.map(result.data.value, function(metricData) {
             return {
-              text: _.values(metric.metric),
+              text: getOriginalMetricName(metricData.metric),
               expandable: true
             };
           });
@@ -147,10 +147,7 @@ function (angular, _, kbn) {
       var dps = [],
           metricLabel = null;
 
-      var metricName = md.metric.__name__ || '';
-      var labelData = md.metric;
-
-      metricLabel = createMetricLabel(metricName, labelData, options);
+      metricLabel = createMetricLabel(md.metric, options);
 
       dps = _.map(md.values, function(value) {
         return [parseFloat(value[1]), value[0] * 1000];
@@ -159,13 +156,9 @@ function (angular, _, kbn) {
       return { target: metricLabel, datapoints: dps };
     }
 
-    function createMetricLabel(metricName, labelData, options) {
+    function createMetricLabel(labelData, options) {
       if (_.isUndefined(options) || _.isEmpty(options.legendFormat)) {
-        delete labelData.__name__;
-        var labelPart = _.map(_.pairs(labelData), function(label) {
-          return label[0] + '="' + label[1] + '"';
-        }).join(',');
-        return metricName + '{' + labelPart + '}';
+        return getOriginalMetricName(labelData);
       }
 
       var originalSettings = _.templateSettings;
@@ -174,11 +167,20 @@ function (angular, _, kbn) {
       };
 
       var template = _.template(options.legendFormat);
-      metricName = template(labelData);
+      var metricName = template(labelData);
 
       _.templateSettings = originalSettings;
 
       return metricName;
+    }
+
+    function getOriginalMetricName(labelData) {
+      var metricName = labelData.__name__ || '';
+      delete labelData.__name__;
+      var labelPart = _.map(_.pairs(labelData), function(label) {
+        return label[0] + '="' + label[1] + '"';
+      }).join(',');
+      return metricName + '{' + labelPart + '}';
     }
 
     function convertToPrometheusRange(from, to) {
