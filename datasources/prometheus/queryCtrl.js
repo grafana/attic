@@ -12,6 +12,7 @@ function (angular, _, kbn) {
 
     $scope.init = function() {
       $scope.target.errors = validateTarget();
+      $scope.target.datasourceErrors = {};
 
       if (!$scope.target.expr) {
         $scope.target.expr = '';
@@ -43,6 +44,11 @@ function (angular, _, kbn) {
         $scope.$apply($scope.inputMetric);
         $scope.refreshMetricData();
       });
+
+      $scope.datasource.lastErrors = {};
+      $scope.$watch('datasource.lastErrors', function() {
+        $scope.target.datasourceErrors = $scope.datasource.lastErrors;
+      }, true);
     };
 
     $scope.refreshMetricData = function() {

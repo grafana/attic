@@ -24,6 +24,7 @@ function (angular, _, kbn) {
         url = url.substr(0, url.length - 1);
       }
       this.url = url;
+      this.lastErrors = {};
     }
 
     // Called once per panel (graph)
@@ -58,14 +59,17 @@ function (angular, _, kbn) {
         return this.performTimeSeriesQuery(query, range, end);
       }, this));
 
+      var self = this;
       return $q.all(allQueryPromise)
         .then(function(allResponse) {
           var result = [];
 
           _.each(allResponse, function(response, index) {
             if (response.data.type === 'error') {
+              self.lastErrors.query = response.data.value;
               throw response.data.value;
             }
+            delete self.lastErrors.query;
 
             _.each(response.data.value, function(metricData) {
               result.push(transformMetricData(metricData, options.targets[index]));
