@@ -39,7 +39,7 @@ function (angular, _, kbn) {
         }
 
         var query = {};
-        query.expr = templateSrv.replace(target.expr);
+        query.expr = templateSrv.replace(target.expr, options.scopedVars);
 
         var interval = target.interval || options.interval;
         var intervalFactor = target.intervalFactor || 1;
