@@ -115,22 +115,48 @@ function (angular, _, kbn) {
     };
 
     PrometheusDatasource.prototype.metricFindQuery = function(query) {
-      var url = this.url + '/api/query?expr=' + encodeURIComponent(query);
+      var options;
+      var matches = query.match(/^[a-zA-Z_:*][a-zA-Z0-9_:*]*/);
 
-      var options = {
-        method: 'GET',
-        url: url,
-      };
+      if (matches != null && matches[0].indexOf('*') >= 0) {
+        // if query has wildcard character, return metric name list
+        options = {
+          method: 'GET',
+          url: this.url + '/api/metrics',
+        };
 
-      return $http(options)
-        .then(function(result) {
-          return _.map(result.data.value, function(metricData) {
-            return {
-              text: getOriginalMetricName(metricData.metric),
-              expandable: true
-            };
+        return $http(options)
+          .then(function(result) {
+            return _.chain(result.data)
+              .filter(function(metricName) {
+                var r = new RegExp(matches[0].replace(/\*/g, '.*'));
+                return r.test(metricName);
+              })
+              .map(function(matchedMetricName) {
+                return {
+                  text: matchedMetricName,
+                  expandable: true
+                };
+              })
+              .value();
+            });
+      } else {
+        // if query contains full metric name, return metric name and label list
+        options = {
+          method: 'GET',
+          url: this.url + '/api/query?expr=' + encodeURIComponent(query),
+        };
+
+        return $http(options)
+          .then(function(result) {
+            return _.map(result.data.value, function(metricData) {
+              return {
+                text: getOriginalMetricName(metricData.metric),
+                expandable: true
+              };
+            });
           });
-        });
+        }
     };
 
     PrometheusDatasource.prototype.calculateInterval = function(interval, intervalFactor) {
