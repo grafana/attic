@@ -24,6 +24,7 @@ function (angular, _, kbn) {
         url = url.substr(0, url.length - 1);
       }
       this.url = url;
+      this.lastErrors = {};
     }
 
     // Called once per panel (graph)
@@ -38,7 +39,7 @@ function (angular, _, kbn) {
         }
 
         var query = {};
-        query.expr = templateSrv.replace(target.expr);
+        query.expr = templateSrv.replace(target.expr, options.scopedVars);
 
         var interval = target.interval || options.interval;
         var intervalFactor = target.intervalFactor || 1;
@@ -58,14 +59,17 @@ function (angular, _, kbn) {
         return this.performTimeSeriesQuery(query, range, end);
       }, this));
 
+      var self = this;
       return $q.all(allQueryPromise)
         .then(function(allResponse) {
           var result = [];
 
           _.each(allResponse, function(response, index) {
             if (response.data.type === 'error') {
+              self.lastErrors.query = response.data.value;
               throw response.data.value;
             }
+            delete self.lastErrors.query;
 
             _.each(response.data.value, function(metricData) {
               result.push(transformMetricData(metricData, options.targets[index]));
@@ -111,22 +115,48 @@ function (angular, _, kbn) {
     };
 
     PrometheusDatasource.prototype.metricFindQuery = function(query) {
-      var url = this.url + '/api/query?expr=' + encodeURIComponent(query);
+      var options;
+      var matches = query.match(/^[a-zA-Z_:*][a-zA-Z0-9_:*]*/);
 
-      var options = {
-        method: 'GET',
-        url: url,
-      };
+      if (matches != null && matches[0].indexOf('*') >= 0) {
+        // if query has wildcard character, return metric name list
+        options = {
+          method: 'GET',
+          url: this.url + '/api/metrics',
+        };
 
-      return $http(options)
-        .then(function(result) {
-          return _.map(result.data.value, function(metric) {
-            return {
-              text: _.values(metric.metric),
-              expandable: true
-            };
+        return $http(options)
+          .then(function(result) {
+            return _.chain(result.data)
+              .filter(function(metricName) {
+                var r = new RegExp(matches[0].replace(/\*/g, '.*'));
+                return r.test(metricName);
+              })
+              .map(function(matchedMetricName) {
+                return {
+                  text: matchedMetricName,
+                  expandable: true
+                };
+              })
+              .value();
+            });
+      } else {
+        // if query contains full metric name, return metric name and label list
+        options = {
+          method: 'GET',
+          url: this.url + '/api/query?expr=' + encodeURIComponent(query),
+        };
+
+        return $http(options)
+          .then(function(result) {
+            return _.map(result.data.value, function(metricData) {
+              return {
+                text: getOriginalMetricName(metricData.metric),
+                expandable: true
+              };
+            });
           });
-        });
+        }
     };
 
     PrometheusDatasource.prototype.calculateInterval = function(interval, intervalFactor) {
@@ -143,10 +173,7 @@ function (angular, _, kbn) {
       var dps = [],
           metricLabel = null;
 
-      var metricName = md.metric.__name__ || '';
-      var labelData = md.metric;
-
-      metricLabel = createMetricLabel(metricName, labelData, options);
+      metricLabel = createMetricLabel(md.metric, options);
 
       dps = _.map(md.values, function(value) {
         return [parseFloat(value[1]), value[0] * 1000];
@@ -155,13 +182,9 @@ function (angular, _, kbn) {
       return { target: metricLabel, datapoints: dps };
     }
 
-    function createMetricLabel(metricName, labelData, options) {
+    function createMetricLabel(labelData, options) {
       if (_.isUndefined(options) || _.isEmpty(options.legendFormat)) {
-        delete labelData.__name__;
-        var labelPart = _.map(_.pairs(labelData), function(label) {
-          return label[0] + '="' + label[1] + '"';
-        }).join(',');
-        return metricName + '{' + labelPart + '}';
+        return getOriginalMetricName(labelData);
       }
 
       var originalSettings = _.templateSettings;
@@ -170,11 +193,20 @@ function (angular, _, kbn) {
       };
 
       var template = _.template(options.legendFormat);
-      metricName = template(labelData);
+      var metricName = template(labelData);
 
       _.templateSettings = originalSettings;
 
       return metricName;
+    }
+
+    function getOriginalMetricName(labelData) {
+      var metricName = labelData.__name__ || '';
+      delete labelData.__name__;
+      var labelPart = _.map(_.pairs(labelData), function(label) {
+        return label[0] + '="' + label[1] + '"';
+      }).join(',');
+      return metricName + '{' + labelPart + '}';
     }
 
     function convertToPrometheusRange(from, to) {
