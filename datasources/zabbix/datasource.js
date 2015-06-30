@@ -2,6 +2,7 @@ define([
   'angular',
   'lodash',
   'kbn',
+  './zabbixAPIWrapper',
   './queryCtrl'
 ],
 function (angular, _, kbn) {
@@ -9,7 +10,7 @@ function (angular, _, kbn) {
 
   var module = angular.module('grafana.services');
 
-  module.factory('ZabbixAPIDatasource', function($q, backendSrv, templateSrv) {
+  module.factory('ZabbixAPIDatasource', function($q, backendSrv, templateSrv, zabbix) {
 
     /**
      * Datasource initialization. Calls when you refresh page, add
@@ -31,6 +32,9 @@ function (angular, _, kbn) {
 
       // Limit metrics per panel for templated request
       this.limitmetrics = datasource.meta.limitmetrics || 50;
+
+      // Initialize Zabbix API
+      zabbix.init(this.url, this.username, this.password);
     }
 
 
@@ -79,15 +83,28 @@ function (angular, _, kbn) {
 
         // Find items by item names and perform queries
         var self = this;
-        return this.itemFindQuery(groups, hosts, apps)
+        return zabbix.itemFindQuery(groups, hosts, apps)
           .then(function (items) {
+
+            // Filter hosts by regex
+            if (target.host.visible_name == 'All') {
+              if (target.hostFilter && _.every(items, _.identity.hosts)) {
+                var host_pattern = new RegExp(target.hostFilter);
+                items = _.filter(items, function (item) {
+                  return _.some(item.hosts, function (host) {
+                    return host_pattern.test(host.name);
+                  });
+                });
+              }
+            }
+
             if (itemnames == 'All') {
 
               // Filter items by regex
               if (target.itemFilter) {
                 var item_pattern = new RegExp(target.itemFilter);
                 return _.filter(items, function (item) {
-                  return item_pattern.test(expandItemName(item));
+                  return item_pattern.test(zabbix.expandItemName(item));
                 });
               } else {
                 return items;
@@ -96,7 +113,7 @@ function (angular, _, kbn) {
 
               // Filtering items
               return _.filter(items, function (item) {
-                return _.contains(itemnames, expandItemName(item));
+                return _.contains(itemnames, zabbix.expandItemName(item));
               });
             }
           }).then(function (items) {
@@ -107,90 +124,36 @@ function (angular, _, kbn) {
               return [];
             } else {
               items = _.flatten(items);
+              var alias = target.item.name === 'All' ? undefined : templateSrv.replace(target.alias);
 
               if ((from < useTrendsFrom) && self.trends) {
-                return self.getTrends(items, from, to)
-                  .then(_.partial(self.handleTrendResponse, items));
+                return zabbix.getTrends(items, from, to)
+                  .then(_.partial(self.handleTrendResponse, items, alias, target.scale));
               } else {
-                return self.performTimeSeriesQuery(items, from, to)
-                  .then(_.partial(self.handleHistoryResponse, items));
+                return zabbix.getHistory(items, from, to)
+                  .then(_.partial(self.handleHistoryResponse, items, alias, target.scale));
               }
             }
           });
       }, this);
 
       return $q.all(_.flatten(promises)).then(function (results) {
-        return { data: _.flatten(results) };
+        var timeseries_data = _.flatten(results);
+        var data = _.map(timeseries_data, function (timeseries) {
+
+          // Series downsampling
+          if (timeseries.datapoints.length > options.maxDataPoints) {
+            var ms_interval = Math.floor((to - from) / options.maxDataPoints) * 1000;
+            timeseries.datapoints = downsampleSeries(timeseries.datapoints, to, ms_interval);
+          }
+          return timeseries;
+        });
+        return { data: data };
       });
     };
 
 
-    /**
-     * Perform history query from Zabbix API
-     *
-     * @param  {Array}  items Array of Zabbix item objects
-     * @param  {Number} start Time in seconds
-     * @param  {Number} end   Time in seconds
-     *
-     * @return {Array}        Array of Zabbix history objects
-     */
-    ZabbixAPIDatasource.prototype.performTimeSeriesQuery = function(items, start, end) {
-      // Group items by value type
-      var grouped_items = _.groupBy(items, 'value_type');
-
-      // Perform request for each value type
-      return $q.all(_.map(grouped_items, function (items, value_type) {
-        var itemids = _.map(items, 'itemid');
-        var params = {
-          output: 'extend',
-          history: value_type,
-          itemids: itemids,
-          sortfield: 'clock',
-          sortorder: 'ASC',
-          time_from: start
-        };
-
-        // Relative queries (e.g. last hour) don't include an end time
-        if (end) {
-          params.time_till = end;
-        }
-
-        return this.performZabbixAPIRequest('history.get', params);
-      }, this)).then(function (results) {
-        return _.flatten(results);
-      });
-    };
-
-
-    ZabbixAPIDatasource.prototype.getTrends = function(items, start, end) {
-      // Group items by value type
-      var grouped_items = _.groupBy(items, 'value_type');
-
-      // Perform request for each value type
-      return $q.all(_.map(grouped_items, function (items, value_type) {
-        var itemids = _.map(items, 'itemid');
-        var params = {
-          output: 'extend',
-          trend: value_type,
-          itemids: itemids,
-          sortfield: 'clock',
-          sortorder: 'ASC',
-          time_from: start
-        };
-
-        // Relative queries (e.g. last hour) don't include an end time
-        if (end) {
-          params.time_till = end;
-        }
-
-        return this.performZabbixAPIRequest('trend.get', params);
-      }, this)).then(function (results) {
-        return _.flatten(results);
-      });
-    };
-
-
-    ZabbixAPIDatasource.prototype.handleTrendResponse = function(items, trends) {
+    ZabbixAPIDatasource.prototype.handleTrendResponse = function(items, alias, scale, trends) {
 
       // Group items and trends by itemid
       var indexed_items = _.indexBy(items, 'itemid');
@@ -199,11 +162,16 @@ function (angular, _, kbn) {
       return $q.when(_.map(grouped_history, function (trends, itemid) {
         var item = indexed_items[itemid];
         var series = {
-          target: (item.hosts ? item.hosts[0].name+': ' : '') + expandItemName(item),
+          target: (item.hosts ? item.hosts[0].name+': ' : '') + (alias ? alias : zabbix.expandItemName(item)),
           datapoints: _.map(trends, function (p) {
 
             // Value must be a number for properly work
             var value = Number(p.value_avg);
+
+            // Apply scale
+            if (scale) {
+              value *= scale;
+            }
             return [value, p.clock * 1000];
           })
         };
@@ -226,7 +194,7 @@ function (angular, _, kbn) {
      *                               datapoints: [[<value>, <unixtime>], ...]
      *                            }
      */
-    ZabbixAPIDatasource.prototype.handleHistoryResponse = function(items, history) {
+    ZabbixAPIDatasource.prototype.handleHistoryResponse = function(items, alias, scale, history) {
       /**
        * Response should be in the format:
        * data: [
@@ -248,11 +216,16 @@ function (angular, _, kbn) {
       return $q.when(_.map(grouped_history, function (history, itemid) {
         var item = indexed_items[itemid];
         var series = {
-          target: (item.hosts ? item.hosts[0].name+': ' : '') + expandItemName(item),
+          target: (item.hosts ? item.hosts[0].name+': ' : '') + (alias ? alias : zabbix.expandItemName(item)),
           datapoints: _.map(history, function (p) {
 
             // Value must be a number for properly work
             var value = Number(p.value);
+
+            // Apply scale
+            if (scale) {
+              value *= scale;
+            }
             return [value, p.clock * 1000];
           })
         };
@@ -260,232 +233,6 @@ function (angular, _, kbn) {
       })).then(function (result) {
         return _.sortBy(result, 'target');
       });
-    };
-
-
-    /**
-     * Request data from Zabbix API
-     *
-     * @param  {string} method Zabbix API method name
-     * @param  {object} params method params
-     *
-     * @return {object}        data.result field or []
-     */
-    ZabbixAPIDatasource.prototype.performZabbixAPIRequest = function(method, params) {
-      var options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        url: this.url,
-        data: {
-          jsonrpc: '2.0',
-          method: method,
-          params: params,
-          auth: this.auth,
-          id: 1
-        }
-      };
-
-      var self = this;
-      return backendSrv.datasourceRequest(options).then(function (response) {
-        if (!response.data) {
-          return [];
-        }
-        // Handle Zabbix API errors
-        else if (response.data.error) {
-
-          // Handle auth errors
-          if (response.data.error.data == "Session terminated, re-login, please." ||
-              response.data.error.data == "Not authorised." ||
-              response.data.error.data == "Not authorized") {
-            return self.performZabbixAPILogin().then(function (response) {
-              self.auth = response;
-              return self.performZabbixAPIRequest(method, params);
-            });
-          }
-        }
-        return response.data.result;
-      });
-    };
-
-
-    // Get authentication token
-    ZabbixAPIDatasource.prototype.performZabbixAPILogin = function() {
-      var options = {
-        url : this.url,
-        method : 'POST',
-        data: {
-          jsonrpc: '2.0',
-          method: 'user.login',
-          params: {
-            user: this.username,
-            password: this.password
-          },
-          auth: null,
-          id: 1
-        },
-      };
-
-      return backendSrv.datasourceRequest(options).then(function (result) {
-        if (!result.data) {
-          return null;
-        }
-        return result.data.result;
-      });
-    };
-
-
-    // Get the list of host groups
-    ZabbixAPIDatasource.prototype.performHostGroupSuggestQuery = function() {
-      var params = {
-        output: ['name'],
-        sortfield: 'name',
-        // Return only host groups that contain hosts
-        real_hosts: true,
-        // Return only host groups that contain monitored hosts.
-        monitored_hosts: true
-      };
-
-      return this.performZabbixAPIRequest('hostgroup.get', params);
-    };
-
-
-    // Get the list of hosts
-    ZabbixAPIDatasource.prototype.performHostSuggestQuery = function(groupids) {
-      var params = {
-        output: ['name', 'host'],
-        sortfield: 'name',
-        // Return only hosts that have items with numeric type of information.
-        with_simple_graph_items: true,
-        // Return only monitored hosts.
-        monitored_hosts: true
-      };
-      // Return only hosts in given group
-      if (groupids) {
-        params.groupids = groupids;
-      }
-      return this.performZabbixAPIRequest('host.get', params);
-    };
-
-
-    // Get the list of applications
-    ZabbixAPIDatasource.prototype.performAppSuggestQuery = function(hostids, /* optional */ groupids) {
-      var params = {
-        output: ['name'],
-        sortfield: 'name'
-      };
-      if (hostids) {
-        params.hostids = hostids;
-      }
-      else if (groupids) {
-        params.groupids = groupids;
-      }
-
-      return this.performZabbixAPIRequest('application.get', params);
-    };
-
-
-    /**
-     * Items request
-     *
-     * @param  {string or Array} hostids          ///////////////////////////
-     * @param  {string or Array} applicationids   // Zabbix API parameters //
-     * @param  {string or Array} groupids         ///////////////////////////
-     *
-     * @return {string or Array}                  Array of Zabbix API item objects
-     */
-    ZabbixAPIDatasource.prototype.performItemSuggestQuery = function(hostids, applicationids, /* optional */ groupids) {
-      var params = {
-        output: ['name', 'key_', 'value_type', 'delay'],
-        sortfield: 'name',
-        //Include web items in the result
-        webitems: true,
-        // Return only numeric items
-        filter: {
-          value_type: [0,3]
-        },
-        // Return only enabled items
-        monitored: true,
-        searchByAny: true
-      };
-
-      // Filter by hosts or by groups
-      if (hostids) {
-        params.hostids = hostids;
-      } else if (groupids) {
-        params.groupids = groupids;
-      }
-
-      // If application selected return only relative items
-      if (applicationids) {
-        params.applicationids = applicationids;
-      }
-
-      // Return host property for multiple hosts
-      if (!hostids || (_.isArray(hostids) && hostids.length  > 1)) {
-        params.selectHosts = ['name'];
-      }
-
-      return this.performZabbixAPIRequest('item.get', params);
-    };
-
-
-    /**
-     * Find groups by names
-     *
-     * @param  {string or array} group group names
-     * @return {array}                 array of Zabbix API hostgroup objects
-     */
-    ZabbixAPIDatasource.prototype.findZabbixGroup = function (group) {
-      var params = {
-        output: ['name'],
-        search: {
-          name: group
-        },
-        searchByAny: true,
-        searchWildcardsEnabled: true
-      }
-      return this.performZabbixAPIRequest('hostgroup.get', params);
-    };
-
-
-    /**
-     * Find hosts by names
-     *
-     * @param  {string or array} hostnames hosts names
-     * @return {array}                     array of Zabbix API host objects
-     */
-    ZabbixAPIDatasource.prototype.findZabbixHost = function (hostnames) {
-      var params = {
-        output: ['host', 'name'],
-        search: {
-          host: hostnames,
-          name: hostnames
-        },
-        searchByAny: true,
-        searchWildcardsEnabled: true
-      }
-      return this.performZabbixAPIRequest('host.get', params);
-    };
-
-
-    /**
-     * Find applications by names
-     *
-     * @param  {string or array} application applications names
-     * @return {array}                       array of Zabbix API application objects
-     */
-    ZabbixAPIDatasource.prototype.findZabbixApp = function (application) {
-      var params = {
-        output: ['name'],
-        search: {
-          name: application
-        },
-        searchByAny: true,
-        searchWildcardsEnabled: true,
-      }
-      return this.performZabbixAPIRequest('application.get', params);
     };
 
 
@@ -515,9 +262,9 @@ function (angular, _, kbn) {
 
       // Get items
       if (parts.length === 4) {
-        return this.itemFindQuery(template.group, template.host, template.app).then(function (result) {
+        return zabbix.itemFindQuery(template.group, template.host, template.app).then(function (result) {
           return _.map(result, function (item) {
-            var itemname = expandItemName(item)
+            var itemname = zabbix.expandItemName(item)
             return {
               text: itemname,
               expandable: false
@@ -527,7 +274,7 @@ function (angular, _, kbn) {
       }
       // Get applications
       else if (parts.length === 3) {
-        return this.appFindQuery(template.host, template.group).then(function (result) {
+        return zabbix.appFindQuery(template.host, template.group).then(function (result) {
           return _.map(result, function (app) {
             return {
               text: app.name,
@@ -538,7 +285,7 @@ function (angular, _, kbn) {
       }
       // Get hosts
       else if (parts.length === 2) {
-        return this.hostFindQuery(template.group).then(function (result) {
+        return zabbix.hostFindQuery(template.group).then(function (result) {
           return _.map(result, function (host) {
             return {
               text: host.name,
@@ -549,7 +296,7 @@ function (angular, _, kbn) {
       }
       // Get groups
       else if (parts.length === 1) {
-        return this.performHostGroupSuggestQuery().then(function (result) {
+        return zabbix.getGroupByName(template.group).then(function (result) {
           return _.map(result, function (hostgroup) {
             return {
               text: hostgroup.name,
@@ -564,114 +311,6 @@ function (angular, _, kbn) {
         d.resolve([]);
         return d.promise;
       }
-    };
-
-
-    /**
-     * Find items belongs to passed groups, hosts and
-     * applications
-     *
-     * @param  {string or array} groups
-     * @param  {string or array} hosts
-     * @param  {string or array} apps
-     *
-     * @return {array}  array of Zabbix API item objects
-     */
-    ZabbixAPIDatasource.prototype.itemFindQuery = function(groups, hosts, apps) {
-      var promises = [];
-
-      // Get hostids from names
-      if (hosts && hosts != '*') {
-        promises.push(this.findZabbixHost(hosts));
-      }
-      // Get groupids from names
-      else if (groups) {
-        promises.push(this.findZabbixGroup(groups));
-      }
-      // Get applicationids from names
-      if (apps) {
-        promises.push(this.findZabbixApp(apps));
-      }
-
-      var self = this;
-      return $q.all(promises).then(function (results) {
-        results = _.flatten(results);
-        if (groups) {
-          var groupids = _.map(_.filter(results, function (object) {
-            return object.groupid;
-          }), 'groupid');
-        }
-        if (hosts && hosts != '*') {
-          var hostids = _.map(_.filter(results, function (object) {
-            return object.hostid;
-          }), 'hostid');
-        }
-        if (apps) {
-          var applicationids = _.map(_.filter(results, function (object) {
-            return object.applicationid;
-          }), 'applicationid');
-        }
-
-        return self.performItemSuggestQuery(hostids, applicationids, groupids);
-      });
-    };
-
-
-    /**
-     * Find applications belongs to passed groups and hosts
-     *
-     * @param  {string or array} hosts
-     * @param  {string or array} groups
-     *
-     * @return {array}  array of Zabbix API application objects
-     */
-    ZabbixAPIDatasource.prototype.appFindQuery = function(hosts, groups) {
-      var promises = [];
-
-      // Get hostids from names
-      if (hosts && hosts != '*') {
-        promises.push(this.findZabbixHost(hosts));
-      }
-      // Get groupids from names
-      else if (groups) {
-        promises.push(this.findZabbixGroup(groups));
-      }
-
-      var self = this;
-      return $q.all(promises).then(function (results) {
-        results = _.flatten(results);
-        if (groups) {
-          var groupids = _.map(_.filter(results, function (object) {
-            return object.groupid;
-          }), 'groupid');
-        }
-        if (hosts && hosts != '*') {
-          var hostids = _.map(_.filter(results, function (object) {
-            return object.hostid;
-          }), 'hostid');
-        }
-
-        return self.performAppSuggestQuery(hostids, groupids);
-      });
-    };
-
-
-    /**
-     * Find hosts belongs to passed groups
-     *
-     * @param  {string or array} groups
-     * @return {array}  array of Zabbix API host objects
-     */
-    ZabbixAPIDatasource.prototype.hostFindQuery = function(groups) {
-      var self = this;
-      return this.findZabbixGroup(groups).then(function (results) {
-        results = _.flatten(results);
-        var groupids = _.map(_.filter(results, function (object) {
-          return object.groupid;
-        }), 'groupid');
-
-        return self.performHostSuggestQuery(groupids);
-      });
     };
 
 
@@ -751,29 +390,6 @@ function splitMetrics(metrics) {
 
 
 /**
- * Expand item parameters, for example:
- * CPU $2 time ($3) --> CPU system time (avg1)
- *
- * @param item: zabbix api item object
- * @return: expanded item name (string)
- */
-function expandItemName(item) {
-  var name = item.name;
-  var key = item.key_;
-
-  // extract params from key:
-  // "system.cpu.util[,system,avg1]" --> ["", "system", "avg1"]
-  var key_params = key.substring(key.indexOf('[') + 1, key.lastIndexOf(']')).split(',');
-
-  // replace item parameters
-  for (var i = key_params.length; i >= 1; i--) {
-    name = name.replace('$' + i, key_params[i - 1]);
-  };
-  return name;
-}
-
-
-/**
  * Convert Date object to local time in format
  * YYYY-MM-DD HH:mm:ss
  *
@@ -810,4 +426,46 @@ function formatAcknowledges(acknowledges) {
   } else {
     return '';
   }
+}
+
+
+/**
+ * Downsample datapoints series
+ *
+ * @param   {array}     datapoints        [[<value>, <unixtime>], ...]
+ * @param   {integer}   time_to           Panel time to
+ * @param   {integer}   ms_interval       Interval in milliseconds for grouping datapoints
+ * @return  {array}     [[<value>, <unixtime>], ...]
+ */
+function downsampleSeries(datapoints, time_to, ms_interval) {
+  var downsampledSeries = new Array();
+  var timeWindow = {
+    from: time_to * 1000 - ms_interval,
+    to: time_to * 1000
+  };
+
+  var points_sum = 0;
+  var points_num = 0;
+  var value_avg = 0;
+  for (var i = datapoints.length - 1; i >= 0; i -= 1) {
+    if (timeWindow.from < datapoints[i][1] && datapoints[i][1] <= timeWindow.to) {
+      points_sum += datapoints[i][0];
+      points_num++;
+    }
+    else {
+      value_avg = points_num ? points_sum / points_num : 0;
+      downsampledSeries.push([value_avg, timeWindow.to]);
+
+      // Shift time window
+      timeWindow.to = timeWindow.from;
+      timeWindow.from -= ms_interval;
+
+      points_sum = 0;
+      points_num = 0;
+
+      // Process point again
+      i++;
+    }
+  }
+  return downsampledSeries.reverse();
 }
