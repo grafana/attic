@@ -1,14 +1,15 @@
 define([
   'angular',
-  'lodash'
+  'lodash',
+  './zabbixAPIWrapper'
 ],
 function (angular, _) {
   'use strict';
 
   var module = angular.module('grafana.controllers');
-  var targetLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  var targetLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-  module.controller('ZabbixAPITargetCtrl', function($scope) {
+  module.controller('ZabbixAPIQueryCtrl', function($scope, $sce, templateSrv, zabbix) {
 
     $scope.init = function() {
       $scope.targetLetters = targetLetters;
@@ -20,25 +21,29 @@ function (angular, _) {
       };
 
       // Update host group, host, application and item lists
-      $scope.updateHostGroupList();
-      if ($scope.target.hostGroup) {
-        $scope.updateHostList($scope.target.hostGroup.groupid);
-      } else {
-        $scope.updateHostList();
-      }
-      if ($scope.target.host) {
-        $scope.updateAppList($scope.target.host.hostid);
-        if ($scope.target.application) {
-          $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);
-        } else {
-          $scope.updateItemList($scope.target.host.hostid, null);
-        }
-      }
+      $scope.updateGroupList();
+      $scope.updateHostList();
+      $scope.updateAppList();
+      $scope.updateItemList();
+
+      setItemAlias();
 
       $scope.target.errors = validateTarget($scope.target);
     };
+
+
+    /**
+     * Take alias from item name by default
+     */
+    function setItemAlias() {
+      if (!$scope.target.alias && $scope.target.item) {
+        $scope.target.alias = $scope.target.item.name;
+      }
+    };
+
 
     $scope.targetBlur = function() {
+      setItemAlias();
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
@@ -46,15 +51,14 @@ function (angular, _) {
       }
     };
 
-    // Call when host group selected
+
+    /**
+     * Call when host group selected
+     */
     $scope.selectHostGroup = function() {
-
-      // Update host list
-      if ($scope.target.hostGroup) {
-        $scope.updateHostList($scope.target.hostGroup.groupid);
-      } else {
-        $scope.updateHostList('');
-      }
+      $scope.updateHostList()
+      $scope.updateAppList();
+      $scope.updateItemList();
 
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -63,18 +67,13 @@ function (angular, _) {
       }
     };
 
-    // Call when host selected
+
+    /**
+     * Call when host selected
+     */
     $scope.selectHost = function() {
-
-      // Update item list
-      if ($scope.target.application) {
-        $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);
-      } else {
-        $scope.updateItemList($scope.target.host.hostid, null);
-      }
-
-      // Update application list
-      $scope.updateAppList($scope.target.host.hostid);
+      $scope.updateAppList();
+      $scope.updateItemList();
 
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -84,15 +83,11 @@ function (angular, _) {
     };
 
 
-    // Call when application selected
+    /**
+     * Call when application selected
+     */
     $scope.selectApplication = function() {
-
-      // Update item list
-      if ($scope.target.application) {
-        $scope.updateItemList($scope.target.host.hostid, $scope.target.application.applicationid);
-      } else {
-        $scope.updateItemList($scope.target.host.hostid, null);
-      }
+      $scope.updateItemList();
 
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
@@ -102,8 +97,11 @@ function (angular, _) {
     };
 
 
-    // Call when item selected
+    /**
+     * Call when item selected
+     */
     $scope.selectItem = function() {
+      setItemAlias();
       $scope.target.errors = validateTarget($scope.target);
       if (!_.isEqual($scope.oldTarget, $scope.target) && _.isEmpty($scope.target.errors)) {
         $scope.oldTarget = angular.copy($scope.target);
@@ -130,16 +128,12 @@ function (angular, _) {
     /**
      * Update list of host groups
      */
-    $scope.updateHostGroupList = function() {
-      $scope.datasource.performHostGroupSuggestQuery().then(function (series) {
-        $scope.metric.hostGroupList = series;
-        if ($scope.target.hostGroup) {
-          $scope.target.hostGroup = $scope.metric.hostGroupList.filter(function (item, index, array) {
+    $scope.updateGroupList = function() {
+      $scope.metric.groupList = [{name: '*', visible_name: 'All'}];
+      addTemplatedVariables($scope.metric.groupList);
 
-            // Find selected host in metric.hostList
-            return (item.groupid == $scope.target.hostGroup.groupid);
-          }).pop();
-        }
+      zabbix.performHostGroupSuggestQuery().then(function (groups) {
+        $scope.metric.groupList = $scope.metric.groupList.concat(groups);
       });
     };
 
@@ -147,14 +141,13 @@ function (angular, _) {
     /**
      * Update list of hosts
      */
-    $scope.updateHostList = function(groupid) {
-      $scope.datasource.performHostSuggestQuery(groupid).then(function (series) {
-        $scope.metric.hostList = series;
-        $scope.target.host = $scope.metric.hostList.filter(function (item, index, array) {
+    $scope.updateHostList = function() {
+      $scope.metric.hostList = [{name: '*', visible_name: 'All'}];
+      addTemplatedVariables($scope.metric.hostList);
 
-          // Find selected host in metric.hostList
-          return (item.hostid == $scope.target.host.hostid);
-        }).pop();
+      var groups = $scope.target.group ? splitMetrics(templateSrv.replace($scope.target.group.name)) : undefined;
+      zabbix.hostFindQuery(groups).then(function (hosts) {
+        $scope.metric.hostList = $scope.metric.hostList.concat(hosts);
       });
     };
 
@@ -162,16 +155,17 @@ function (angular, _) {
     /**
      * Update list of host applications
      */
-    $scope.updateAppList = function(hostid) {
-      $scope.datasource.performAppSuggestQuery(hostid).then(function (series) {
-        $scope.metric.applicationList = series;
-        if ($scope.target.application) {
-          $scope.target.application = $scope.metric.applicationList.filter(function (item, index, array) {
+    $scope.updateAppList = function() {
+      $scope.metric.applicationList = [{name: '*', visible_name: 'All'}];
+      addTemplatedVariables($scope.metric.applicationList);
 
-            // Find selected application in metric.hostList
-            return (item.applicationid == $scope.target.application.applicationid);
-          }).pop();
-        }
+      var groups = $scope.target.group ? splitMetrics(templateSrv.replace($scope.target.group.name)) : undefined;
+      var hosts = $scope.target.host ? splitMetrics(templateSrv.replace($scope.target.host.name)) : undefined;
+      zabbix.appFindQuery(hosts, groups).then(function (apps) {
+        var apps = _.map(_.uniq(_.map(apps, 'name')), function (appname) {
+          return {name: appname};
+        });
+        $scope.metric.applicationList = $scope.metric.applicationList.concat(apps);
       });
     };
 
@@ -179,51 +173,37 @@ function (angular, _) {
     /**
      * Update list of items
      */
-    $scope.updateItemList = function(hostid, applicationid) {
+    $scope.updateItemList = function() {
+      $scope.metric.itemList = [{name: 'All'}];;
+      addTemplatedVariables($scope.metric.itemList);
 
-      // Update only if host selected
-      if (hostid) {
-        $scope.datasource.performItemSuggestQuery(hostid, applicationid).then(function (series) {
-          $scope.metric.itemList = series;
-
-          // Expand item parameters
-          $scope.metric.itemList.forEach(function (item, index, array) {
-            if (item && item.key_ && item.name) {
-              item.expandedName = expandItemName(item);
-            }
-          });
-          $scope.target.item = $scope.metric.itemList.filter(function (item, index, array) {
-
-            // Find selected item in metric.hostList
-            return (item.itemid == $scope.target.item.itemid);
-          }).pop();
+      var groups = $scope.target.group ? splitMetrics(templateSrv.replace($scope.target.group.name)) : undefined;
+      var hosts = $scope.target.host ? splitMetrics(templateSrv.replace($scope.target.host.name)) : undefined;
+      var apps = $scope.target.application ? splitMetrics(templateSrv.replace($scope.target.application.name)) : undefined;
+      zabbix.itemFindQuery(groups, hosts, apps).then(function (items) {
+        // Show only unique item names
+        var uniq_items = _.map(_.uniq(items, function (item) {
+          return zabbix.expandItemName(item);
+        }), function (item) {
+          return {name: zabbix.expandItemName(item)}
         });
-      } else {
-        $scope.metric.itemList = [];
-      }
+        $scope.metric.itemList = $scope.metric.itemList.concat(uniq_items);
+      });
     };
 
 
     /**
-     * Expand item parameters, for example:
-     * CPU $2 time ($3) --> CPU system time (avg1)
+     * Add templated variables to list of available metrics
      *
-     * @param item: zabbix api item object
-     * @return: expanded item name (string)
+     * @param {Array} metricList List of metrics which variables add to
      */
-    function expandItemName(item) {
-      var name = item.name;
-      var key = item.key_;
-
-      // extract params from key:
-      // "system.cpu.util[,system,avg1]" --> ["", "system", "avg1"]
-      var key_params = key.substring(key.indexOf('[') + 1, key.lastIndexOf(']')).split(',');
-
-      // replace item parameters
-      for (var i = key_params.length; i >= 1; i--) {
-        name = name.replace('$' + i, key_params[i - 1]);
-      };
-      return name;
+    function addTemplatedVariables(metricList) {
+      _.each(templateSrv.variables, function(variable) {
+        metricList.push({
+          name: '$' + variable.name,
+          templated: true
+        })
+      });
     };
 
 
@@ -240,3 +220,17 @@ function (angular, _) {
   });
 
 });
+
+
+/**
+ * Convert multiple mettrics to array
+ * "{metric1,metcic2,...,metricN}" --> [metric1, metcic2,..., metricN]
+ *
+ * @param  {string} metrics   "{metric1,metcic2,...,metricN}"
+ * @return {Array}            [metric1, metcic2,..., metricN]
+ */
+function splitMetrics(metrics) {
+  var remove_brackets_pattern = /^{|}$/g;
+  var metric_split_pattern = /,(?!\s)/g;
+  return metrics.replace(remove_brackets_pattern, '').split(metric_split_pattern)
+}
