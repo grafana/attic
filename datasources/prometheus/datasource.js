@@ -174,6 +174,12 @@ function (angular, _, kbn) {
         }
     };
 
+    PrometheusDatasource.prototype.testDatasource = function() {
+      return this.metricFindQuery('*').then(function() {
+        return { status: 'success', message: 'Data source is working', title: 'Success' };
+      });
+    };
+
     PrometheusDatasource.prototype.calculateInterval = function(interval, intervalFactor) {
       var sec = kbn.interval_to_seconds(interval);
 
