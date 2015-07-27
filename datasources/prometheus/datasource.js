@@ -144,7 +144,7 @@ function (angular, _, kbn) {
           .then(function(result) {
             return _.chain(result.data.data)
               .filter(function(metricName) {
-                var r = new RegExp(matches[0].replace(/\*/g, '.*'));
+                var r = new RegExp(metricsQuery[0].replace(/\*/g, '.*'));
                 return r.test(metricName);
               })
               .map(function(matchedMetricName) {
