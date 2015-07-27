@@ -208,7 +208,12 @@ function (angular, _, kbn) {
       };
 
       var template = _.template(options.legendFormat);
-      var metricName = template(labelData);
+      var metricName;
+      try {
+        metricName = template(labelData);
+      } catch (e) {
+        metricName = '{}';
+      }
 
       _.templateSettings = originalSettings;
 
