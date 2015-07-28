@@ -84,7 +84,7 @@ function (angular, _, kbn) {
       var url = this.url + '/api/v1/query_range?query=' + encodeURIComponent(query.expr) + '&start=' + start + '&end=' + end;
 
       var step = query.step;
-      var range = Math.floor(end - start)
+      var range = Math.floor(end - start);
       // Prometheus drop query if range/step > 11000
       // calibrate step if it is too big
       if (step !== 0 && range / step > 11000) {
@@ -128,7 +128,7 @@ function (angular, _, kbn) {
           url: this.url + '/api/v1/label/' + labelValuesQuery[1] + '/values',
         };
 
-        return $http(options).then(function(result){
+        return $http(options).then(function(result) {
           return _.map(result.data.data, function(value) {
             return {text: value};
           });
@@ -154,7 +154,7 @@ function (angular, _, kbn) {
                 };
               })
               .value();
-            });
+          });
       } else {
         // if query contains full metric name, return metric name and label list
         options = {
@@ -171,7 +171,7 @@ function (angular, _, kbn) {
               };
             });
           });
-        }
+      }
     };
 
     PrometheusDatasource.prototype.testDatasource = function() {
