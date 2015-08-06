@@ -1,372 +1,303 @@
+'use strict';
 define([
   'angular',
   'lodash',
   'kbn',
-  'moment'
+  './zabbixAPIWrapper',
+  './helperFunctions',
+  './queryCtrl'
 ],
 function (angular, _, kbn) {
-  'use strict';
+  //'use strict';
 
   var module = angular.module('grafana.services');
 
-  module.factory('ZabbixAPIDatasource', function($q, $http, templateSrv) {
-
-    function ZabbixAPIDatasource(datasource) {
-      this.name             = datasource.name;
-      this.type             = 'ZabbixAPIDatasource';
-
-      this.url              = datasource.url;
-      this.username         = datasource.username;
-      this.password         = datasource.password;
-
-      // No datapoints limit by default
-      this.limitmetrics     = datasource.limitmetrics || 0;
-
-      this.partials = datasource.partials || 'plugins/datasource/zabbix/partials';
-      this.editorSrc = this.partials + '/query.editor.html';
-      this.annotationEditorSrc = this.partials + '/annotations.editor.html';
-
-      this.supportMetrics   = true;
-      this.supportAnnotations = true;
-    }
-
-
-    ZabbixAPIDatasource.prototype.query = function(options) {
-      // get from & to in seconds
-      var from = kbn.parseDate(options.range.from).getTime();
-      var to = kbn.parseDate(options.range.to).getTime();
-      // Need for find target alias
-      var targets = options.targets;
-
-      // Check that all targets defined
-      var targetsDefined = options.targets.every(function (target, index, array) {
-        return target.item;
-      });
-      if (targetsDefined) {
-        // Extract zabbix api item objects from targets
-        var target_items = _.map(options.targets, 'item');
-      } else {
-
-        // No valid targets, return the empty dataset
-        var d = $q.defer();
-        d.resolve({ data: [] });
-        return d.promise;
-      }
-
-      from = Math.ceil(from/1000);
-      to = Math.ceil(to/1000);
-
-      var performedQuery;
-
-      // Check authorization first
-      if (!this.auth) {
-        var self = this;
-        performedQuery = this.performZabbixAPILogin().then(function (response) {
-          self.auth = response;
-          return self.performTimeSeriesQuery(target_items, from, to);
-        });
-      } else {
-        performedQuery = this.performTimeSeriesQuery(target_items, from, to);
-      }
-
-      return performedQuery.then(function (response) {
-        /**
-         * Response should be in the format:
-         * data: [
-         *          {
-         *             target: "Metric name",
-         *             datapoints: [[<value>, <unixtime>], ...]
-         *          },
-         *          {
-         *             target: "Metric name",
-         *             datapoints: [[<value>, <unixtime>], ...]
-         *          },
-         *       ]
-         */
-
-        // Index returned datapoints by item/metric id
-        var indexed_result = _.groupBy(response.data.result, function (history_item) {
-          return history_item.itemid;
-        });
-
-        // Reduce timeseries to the same size for stacking and tooltip work properly
-        var min_length = _.min(_.map(indexed_result, function (history) {
-          return history.length;
-        }));
-        _.each(indexed_result, function (item) {
-          item.splice(0, item.length - min_length);
-        });
-
-        // Sort result as the same as targets for display
-        // stacked timeseries in proper order
-        var sorted_history = _.sortBy(indexed_result, function (value, key, list) {
-          return _.indexOf(_.map(target_items, 'itemid'), key);
-        });
-
-        var series = _.map(sorted_history,
-          // Foreach itemid index: iterate over the data points and
-          // normalize to Grafana response format.
-          function (history, index) {
-            return {
-              // Lookup itemid:alias map
-              //target: targets[itemid].alias,
-              target: targets[index].alias,
-
-              datapoints: _.map(history, function (p) {
-
-                // Value must be a number for properly work
-                var value = Number(p.value);
-
-                // TODO: Correct time for proper stacking
-                //var clock = Math.round(Number(p.clock) / 60) * 60;
-                return [value, p.clock * 1000];
-              })
-            };
-          })
-        return $q.when({data: series});
-      });
-    };
-
-
-    ///////////////////////////////////////////////////////////////////////
-    /// Query methods
-    ///////////////////////////////////////////////////////////////////////
-
-
-    // Request data from Zabbix API
-    ZabbixAPIDatasource.prototype.doZabbixAPIRequest = function(request_data) {
-      var options = {
-        method: 'POST',
-        url: this.url,
-        data: request_data
-      };
-
-      var performedQuery;
-
-      // Check authorization first
-      if (!this.auth) {
-        var self = this;
-        performedQuery = this.performZabbixAPILogin().then(function (response) {
-          self.auth = response;
-          options.data.auth = response;
-          return $http(options);
-        });
-      } else {
-        performedQuery = $http(options);
-      }
-
-      // Handle response
-      return performedQuery.then(function (response) {
-        if (!response.data) {
-          return [];
-        }
-        return response.data.result;
-      });
-    };
-
+  module.factory('ZabbixAPIDatasource', function($q, backendSrv, templateSrv, alertSrv, ZabbixAPI, zabbixHelperSrv) {
 
     /**
-     * Perform time series query to Zabbix API
+     * Datasource initialization. Calls when you refresh page, add
+     * or modify datasource.
      *
-     * @param items: array of zabbix api item objects
+     * @param {Object} datasource Grafana datasource object.
      */
-    ZabbixAPIDatasource.prototype.performTimeSeriesQuery = function(items, start, end) {
-      var item_ids = items.map(function (item, index, array) {
-        return item.itemid;
-      });
-      // TODO: if different value types passed?
-      //       Perform multiple api request.
-      var hystory_type = items[0].value_type;
-      var options = {
-        method: 'POST',
-        url: this.url,
-        data: {
-          jsonrpc: '2.0',
-          method: 'history.get',
-          params: {
-              output: 'extend',
-              history: hystory_type,
-              itemids: item_ids,
-              sortfield: 'clock',
-              sortorder: 'ASC',
-              limit: this.limitmetrics,
-              time_from: start,
-          },
-          auth: this.auth,
-          id: 1
-        },
-      };
-      // Relative queries (e.g. last hour) don't include an end time
-      if (end) {
-        options.data.params.time_till = end;
-      }
+    function ZabbixAPIDatasource(datasource) {
+      this.name             = datasource.name;
+      this.url              = datasource.url;
+      this.basicAuth        = datasource.basicAuth;
+      this.withCredentials  = datasource.withCredentials;
 
-      return $http(options);
-    };
+      // TODO: fix passing username and password from config.html
+      this.username         = datasource.meta.username;
+      this.password         = datasource.meta.password;
 
+      // Use trends instead history since specified time
+      this.trends = datasource.meta.trends;
+      this.trendsFrom = datasource.meta.trendsFrom || '7d';
 
-    // Get authentication token
-    ZabbixAPIDatasource.prototype.performZabbixAPILogin = function() {
-      var options = {
-        url : this.url,
-        method : 'POST',
-        data: {
-          jsonrpc: '2.0',
-          method: 'user.login',
-          params: {
-            user: this.username,
-            password: this.password
-          },
-          auth: null,
-          id: 1
-        },
-      };
+      // Limit metrics per panel for templated request
+      this.limitmetrics = datasource.meta.limitmetrics || 100;
 
-      return $http(options).then(function (result) {
-        if (!result.data) {
-          return null;
+      // Initialize Zabbix API
+      this.zabbixAPI = new ZabbixAPI(this.url, this.username, this.password, this.basicAuth, this.withCredentials);
+    }
+
+    /**
+     * Calls for each panel in dashboard.
+     *
+     * @param  {Object} options   Query options. Contains time range, targets
+     *                            and other info.
+     *
+     * @return {Object}           Grafana metrics object with timeseries data
+     *                            for each target.
+     */
+    ZabbixAPIDatasource.prototype.query = function(options) {
+
+      // get from & to in seconds
+      var from = Math.ceil(kbn.parseDate(options.range.from).getTime() / 1000);
+      var to = Math.ceil(kbn.parseDate(options.range.to).getTime() / 1000);
+      var useTrendsFrom = Math.ceil(kbn.parseDate('now-' + this.trendsFrom).getTime() / 1000);
+
+      // Create request for each target
+      var promises = _.map(options.targets, function(target) {
+
+        // Don't show undefined and hidden targets
+        if (target.hide || !target.group || !target.host
+                        || !target.application || !target.item) {
+          return [];
         }
-        return result.data.result;
+
+        // Replace templated variables
+        var groupname = templateSrv.replace(target.group.name);
+        var hostname  = templateSrv.replace(target.host.name);
+        var appname   = templateSrv.replace(target.application.name);
+        var itemname  = templateSrv.replace(target.item.name);
+
+        // Extract zabbix groups, hosts and apps from string:
+        // "{host1,host2,...,hostN}" --> [host1, host2, ..., hostN]
+        var groups = zabbixHelperSrv.splitMetrics(groupname);
+        var hosts  = zabbixHelperSrv.splitMetrics(hostname);
+        var apps   = zabbixHelperSrv.splitMetrics(appname);
+
+        // Remove hostnames from item names and then
+        // extract item names
+        // "hostname: itemname" --> "itemname"
+        var delete_hostname_pattern = /(?:\[[\w\.]+\]\:\s)/g;
+        var itemnames = zabbixHelperSrv.splitMetrics(itemname.replace(delete_hostname_pattern, ''));
+
+        // Find items by item names and perform queries
+        var self = this;
+        return this.zabbixAPI.itemFindQuery(groups, hosts, apps)
+          .then(function (items) {
+
+            // Filter hosts by regex
+            if (target.host.visible_name === 'All') {
+              if (target.hostFilter && _.every(items, _.identity.hosts)) {
+
+                // Use templated variables in filter
+                var host_pattern = new RegExp(templateSrv.replace(target.hostFilter));
+                items = _.filter(items, function (item) {
+                  return _.some(item.hosts, function (host) {
+                    return host_pattern.test(host.name);
+                  });
+                });
+              }
+            }
+
+            if (itemnames[0] === 'All') {
+
+              // Filter items by regex
+              if (target.itemFilter) {
+
+                // Use templated variables in filter
+                var item_pattern = new RegExp(templateSrv.replace(target.itemFilter));
+                return _.filter(items, function (item) {
+                  return item_pattern.test(zabbixHelperSrv.expandItemName(item));
+                });
+              } else {
+                return items;
+              }
+            } else {
+
+              // Filtering items
+              return _.filter(items, function (item) {
+                return _.contains(itemnames, zabbixHelperSrv.expandItemName(item));
+              });
+            }
+          }).then(function (items) {
+
+            // Don't perform query for high number of items
+            // to prevent Grafana slowdown
+            if (items.length > self.limitmetrics) {
+              var message = "Try to increase limitmetrics parameter in datasource config.<br>"
+                + "Current limitmetrics value is " + self.limitmetrics;
+              alertSrv.set("Metrics limit exceeded", message, "warning", 10000);
+              return [];
+            } else {
+              items = _.flatten(items);
+
+              // Use alias only for single metric, otherwise use item names
+              var alias = target.item.name === 'All' || itemnames.length > 1 ? undefined : templateSrv.replace(target.alias);
+
+              if ((from < useTrendsFrom) && self.trends) {
+                return self.zabbixAPI.getTrends(items, from, to)
+                  .then(_.bind(zabbixHelperSrv.handleTrendResponse, zabbixHelperSrv, items, alias, target.scale));
+              } else {
+                return self.zabbixAPI.getHistory(items, from, to)
+                  .then(_.bind(zabbixHelperSrv.handleHistoryResponse, zabbixHelperSrv, items, alias, target.scale));
+              }
+            }
+          });
+      }, this);
+
+      return $q.all(_.flatten(promises)).then(function (results) {
+        var timeseries_data = _.flatten(results);
+        var data = _.map(timeseries_data, function (timeseries) {
+
+          // Series downsampling
+          if (timeseries.datapoints.length > options.maxDataPoints) {
+            var ms_interval = Math.floor((to - from) / options.maxDataPoints) * 1000;
+            timeseries.datapoints = zabbixHelperSrv.downsampleSeries(timeseries.datapoints, to, ms_interval);
+          }
+          return timeseries;
+        });
+        return { data: data };
       });
     };
 
+    ////////////////
+    // Templating //
+    ////////////////
 
-    // Get the list of host groups
-    ZabbixAPIDatasource.prototype.performHostGroupSuggestQuery = function() {
-      var data = {
-        jsonrpc: '2.0',
-        method: 'hostgroup.get',
-        params: {
-          output: ['name'],
-          sortfield: 'name'
-        },
-        auth: this.auth,
-        id: 1
-      };
+    /**
+     * Find metrics from templated request.
+     *
+     * @param  {string} query Query from Templating
+     * @return {string}       Metric name - group, host, app or item or list
+     *                        of metrics in "{metric1,metcic2,...,metricN}" format.
+     */
+    ZabbixAPIDatasource.prototype.metricFindQuery = function (query) {
+      // Split query. Query structure:
+      // group.host.app.item
+      var parts = [];
+      _.each(query.split('.'), function (part) {
+        part = templateSrv.replace(part);
+        if (part[0] === '{') {
+          // Convert multiple mettrics to array
+          // "{metric1,metcic2,...,metricN}" --> [metric1, metcic2,..., metricN]
+          parts.push(zabbixHelperSrv.splitMetrics(part));
+        } else {
+          parts.push(part);
+        }
+      });
+      var template = _.object(['group', 'host', 'app', 'item'], parts);
 
-      return this.doZabbixAPIRequest(data);
-    };
-
-
-    // Get the list of hosts
-    ZabbixAPIDatasource.prototype.performHostSuggestQuery = function(groupid) {
-      var data = {
-        jsonrpc: '2.0',
-        method: 'host.get',
-        params: {
-          output: ['name'],
-          sortfield: 'name'
-        },
-        auth: this.auth,
-        id: 1
-      };
-      if (groupid) {
-        data.params.groupids = groupid;
-      }
-
-      return this.doZabbixAPIRequest(data);
-    };
-
-
-    // Get the list of applications
-    ZabbixAPIDatasource.prototype.performAppSuggestQuery = function(hostid) {
-      var data = {
-        jsonrpc: '2.0',
-        method: 'application.get',
-        params: {
-          output: ['name'],
-          sortfield: 'name',
-          hostids: hostid
-        },
-        auth: this.auth,
-        id: 1
-      };
-
-      return this.doZabbixAPIRequest(data);
-    };
-
-
-    // Get the list of host items
-    ZabbixAPIDatasource.prototype.performItemSuggestQuery = function(hostid, applicationid) {
-      var data = {
-        jsonrpc: '2.0',
-        method: 'item.get',
-        params: {
-          output: ['name', 'key_', 'value_type', 'delay'],
-          sortfield: 'name',
-          hostids: hostid
-        },
-        auth: this.auth,
-        id: 1
-      };
-      // If application selected return only relative items
-      if (applicationid) {
-        data.params.applicationids = applicationid;
-      }
-
-      return this.doZabbixAPIRequest(data);
-    };
-
-
-    ZabbixAPIDatasource.prototype.annotationQuery = function(annotation, rangeUnparsed) {
-      var from = kbn.parseDate(rangeUnparsed.from).getTime();
-      var to = kbn.parseDate(rangeUnparsed.to).getTime();
-      var self = this;
-      from = Math.ceil(from/1000);
-      to = Math.ceil(to/1000);
-
-      var tid_options = {
-        method: 'POST',
-        url: self.url + '',
-        data: {
-          jsonrpc: '2.0',
-          method: 'trigger.get',
-          params: {
-              output: ['triggerid', 'description'],
-              itemids: annotation.aids.split(','), // TODO: validate / pull automatically from dashboard.
-              limit: self.limitmetrics,
-          },
-          auth: self.auth,
-          id: 1
-        },
-      };
-
-      return $http(tid_options).then(function(result) {
-        var obs = {};
-        obs = _.indexBy(result.data.result, 'triggerid');
-
-        var options = {
-          method: 'POST',
-          url: self.url + '',
-          data: {
-            jsonrpc: '2.0',
-            method: 'event.get',
-            params: {
-                output: 'extend',
-                sortorder: 'DESC',
-                time_from: from,
-                time_till: to,
-                objectids: _.keys(obs),
-                limit: self.limitmetrics,
-            },
-            auth: self.auth,
-            id: 1
-          },
-        };
-
-        return $http(options).then(function(result2) {
-          var list = [];
-          _.each(result2.data.result, function(e) {
-            list.push({
-              annotation: annotation,
-              time: e.clock * 1000,
-              title: obs[e.objectid].description,
-              text: e.eventid,
+      // Get items
+      if (parts.length === 4) {
+        return this.zabbixAPI.itemFindQuery(template.group, template.host, template.app)
+          .then(function (result) {
+            return _.map(result, function (item) {
+              var itemname = zabbixHelperSrv.expandItemName(item);
+              return {
+                text: itemname,
+                expandable: false
+              };
             });
           });
-          return list;
+      }
+      // Get applications
+      else if (parts.length === 3) {
+        return this.zabbixAPI.appFindQuery(template.host, template.group).then(function (result) {
+          return _.map(result, function (app) {
+            return {
+              text: app.name,
+              expandable: false
+            };
+          });
         });
-      });
+      }
+      // Get hosts
+      else if (parts.length === 2) {
+        return this.zabbixAPI.hostFindQuery(template.group).then(function (result) {
+          return _.map(result, function (host) {
+            return {
+              text: host.name,
+              expandable: false
+            };
+          });
+        });
+      }
+      // Get groups
+      else if (parts.length === 1) {
+        return this.zabbixAPI.getGroupByName(template.group).then(function (result) {
+          return _.map(result, function (hostgroup) {
+            return {
+              text: hostgroup.name,
+              expandable: false
+            };
+          });
+        });
+      }
+      // Return empty object for invalid request
+      else {
+        var d = $q.defer();
+        d.resolve([]);
+        return d.promise;
+      }
+    };
+
+    /////////////////
+    // Annotations //
+    /////////////////
+
+    ZabbixAPIDatasource.prototype.annotationQuery = function(annotation, rangeUnparsed) {
+      var from = Math.ceil(kbn.parseDate(rangeUnparsed.from).getTime() / 1000);
+      var to = Math.ceil(kbn.parseDate(rangeUnparsed.to).getTime() / 1000);
+      var self = this;
+
+      var params = {
+        output: ['triggerid', 'description'],
+        search: {
+          'description': annotation.query
+        },
+        searchWildcardsEnabled: true,
+        expandDescription: true
+      };
+
+      return this.zabbixAPI.performZabbixAPIRequest('trigger.get', params)
+        .then(function (result) {
+          if(result) {
+            var objects = _.indexBy(result, 'triggerid');
+            var params = {
+              output: 'extend',
+              time_from: from,
+              time_till: to,
+              objectids: _.keys(objects),
+              select_acknowledges: 'extend'
+            };
+
+            // Show problem events only
+            if (!annotation.showOkEvents) {
+              params.value = 1;
+            }
+
+            return self.zabbixAPI.performZabbixAPIRequest('event.get', params)
+              .then(function (result) {
+                var events = [];
+                _.each(result, function(e) {
+                  var formatted_acknowledges = zabbixHelperSrv.formatAcknowledges(e.acknowledges);
+                  events.push({
+                    annotation: annotation,
+                    time: e.clock * 1000,
+                    title: Number(e.value) ? 'Problem' : 'OK',
+                    text: objects[e.objectid].description + formatted_acknowledges,
+                  });
+                });
+                return events;
+              });
+          } else {
+            return [];
+          }
+        });
     };
 
     return ZabbixAPIDatasource;

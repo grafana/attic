@@ -29,8 +29,8 @@ function (angular, _, kbn) {
 
     // Called once per panel (graph)
     PrometheusDatasource.prototype.query = function(options) {
+      var start = convertToPrometheusTime(options.range.from);
       var end = convertToPrometheusTime(options.range.to);
-      var range = convertToPrometheusRange(options.range.from, options.range.to);
 
       var queries = [];
       _.each(options.targets, _.bind(function(target) {
@@ -56,7 +56,7 @@ function (angular, _, kbn) {
       }
 
       var allQueryPromise = _.map(queries, _.bind(function(query) {
-        return this.performTimeSeriesQuery(query, range, end);
+        return this.performTimeSeriesQuery(query, start, end);
       }, this));
 
       var self = this;
@@ -65,13 +65,13 @@ function (angular, _, kbn) {
           var result = [];
 
           _.each(allResponse, function(response, index) {
-            if (response.data.type === 'error') {
-              self.lastErrors.query = response.data.value;
-              throw response.data.value;
+            if (response.status === 'error') {
+              self.lastErrors.query = response.error;
+              throw response.error;
             }
             delete self.lastErrors.query;
 
-            _.each(response.data.value, function(metricData) {
+            _.each(response.data.data.result, function(metricData) {
               result.push(transformMetricData(metricData, options.targets[index]));
             });
           });
@@ -80,10 +80,11 @@ function (angular, _, kbn) {
         });
     };
 
-    PrometheusDatasource.prototype.performTimeSeriesQuery = function(query, range, end) {
-      var url = this.url + '/api/query_range?expr=' + encodeURIComponent(query.expr) + '&range=' + range + '&end=' + end;
+    PrometheusDatasource.prototype.performTimeSeriesQuery = function(query, start, end) {
+      var url = this.url + '/api/v1/query_range?query=' + encodeURIComponent(query.expr) + '&start=' + start + '&end=' + end;
 
       var step = query.step;
+      var range = Math.floor(end - start)
       // Prometheus drop query if range/step > 11000
       // calibrate step if it is too big
       if (step !== 0 && range / step > 11000) {
@@ -102,11 +103,11 @@ function (angular, _, kbn) {
     PrometheusDatasource.prototype.performSuggestQuery = function(query) {
       var options = {
         method: 'GET',
-        url: this.url + '/api/metrics',
+        url: this.url + '/api/v1/label/__name__/values',
       };
 
       return $http(options).then(function(result) {
-        var suggestData = _.filter(result.data, function(metricName) {
+        var suggestData = _.filter(result.data.data, function(metricName) {
           return metricName.indexOf(query) !==  1;
         });
 
@@ -116,18 +117,32 @@ function (angular, _, kbn) {
 
     PrometheusDatasource.prototype.metricFindQuery = function(query) {
       var options;
-      var matches = query.match(/^[a-zA-Z_:*][a-zA-Z0-9_:*]*/);
 
-      if (matches != null && matches[0].indexOf('*') >= 0) {
+      var metricsQuery = query.match(/^[a-zA-Z_:*][a-zA-Z0-9_:*]*/);
+      var labelValuesQuery = query.match(/^label_values\((.+)\)/);
+
+      if (labelValuesQuery) {
+        // return label values
+        options = {
+          method: 'GET',
+          url: this.url + '/api/v1/label/' + labelValuesQuery[1] + '/values',
+        };
+
+        return $http(options).then(function(result){
+          return _.map(result.data.data, function(value) {
+            return {text: value};
+          });
+        });
+      } else if (metricsQuery != null && metricsQuery[0].indexOf('*') >= 0) {
         // if query has wildcard character, return metric name list
         options = {
           method: 'GET',
-          url: this.url + '/api/metrics',
+          url: this.url + '/api/v1/label/__name__/values',
         };
 
         return $http(options)
           .then(function(result) {
-            return _.chain(result.data)
+            return _.chain(result.data.data)
               .filter(function(metricName) {
                 var r = new RegExp(matches[0].replace(/\*/g, '.*'));
                 return r.test(metricName);
@@ -144,12 +159,12 @@ function (angular, _, kbn) {
         // if query contains full metric name, return metric name and label list
         options = {
           method: 'GET',
-          url: this.url + '/api/query?expr=' + encodeURIComponent(query),
+          url: this.url + '/api/v1/query?query=' + encodeURIComponent(query),
         };
 
         return $http(options)
           .then(function(result) {
-            return _.map(result.data.value, function(metricData) {
+            return _.map(result.data.result, function(metricData) {
               return {
                 text: getOriginalMetricName(metricData.metric),
                 expandable: true
@@ -207,10 +222,6 @@ function (angular, _, kbn) {
         return label[0] + '="' + label[1] + '"';
       }).join(',');
       return metricName + '{' + labelPart + '}';
-    }
-
-    function convertToPrometheusRange(from, to) {
-      return Math.floor(convertToPrometheusTime(to) - convertToPrometheusTime(from));
     }
 
     function convertToPrometheusTime(date) {
