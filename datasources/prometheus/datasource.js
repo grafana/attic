@@ -10,7 +10,7 @@ function (angular, _, kbn) {
 
   var module = angular.module('grafana.services');
 
-  module.factory('PrometheusDatasource', function($q, $http, templateSrv) {
+  module.factory('PrometheusDatasource', function($q, backendSrv, templateSrv) {
 
     function PrometheusDatasource(datasource) {
       this.type = 'prometheus';
@@ -24,8 +24,25 @@ function (angular, _, kbn) {
         url = url.substr(0, url.length - 1);
       }
       this.url = url;
+      this.basicAuth = datasource.basicAuth;
       this.lastErrors = {};
     }
+
+    PrometheusDatasource.prototype._request = function(method, url) {
+      var options = {
+        url: this.url + url,
+        method: method
+      };
+
+      if (this.basicAuth) {
+        options.withCredentials = true;
+        options.headers = {
+          "Authorization": this.basicAuth
+        };
+      }
+
+      return backendSrv.datasourceRequest(options);
+    };
 
     // Called once per panel (graph)
     PrometheusDatasource.prototype.query = function(options) {
@@ -81,7 +98,7 @@ function (angular, _, kbn) {
     };
 
     PrometheusDatasource.prototype.performTimeSeriesQuery = function(query, start, end) {
-      var url = this.url + '/api/v1/query_range?query=' + encodeURIComponent(query.expr) + '&start=' + start + '&end=' + end;
+      var url = '/api/v1/query_range?query=' + encodeURIComponent(query.expr) + '&start=' + start + '&end=' + end;
 
       var step = query.step;
       var range = Math.floor(end - start);
@@ -92,21 +109,13 @@ function (angular, _, kbn) {
       }
       url += '&step=' + step;
 
-      var options = {
-        method: 'GET',
-        url: url,
-      };
-
-      return $http(options);
+      return this._request('GET', url);
     };
 
     PrometheusDatasource.prototype.performSuggestQuery = function(query) {
-      var options = {
-        method: 'GET',
-        url: this.url + '/api/v1/label/__name__/values',
-      };
+      var url = '/api/v1/label/__name__/values';
 
-      return $http(options).then(function(result) {
+      return this._request('GET', url).then(function(result) {
         var suggestData = _.filter(result.data.data, function(metricName) {
           return metricName.indexOf(query) !==  1;
         });
@@ -116,31 +125,25 @@ function (angular, _, kbn) {
     };
 
     PrometheusDatasource.prototype.metricFindQuery = function(query) {
-      var options;
+      var url;
 
       var metricsQuery = query.match(/^[a-zA-Z_:*][a-zA-Z0-9_:*]*/);
       var labelValuesQuery = query.match(/^label_values\((.+)\)/);
 
       if (labelValuesQuery) {
         // return label values
-        options = {
-          method: 'GET',
-          url: this.url + '/api/v1/label/' + labelValuesQuery[1] + '/values',
-        };
+        url = '/api/v1/label/' + labelValuesQuery[1] + '/values';
 
-        return $http(options).then(function(result) {
+        return this._request('GET', url).then(function(result) {
           return _.map(result.data.data, function(value) {
             return {text: value};
           });
         });
       } else if (metricsQuery != null && metricsQuery[0].indexOf('*') >= 0) {
         // if query has wildcard character, return metric name list
-        options = {
-          method: 'GET',
-          url: this.url + '/api/v1/label/__name__/values',
-        };
+        url = '/api/v1/label/__name__/values';
 
-        return $http(options)
+        return this._request('GET', url)
           .then(function(result) {
             return _.chain(result.data.data)
               .filter(function(metricName) {
@@ -157,12 +160,9 @@ function (angular, _, kbn) {
           });
       } else {
         // if query contains full metric name, return metric name and label list
-        options = {
-          method: 'GET',
-          url: this.url + '/api/v1/query?query=' + encodeURIComponent(query),
-        };
+        url = '/api/v1/query?query=' + encodeURIComponent(query);
 
-        return $http(options)
+        return this._request('GET', url)
           .then(function(result) {
             return _.map(result.data.result, function(metricData) {
               return {
