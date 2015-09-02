@@ -214,7 +214,7 @@ function (angular, _, kbn) {
         interpolate: /\{\{(.+?)\}\}/g
       };
 
-      var template = _.template(options.legendFormat);
+      var template = _.template(templateSrv.replace(options.legendFormat));
       var metricName;
       try {
         metricName = template(labelData);
