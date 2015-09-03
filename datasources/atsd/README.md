@@ -1,6 +1,6 @@
 # Axibase Time Series Database plugin for Grafana
 
-Axibase Time Series Database was designed from the ground-up to store and analyze time-series data at scale. Unlike traditional databases it comes with pre-integrated Visualization, Rule Engine and more. [Learn more about ATSD on axibase.com](http://axibase.com/products/axibase-time-series-database/) 
+Axibase Time Series Database was designed from the ground-up to store and analyze time-series data at scale. Unlike traditional databases it comes with Rule Engine, Data Versioning, SQL Query Language, Data Forecasting and more. [Learn more about ATSD on axibase.com](http://axibase.com/products/axibase-time-series-database/) 
 
 ## Installation guide
 
@@ -18,8 +18,8 @@ Example portal built with the ATSD data source:
 ![Default](https://axibase.com/wp-content/uploads/2015/09/00-default.png)
 
 * Disconnect interval option makes use of Grafana's null point mode. If there is a gap in data bigger than the indicated value, visually it will behave as if the gap was filled with nulls.
-Supported 'Disconnect' format is a number followed by a letter (corresponding to the time frame), e.g. 15s, 5m, 2h, 1w etc.
-Supported values: s - seconds, m - minutes, h or H - hours, d - days, w - weeks, M - months, y - years.
+Supported 'Disconnect' format is a number followed by a letter (corresponding to the time frame), e.g. `15s`, `5m`, `2h`, `1w` etc.
+Supported values: `s` - seconds, `m` - minutes, `h` or `H` - hours, `d` - days, `w` - weeks, `M` - months, `y` - years.
 ![Disconnect](https://axibase.com/wp-content/uploads/2015/09/01-disconnect.png)
 
 * There is auto-complete in the entity field. This and other meta-data request results, such as metric lists and tag combinations, are cached for 5 minutes, and you can drop the cache with the 'Cache' button.
@@ -47,8 +47,8 @@ Supported values: s - seconds, m - minutes, h or H - hours, d - days, w - weeks,
 ![Aggregator](https://axibase.com/wp-content/uploads/2015/09/10-aggregator.png)
 
 * You can denote the aggregation period.
-Supported 'Period' format is a number followed by a letter (corresponding to the time frame), e.g. 15s, 5m, 2h, 1w etc.
-Supported values: s - seconds, m - minutes, h or H - hours, d - days, w - weeks, M - months, y - years.
+Supported 'Period' format is a number followed by a letter (corresponding to the time frame), e.g. `15s`, `5m`, `2h`, `1w` etc.
+Supported values: `s` - seconds, `m` - minutes, `h` or `H` - hours, `d` - days, `w` - weeks, `M` - months, `y` - years.
 ![Period](https://axibase.com/wp-content/uploads/2015/09/11-period.png)
 
 * There are two tag editing modes. The first one is 'Tag editor', where you add tag name-value pairs one by one with the help of auto-complete.
