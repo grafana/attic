@@ -68,7 +68,7 @@ function (angular, _) {
                 target.errors = "Datasource authentification failed";
                 break;
               case 400:
-                target.errors = 'bla: ' + result;
+                target.errors = 'Client error: ' + result;
                 break;
               case 200:
                 target.errors = null;
