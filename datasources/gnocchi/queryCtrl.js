@@ -11,7 +11,9 @@ function (angular, _) {
 
     $scope.init = function() {
       // TODO(sileht): Allows custom
-      $scope.aggregators = ['mean', 'sum', 'min', 'max'];
+      $scope.aggregators = ['mean', 'sum', 'min', 'max',
+                            'std', 'median', 'first', 'last', 'count'].concat(
+                                _.range(1, 100).map(function (i) { return i + "pct"; }));
 
       if (!$scope.target.aggregator) {
         $scope.target.aggregator = 'mean';
