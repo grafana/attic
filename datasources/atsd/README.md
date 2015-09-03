@@ -43,7 +43,7 @@ Supported values: s - seconds, m - minutes, h or H - hours, d - days, w - weeks,
 * You can switch between modes by clicking 'as tokens' / 'as text'.
 ![As text](https://axibase.com/wp-content/uploads/2015/09/09-as_text.png)
 
-* The queries support all ATSD statistic aggregators. Supported Aggregators: ```detail, avg, max, min, sum, count, percentile_99, percentile_95, percentile_90, percentile_75, percentile_50 (median), min_value_time, max_value_time```
+* The queries support all ATSD statistic aggregators. Supported Aggregators: *Detail*, *Count*, *Minimum*, *Maximum*, *Average*, *Median*, *Sum*, *Percentile 99.9%*, *Percentile 99.5%*, *Percentile 99%*, *Percentile 95%*, *Percentile 90%*, *Percentile 75%*, *First value*, *Last value*, *Delta*, *Weighted average*, *Weighted time average*, *Standard deviation*.
 ![Aggregator](https://axibase.com/wp-content/uploads/2015/09/10-aggregator.png)
 
 * You can denote the aggregation period.
