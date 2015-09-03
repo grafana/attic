@@ -1,12 +1,17 @@
 # Axibase Time Series Database plugin for Grafana
 
+Axibase Time Series Database was designed from the ground-up to store and analyze time-series data at scale. Unlike traditional databases it comes with pre-integrated Visualization, Rule Engine and more. [Learn more about ATSD on axibase.com](http://axibase.com/products/axibase-time-series-database/) 
+
 ## Installation guide
 
 Copy ```atsd/``` into ```<grafana-2.x.x source directory>/public/app/plugins/datasource/``` directory and restart Grafana server. Then proceed as you would normally do with any built-in plugin by adding it through the data source menu.
+Be sure to set URL to the http port of your ATSD installation.
+User and Password should be set to the ATSD user.
 ![Datasource](https://axibase.com/wp-content/uploads/2015/09/18-datasource.png)
 
 ## Query editor overview
 
+Example portal built with the ATSD data source:
 ![Overall](https://axibase.com/wp-content/uploads/2015/09/17-overall.png)
 
 * Clicking the 'Submit' button results in a time series request. The 'Cache' button is for dropping the meta-data cache (described below).
@@ -18,6 +23,7 @@ Supported values: s - seconds, m - minutes, h or H - hours, d - days, w - weeks,
 ![Disconnect](https://axibase.com/wp-content/uploads/2015/09/01-disconnect.png)
 
 * There is auto-complete in the entity field. This and other meta-data request results, such as metric lists and tag combinations, are cached for 5 minutes, and you can drop the cache with the 'Cache' button.
+[Learn more about Entities, Metrics and Tags on the Axibase website.](http://axibase.com/products/axibase-time-series-database/data-model/)
 ![Entity](https://axibase.com/wp-content/uploads/2015/09/02-entity.png)
 
 * The same works for the metric field.
@@ -37,7 +43,7 @@ Supported values: s - seconds, m - minutes, h or H - hours, d - days, w - weeks,
 * You can switch between modes by clicking 'as tokens' / 'as text'.
 ![As text](https://axibase.com/wp-content/uploads/2015/09/09-as_text.png)
 
-* The queries support all ATSD statistic aggregators.
+* The queries support all ATSD statistic aggregators. Supported Aggregators: ```detail, avg, max, min, sum, count, percentile_99, percentile_95, percentile_90, percentile_75, percentile_50 (median), min_value_time, max_value_time```
 ![Aggregator](https://axibase.com/wp-content/uploads/2015/09/10-aggregator.png)
 
 * You can denote the aggregation period.
