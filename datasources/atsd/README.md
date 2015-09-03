@@ -2,16 +2,17 @@
 
 ## Installation guide
 
-Copy ```atsd/``` into ```<grafana-2.x.x source directory>/public/app/plugins/datasource/``` directory, then proceed as you would normally do with any built-in plugin.
+Copy ```atsd/``` into ```<grafana-2.x.x source directory>/public/app/plugins/datasource/``` directory and restart Grafana server. Then proceed as you would normally do with any built-in plugin by adding it through the data source menu.
+![Datasource](https://axibase.com/wp-content/uploads/2015/09/18-datasource.png)
 
 ## Query editor overview
 
 ![Overall](https://axibase.com/wp-content/uploads/2015/09/17-overall.png)
 
-* Clicking the 'Submit' button results in a 'get_data' request. The 'Cache' button is for dropping the meta-data cache (described below).
+* Clicking the 'Submit' button results in a time series request. The 'Cache' button is for dropping the meta-data cache (described below).
 ![Default](https://axibase.com/wp-content/uploads/2015/09/00-default.png)
 
-* Disconnect interval option makes use of Grafana's null point mode. If there is a gap in data bigger than the indicated value, a couple of nulls are inserted on each side of the gap.
+* Disconnect interval option makes use of Grafana's null point mode. If there is a gap in data bigger than the indicated value, visually it will behave as if the gap was filled with nulls.
 ![Disconnect](https://axibase.com/wp-content/uploads/2015/09/01-disconnect.png)
 
 * There is auto-complete in the entity field. This and other meta-data request results, such as metric lists and tag combinations, are cached for 5 minutes, and you can drop the cache with the 'Cache' button.
