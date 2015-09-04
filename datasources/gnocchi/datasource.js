@@ -32,6 +32,7 @@ function (angular, _, kbn, moment) {
         this.default_headers['X-Auth-Token'] = datasource.jsonData.token;
       }
 
+      // If the URL starts with http, we are in direct mode
       if (datasource.url.indexOf('http') === 0){
         this.url = null;
         this.keystone_endpoint = sanitize_url(datasource.url);
