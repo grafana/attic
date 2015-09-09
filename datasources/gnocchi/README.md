@@ -5,9 +5,9 @@ grafana2-gnocchi-datasource-plugin
 Grafana 2 - Gnocchi datasource Plugin
 =====================================
 
-This is a plugin that allows Grafana 2 to support Gnocchi as datasource
+This is a plugin that allows Grafana 2 to support Gnocchi as a datasource.
 
-This is developed with in devloppement Grafana 2.1.X
+This has been developed for Grafana 2.1.
 
 Installation
 ============
@@ -41,17 +41,15 @@ Not yet implemented
 Current Limitation
 ==================
 
-Grafana doesn’t allow to query two different servers when using the proxymode
-So we are not able to query Keystone for a token and then query gnocchi.
+Grafana doesn’t allow to query two different servers when using the proxy mode,
+so we are not able to query Keystone for a token and then query gnocchi.
 
-In proxymode, we need to set a token and the Gnocchi url on the datasource
+In proxymode, we need to set a token and the Gnocchi URL on the datasource.
 
-In directmode, we can use login/password and the Keystone url. 
+In direct mode, we can use login/password and the Keystone URL.
 Note that CORS MUST be enabled on Keystone and Gnocchi servers.
-
 
 License
 =======
 
 APACHE LICENSE Version 2.0, January 2004
-

@@ -20,10 +20,19 @@ function (angular, _, kbn, moment) {
     function GnocchiDatasource(datasource) {
       this.type = 'gnocchi';
       this.name = datasource.name;
-      this.project = datasource.jsonData.project;
-      this.username = datasource.jsonData.username;
-      this.password = datasource.jsonData.password;
 
+      this.default_headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (datasource.jsonData) {
+        this.project = datasource.jsonData.project;
+        this.username = datasource.jsonData.username;
+        this.password = datasource.jsonData.password;
+        this.default_headers['X-Auth-Token'] = datasource.jsonData.token;
+      }
+
+      // If the URL starts with http, we are in direct mode
       if (datasource.url.indexOf('http') === 0){
         this.url = null;
         this.keystone_endpoint = sanitize_url(datasource.url);
@@ -31,11 +40,6 @@ function (angular, _, kbn, moment) {
         this.url = sanitize_url(datasource.url);
         this.keystone_endpoint = null;
       }
-
-      this.default_headers = {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': datasource.jsonData.token,
-      };
 
       this.supportMetrics = true;
       this.editorSrc = 'app/features/gnocchi/partials/query.editor.html';
