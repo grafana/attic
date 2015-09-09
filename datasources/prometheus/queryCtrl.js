@@ -72,11 +72,6 @@ function (angular, _, kbn) {
       _.move($scope.panel.targets, fromIndex, toIndex);
     };
 
-    $scope.duplicate = function() {
-      var clone = angular.copy($scope.target);
-      $scope.panel.targets.push(clone);
-    };
-
     $scope.suggestMetrics = function(query, callback) {
       $scope.datasource
         .performSuggestQuery(query)
@@ -132,6 +127,7 @@ function (angular, _, kbn) {
       return errs;
     }
 
+    $scope.init();
   });
 
 });
