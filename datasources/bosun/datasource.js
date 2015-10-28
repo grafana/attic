@@ -33,9 +33,8 @@ function (angular, _) {
     // Called once per panel (graph)
     BosunDatasource.prototype.query = function(options) {
       var queries = [];
-      // Get time values to replace $bStart and $bEnd
+      // Get time values to replace $start
       // The end time is what bosun regards as 'now'
-      console.log(options);
       var secondsAgo = options.range.to.diff(options.range.from.utc(), 'seconds');
       secondsAgo += 's';
       _.each(options.targets, _.bind(function(target) {
@@ -56,8 +55,8 @@ function (angular, _) {
         return d.promise;
       }
 
-      var allQueryPromise = _.map(queries, _.bind(function(query) {
-        return this.performTimeSeriesQuery(query, options);
+      var allQueryPromise = _.map(queries, _.bind(function(query, index) {
+        return this.performTimeSeriesQuery(query, options.targets[index], options);
       }, this));
 
       return $q.all(allQueryPromise)
@@ -72,32 +71,41 @@ function (angular, _) {
         });
     };
 
-    BosunDatasource.prototype.performTimeSeriesQuery = function(query, options) {
+    BosunDatasource.prototype.performTimeSeriesQuery = function(query, target, options) {
       var exprDate = options.range.to.utc().format('YYYY-MM-DD');
-      var exprTime = options.range.to.utc().format('HH:mm');
+      var exprTime = options.range.to.utc().format('HH:mm:ss');
       var url = '/api/expr?date=' + encodeURIComponent(exprDate) + '&time=' + encodeURIComponent(exprTime);
       return this._request('POST', url, query).then(function(response) {
         if (response.data.Type !== 'series') {
           throw 'Bosun response type must be a series';
         }
         var result = _.map(response.data.Results, function(result) {
-          return transformMetricData(result);
+          return transformMetricData(result, target, options);
         });
         return { data: result };
       });
     };
 
-    function transformMetricData(result) {
+    function transformMetricData(result, target, options) {
       var tagData = [];
       _.each(result.Group, function(v, k) {
         tagData.push({'value': v, 'key': k});
       });
       var sortedTags = _.sortBy(tagData, 'key');
-      tagData = [];
-      _.each(sortedTags, function(tag) {
-        tagData.push(tag.key + '=' + tag.value);
-      });
-      var metricLabel = '{' + tagData.join(', ') + '}';
+      var metricLabel = "";
+      if (target.alias) {
+        var scopedVars = _.clone(options.scopedVars || {});
+        _.each(sortedTags, function(value) {
+          scopedVars['tag_' + value.key] = {"value": value.value};
+        });
+        metricLabel = templateSrv.replace(target.alias, scopedVars);
+      } else {
+        tagData = [];
+        _.each(sortedTags, function(tag) {
+          tagData.push(tag.key + '=' + tag.value);
+        });
+        metricLabel = '{' + tagData.join(', ') + '}';
+      }
       var dps = [];
       _.each(result.Value, function (v, k) {
         dps.push([v, parseInt(k) * 1000]);
