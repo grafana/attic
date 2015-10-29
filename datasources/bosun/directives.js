@@ -10,4 +10,8 @@ function (angular) {
     return {controller: 'BosunQueryCtrl', templateUrl: 'app/plugins/datasource/bosun/partials/query.editor.html'};
   });
 
+  module.directive('metricQueryOptionsBosun', function() {
+    return {templateUrl: 'app/plugins/datasource/bosun/partials/query.options.html'};
+  });
+
 });
