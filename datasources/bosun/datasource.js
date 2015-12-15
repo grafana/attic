@@ -1,10 +1,11 @@
 define([
   'angular',
+  'app/core/table_model',
   'lodash',
   './directives',
   './query_ctrl',
 ],
-function (angular, _) {
+function (angular, TableModel, _) {
   'use strict';
 
   var module = angular.module('grafana.services');
@@ -76,15 +77,43 @@ function (angular, _) {
       var exprTime = options.range.to.utc().format('HH:mm:ss');
       var url = '/api/expr?date=' + encodeURIComponent(exprDate) + '&time=' + encodeURIComponent(exprTime);
       return this._request('POST', url, query).then(function(response) {
-        if (response.data.Type !== 'series') {
-          throw 'Bosun response type must be a series';
+        var result;
+        if (response.data.Type === 'series') {
+          result = _.map(response.data.Results, function(result) {
+            return transformMetricData(result, target, options);
+          });
         }
-        var result = _.map(response.data.Results, function(result) {
-          return transformMetricData(result, target, options);
-        });
+        if (response.data.Type === 'number') {
+          result = makeTable(response.data.Results);
+        }
         return { data: result };
       });
     };
+
+    function makeTable(result) {
+      var table = new TableModel();
+      if (Object.keys(result).length < 1) {
+        return table;
+      }
+      var tagKeys = [];
+      _.each(result[0].Group, function(v, tagKey) {
+        tagKeys.push(tagKey);
+      });
+      tagKeys.sort();
+      table.columns = _.map(tagKeys, function(tagKey) {
+        return {"text": tagKey};
+      });
+      table.columns.push({"text": "value"});
+      _.each(result, function(res) {
+         var row = [];
+         _.each(res.Group, function(tagValue, tagKey) {
+           row[tagKeys.indexOf(tagKey)] = tagValue;
+         });
+         row.push(res.Value);
+         table.rows.push(row);
+      });
+      return [table];
+    }
 
     function transformMetricData(result, target, options) {
       var tagData = [];
