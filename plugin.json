@@ -1,0 +1,25 @@
+{
+  "pluginType": "app",
+  "type": "app-example",
+  "enabled": true,
+
+  "plugins": [
+    {"name": "graph",    "type": "panel",   },
+    {"name": "graphite", "type": "datasource"},
+  ],
+
+  "css": {"light": "plugin.dark.css", "dark": "plugin.light.css"},
+
+  "module": "app",
+
+  "page": {
+    "icon": "fa-fw icon-warning",
+    "url": "/app-example",
+    "reqRole": "Editor"
+  },
+
+  "staticRoot": {
+    "url": "app-example",
+    "path": "./public"
+  }
+}
