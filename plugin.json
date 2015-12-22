@@ -1,25 +1,41 @@
 {
   "pluginType": "app",
+  "name": "App Example",
   "type": "app-example",
-  "enabled": true,
 
-  "plugins": [
-    {"name": "graph",    "type": "panel",   },
-    {"name": "graphite", "type": "datasource"},
-  ],
+  "plugins": [],
 
-  "css": {"light": "plugin.dark.css", "dark": "plugin.light.css"},
+  "css": {
+    "light":  "plugin.dark.css",
+    "dark":   "plugin.light.css"
+  },
 
   "module": "app",
 
-  "page": {
-    "icon": "fa-fw icon-warning",
-    "url": "/app-example",
-    "reqRole": "Editor"
+  "pages": [
+    {"name": "Example1", "url": "/app-example", "reqRole": "Editor"}
+  ],
+
+  "public": {
+    "urlFragment": "app-example",
+    "path": "./public"
   },
 
-  "staticRoot": {
-    "url": "app-example",
-    "path": "./public"
+  "info": {
+    "description": "Example Grafana App",
+    "author": {
+      "name": "Raintank Inc.",
+      "url": "http://raintank.io"
+    },
+    "homepage": "http://github.com",
+    "keywords": ["example"],
+    "logos": {
+      "small": "img/logo_small.png",
+      "large": "img/logo_large.png"
+    },
+    "version": "1.0.0",
+    "updated": "2015-02-10",
+    "grafanaVersion": {"min": "3.0.0", "max": "3.0.0"},
+    "license": {"type": "Apache 2", "url": "http://apache.org"}
   }
 }
