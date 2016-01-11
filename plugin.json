@@ -4,7 +4,6 @@
   "id": "app-example",
 
   "staticRoot": "./public",
-  "module": "app",
 
   "pages": [
     {"name": "Example1", "url": "/app-example", "reqRole": "Editor"}
