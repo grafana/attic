@@ -10,8 +10,8 @@
   ],
 
   "css": {
-    "light":  "css/plugin.dark.css",
-    "dark":   "css/plugin.light.css"
+    "light":  "css/dark.css",
+    "dark":   "css/light.css"
   },
 
   "info": {
