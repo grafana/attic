@@ -579,7 +579,7 @@ define([
 
       function _convertToAtsdTime(date) {
         date = date !== 'now' ? date : new Date();
-        date = dateMath.parseDate(date);
+        date = dateMath.parse(date);
 
         return date.toISOString();
       }
