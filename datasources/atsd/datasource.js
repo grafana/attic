@@ -1,7 +1,7 @@
 define([
     'angular',
     'lodash',
-    '../../../app/core/utils/datemath',
+    '../../../../app/core/utils/datemath',
     'moment',
     './directives',
     './queryCtrl',
