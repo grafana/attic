@@ -1,12 +1,12 @@
 define([
     'angular',
     'lodash',
-    'kbn',
+    '../../../../app/core/utils/datemath',
     'moment',
     './directives',
     './queryCtrl',
   ],
-  function (angular, _, kbn) {
+  function (angular, _, dateMath) {
     'use strict';
 
     var module = angular.module('grafana.services');
@@ -579,7 +579,7 @@ define([
 
       function _convertToAtsdTime(date) {
         date = date !== 'now' ? date : new Date();
-        date = kbn.parseDate(date);
+        date = dateMath.parse(date);
 
         return date.toISOString();
       }
