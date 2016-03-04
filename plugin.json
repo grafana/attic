@@ -22,8 +22,8 @@
     },
     "keywords": ["example"],
     "logos": {
-      "small": "img/logo_small.png",
-      "large": "img/logo_large.png"
+      "small": "public/img/logo_small.png",
+      "large": "public/img/logo_large.png"
     },
     "links": [
       {"name": "Project site", "url": "http://project.com"},
