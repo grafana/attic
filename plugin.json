@@ -33,11 +33,9 @@
     "updated": "2015-02-10"
   },
 
-  "includes": {
-    "plugins": [
-      {"type": "panel", "name": "App Plugin Example"},
-    ]
-  },
+  "includes": [
+    {"type": "panel", "name": "App Plugin Example"}
+  ],
 
   "dependencies": {
     "grafanaVersion": "2.6.x",
