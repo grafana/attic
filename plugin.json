@@ -1,12 +1,12 @@
 {
   "type": "app",
-  "name": "App Example",
-  "id": "app-example",
+  "name": "Example App",
+  "id": "example-app",
 
   "staticRoot": "./public",
 
   "pages": [
-    {"name": "Example1", "url": "/app-example", "reqRole": "Editor"}
+    {"name": "Example1", "url": "/example-app", "reqRole": "Editor"}
   ],
 
   "css": {
@@ -15,7 +15,7 @@
   },
 
   "info": {
-    "description": "Example Grafana App",
+    "description": "Grafana Example App",
     "author": {
       "name": "Raintank Inc.",
       "url": "http://raintank.io"
@@ -34,7 +34,7 @@
   },
 
   "includes": [
-    {"type": "panel", "name": "App Plugin Example"}
+    {"type": "panel", "name": "App Example"}
   ],
 
   "dependencies": {
