@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/components/logs.js"],"names":[],"mappings":";;;;;;;;;;;;;;8BACa;;;;;;AAEb,mBAAa,WAAb,GAA2B,sBAA3B","file":"logs.js","sourcesContent":["\nexport class LogsPageCtrl {\n}\nLogsPageCtrl.templateUrl = 'components/logs.html';\n\n\n"]}

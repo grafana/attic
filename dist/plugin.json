@@ -1,0 +1,47 @@
+{
+  "type": "app",
+  "name": "Example App",
+  "id": "example-app",
+
+  "staticRoot": ".",
+
+  "pages": [
+    { "name": "Live stream", "component": "StreamPageCtrl", "role": "Editor"},
+    { "name": "Log view", "component": "LogsPageCtrl", "role": "Viewer"}
+  ],
+
+  "css": {
+    "dark":  "css/dark.css",
+    "light":  "css/light.css"
+  },
+
+  "info": {
+    "description": "Example app for Grafana",
+    "author": {
+      "name": "Raintank",
+      "url": "http://raintank.io"
+    },
+    "keywords": ["example app"],
+    "logos": {
+      "small": "img/logo_small.png",
+      "large": "img/logo_large.png"
+    },
+    "links": [
+      {"name": "Project site", "url": "http://project.com"},
+      {"name": "License & Terms", "url": "http://license.com"}
+    ],
+    "version": "1.0.0",
+    "updated": "2015-02-10"
+  },
+
+  "includes": [
+    {"type": "dashboard", "name": "Nginx Connection stats", "path": "dashboards/nginx_connection_stats.json"},
+    {"type": "panel", "name": "Nginx Panel"},
+    {"type": "datasource", "name": "Nginx Datasource"}
+  ],
+
+  "dependencies": {
+    "grafanaVersion": "3.x.x",
+    "plugins": []
+  }
+}
