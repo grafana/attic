@@ -18,14 +18,14 @@ module.exports = function(grunt) {
       },
       pluginDef: {
         expand: true,
-        src: ['plugin.json', 'readme.md'],
+        src: ['plugin.json', 'README.md'],
         dest: 'dist',
       }
     },
 
     watch: {
       rebuild_all: {
-        files: ['src/**/*', 'plugin.json', 'readme.md'],
+        files: ['src/**/*', 'plugin.json', 'README.md'],
         tasks: ['default'],
         options: {spawn: false}
       },
