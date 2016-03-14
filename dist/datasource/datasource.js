@@ -1,7 +1,7 @@
 "use strict";
 
 System.register([], function (_export, _context) {
-  var _createClass, NginxDatasource;
+  var _createClass, ExampleAppDatasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -30,12 +30,12 @@ System.register([], function (_export, _context) {
         };
       }();
 
-      NginxDatasource = function () {
-        function NginxDatasource() {
-          _classCallCheck(this, NginxDatasource);
+      ExampleAppDatasource = function () {
+        function ExampleAppDatasource() {
+          _classCallCheck(this, ExampleAppDatasource);
         }
 
-        _createClass(NginxDatasource, [{
+        _createClass(ExampleAppDatasource, [{
           key: "query",
           value: function query(options) {
             return [];
@@ -47,10 +47,10 @@ System.register([], function (_export, _context) {
           }
         }]);
 
-        return NginxDatasource;
+        return ExampleAppDatasource;
       }();
 
-      _export("default", NginxDatasource);
+      _export("default", ExampleAppDatasource);
     }
   };
 });

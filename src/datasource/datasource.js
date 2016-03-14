@@ -1,4 +1,4 @@
-export default class NginxDatasource {
+export default class ExampleAppDatasource {
 
   constructor() {}
 

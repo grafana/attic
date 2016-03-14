@@ -1,7 +1,7 @@
 'use strict';
 
-System.register(['app/plugins/sdk'], function (_export, _context) {
-  var PanelCtrl, NginxPanelCtrl;
+System.register(['app/plugins/sdk', '../css/example-app.css!'], function (_export, _context) {
+  var PanelCtrl, ExampleAppPanelCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -36,23 +36,23 @@ System.register(['app/plugins/sdk'], function (_export, _context) {
   return {
     setters: [function (_appPluginsSdk) {
       PanelCtrl = _appPluginsSdk.PanelCtrl;
-    }],
+    }, function (_cssExampleAppCss) {}],
     execute: function () {
-      _export('PanelCtrl', NginxPanelCtrl = function (_PanelCtrl) {
-        _inherits(NginxPanelCtrl, _PanelCtrl);
+      _export('PanelCtrl', ExampleAppPanelCtrl = function (_PanelCtrl) {
+        _inherits(ExampleAppPanelCtrl, _PanelCtrl);
 
-        function NginxPanelCtrl($scope, $injector) {
-          _classCallCheck(this, NginxPanelCtrl);
+        function ExampleAppPanelCtrl($scope, $injector) {
+          _classCallCheck(this, ExampleAppPanelCtrl);
 
-          return _possibleConstructorReturn(this, Object.getPrototypeOf(NginxPanelCtrl).call(this, $scope, $injector));
+          return _possibleConstructorReturn(this, Object.getPrototypeOf(ExampleAppPanelCtrl).call(this, $scope, $injector));
         }
 
-        return NginxPanelCtrl;
+        return ExampleAppPanelCtrl;
       }(PanelCtrl));
 
-      NginxPanelCtrl.template = '<h2>nginx!</h2>';
+      ExampleAppPanelCtrl.template = '<h2 class="example-app-heading">Example app!</h2>';
 
-      _export('PanelCtrl', NginxPanelCtrl);
+      _export('PanelCtrl', ExampleAppPanelCtrl);
     }
   };
 });

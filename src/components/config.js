@@ -1,6 +1,6 @@
 
-export class NginxAppConfigCtrl {
+export class ExampleAppConfigCtrl {
 }
-NginxAppConfigCtrl.templateUrl = 'components/config.html';
+ExampleAppConfigCtrl.templateUrl = 'components/config.html';
 
 

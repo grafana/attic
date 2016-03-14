@@ -23,8 +23,8 @@
     },
     "keywords": ["example app"],
     "logos": {
-      "small": "img/logo_small.png",
-      "large": "img/logo_large.png"
+      "small": "/img/logo_small.png",
+      "large": "/img/logo_large.png"
     },
     "links": [
       {"name": "Project site", "url": "http://project.com"},
@@ -35,9 +35,9 @@
   },
 
   "includes": [
-    {"type": "dashboard", "name": "Nginx Connection stats", "path": "dashboards/nginx_connection_stats.json"},
-    {"type": "panel", "name": "Nginx Panel"},
-    {"type": "datasource", "name": "Nginx Datasource"}
+    {"type": "dashboard", "name": "Example App Dashboard", "path": "dashboards/example_app_dashboard.json"},
+    {"type": "panel", "name": "Example App Panel"},
+    {"type": "datasource", "name": "Example App Datasource"}
   ],
 
   "dependencies": {

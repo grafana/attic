@@ -1,15 +1,16 @@
 import {PanelCtrl} from  'app/plugins/sdk';
+import '../css/example-app.css!'
 
-class NginxPanelCtrl extends PanelCtrl {
+class ExampleAppPanelCtrl extends PanelCtrl {
 
   constructor($scope, $injector) {
     super($scope, $injector);
   }
 
 }
-NginxPanelCtrl.template = '<h2>nginx!</h2>';
+ExampleAppPanelCtrl.template = '<h2 class="example-app-heading">Example app!</h2>';
 
 export {
-  NginxPanelCtrl as PanelCtrl
+  ExampleAppPanelCtrl as PanelCtrl
 };
 

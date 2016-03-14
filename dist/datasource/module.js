@@ -1,7 +1,7 @@
 'use strict';
 
 System.register(['./datasource'], function (_export, _context) {
-  var Datasource, ExampleAppConfigCtrl;
+  var ExampleAppDatasource, ExampleAppConfigCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -11,7 +11,7 @@ System.register(['./datasource'], function (_export, _context) {
 
   return {
     setters: [function (_datasource) {
-      Datasource = _datasource.Datasource;
+      ExampleAppDatasource = _datasource.ExampleAppDatasource;
     }],
     execute: function () {
       _export('ConfigCtrl', ExampleAppConfigCtrl = function ExampleAppConfigCtrl() {
@@ -20,7 +20,7 @@ System.register(['./datasource'], function (_export, _context) {
 
       ExampleAppConfigCtrl.template = '<datasource-http-settings current="ctrl.current"></datasource-http-settings>';
 
-      _export('Datasource', Datasource);
+      _export('ExampleAppDatasource', ExampleAppDatasource);
 
       _export('ConfigCtrl', ExampleAppConfigCtrl);
     }

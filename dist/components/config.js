@@ -1,7 +1,7 @@
 'use strict';
 
 System.register([], function (_export, _context) {
-  var NginxAppConfigCtrl;
+  var ExampleAppConfigCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -12,13 +12,13 @@ System.register([], function (_export, _context) {
   return {
     setters: [],
     execute: function () {
-      _export('NginxAppConfigCtrl', NginxAppConfigCtrl = function NginxAppConfigCtrl() {
-        _classCallCheck(this, NginxAppConfigCtrl);
+      _export('ExampleAppConfigCtrl', ExampleAppConfigCtrl = function ExampleAppConfigCtrl() {
+        _classCallCheck(this, ExampleAppConfigCtrl);
       });
 
-      _export('NginxAppConfigCtrl', NginxAppConfigCtrl);
+      _export('ExampleAppConfigCtrl', ExampleAppConfigCtrl);
 
-      NginxAppConfigCtrl.templateUrl = 'components/config.html';
+      ExampleAppConfigCtrl.templateUrl = 'components/config.html';
     }
   };
 });
