@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/config.js"],"names":[],"mappings":";;;;;;;;;;;;;;oCACa;;;;;;AAEb,yBAAmB,WAAnB,GAAiC,wBAAjC","file":"config.js","sourcesContent":["\nexport class NginxAppConfigCtrl {\n}\nNginxAppConfigCtrl.templateUrl = 'components/config.html';\n\n\n"]}

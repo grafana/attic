@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/datasource/module.js"],"names":[],"mappings":";;;;;;AAAQ;;;4BAGN","file":"module.js","sourcesContent":["import {Datasource} from  './datasource';\n\nexport {\n  Datasource\n};"]}

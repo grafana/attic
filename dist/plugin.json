@@ -3,7 +3,7 @@
   "name": "Example App",
   "id": "example-app",
 
-  "staticRoot": ".",
+  "staticRoot": "src",
 
   "pages": [
     { "name": "Live stream", "component": "StreamPageCtrl", "role": "Editor"},
