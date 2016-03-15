@@ -3,7 +3,7 @@
   "title": "Example App Dashboard",
   "originalTitle": "Example App Dashboard",
   "tags": [
-    "graphite"
+    "example-app", "imported"
   ],
   "style": "dark",
   "timezone": "browser",
