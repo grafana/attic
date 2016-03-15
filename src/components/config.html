@@ -1,3 +1,10 @@
-<h3>
-	Example App Config!
-</h3>
+<h3 class="page-heading">Example App Config!</h3>
+
+<editor-checkbox text="Custom value" model="ctrl.appModel.jsonData.customCheckbox" ng-click="ctrl.shooow()"></editor-checkbox>
+
+<div class="gf-form-group">
+	<div class="gf-form">
+		<span class="gf-form-label">json Data property</span>
+		<input type="text" class="gf-form-input" ng-model="ctrl.appModel.jsonData.customText" >
+	</div>
+</div>
