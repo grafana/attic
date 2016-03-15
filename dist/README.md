@@ -1,4 +1,4 @@
-This is a very simple Grafana App Plugin Example.
+This is the README.md for Grafana App Plugin Example.
 
 ### Features
 
