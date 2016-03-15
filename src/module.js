@@ -1,9 +1,9 @@
 import {LogsPageCtrl} from './components/logs';
 import {StreamPageCtrl} from './components/stream';
-import {NginxAppConfigCtrl} from './components/config';
+import {ExampleAppConfigCtrl} from './components/config';
 
 export {
-  NginxAppConfigCtrl as ConfigCtrl,
+  ExampleAppConfigCtrl as ConfigCtrl,
   StreamPageCtrl,
   LogsPageCtrl
 };

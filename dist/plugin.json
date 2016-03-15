@@ -3,8 +3,6 @@
   "name": "Example App",
   "id": "example-app",
 
-  "staticRoot": "src",
-
   "pages": [
     { "name": "Live stream", "component": "StreamPageCtrl", "role": "Editor"},
     { "name": "Log view", "component": "LogsPageCtrl", "role": "Viewer"}
