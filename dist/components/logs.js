@@ -1,7 +1,7 @@
 'use strict';
 
-System.register([], function (_export, _context) {
-  var LogsPageCtrl;
+System.register(['app/core/config'], function (_export, _context) {
+  var config, LogsPageCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -10,10 +10,14 @@ System.register([], function (_export, _context) {
   }
 
   return {
-    setters: [],
+    setters: [function (_appCoreConfig) {
+      config = _appCoreConfig.default;
+    }],
     execute: function () {
       _export('LogsPageCtrl', LogsPageCtrl = function LogsPageCtrl() {
         _classCallCheck(this, LogsPageCtrl);
+
+        this.name = config.bootData.user.name;
       });
 
       _export('LogsPageCtrl', LogsPageCtrl);

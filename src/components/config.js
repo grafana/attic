@@ -1,11 +1,6 @@
 
 export class ExampleAppConfigCtrl {
-
-  constructor() {
-  }
-
-  shooow() {
-  }
+  constructor() { }
 }
 ExampleAppConfigCtrl.templateUrl = 'components/config.html';
 
