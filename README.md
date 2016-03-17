@@ -10,6 +10,7 @@ This is the README.md for Grafana App Plugin Example.
 | ------|------|
 | 10    | 10   |
 | 15    | 20   |
+|       |      |
 
 ### Installation
 

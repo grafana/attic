@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['app/core/config'], function (_export, _context) {
+System.register(['app/core/config', './clippy.css!css', './custom_js_file'], function (_export, _context) {
   var config, LogsPageCtrl;
 
   function _classCallCheck(instance, Constructor) {
@@ -12,12 +12,25 @@ System.register(['app/core/config'], function (_export, _context) {
   return {
     setters: [function (_appCoreConfig) {
       config = _appCoreConfig.default;
-    }],
+    }, function (_clippyCssCss) {}, function (_custom_js_file) {}],
     execute: function () {
       _export('LogsPageCtrl', LogsPageCtrl = function LogsPageCtrl() {
         _classCallCheck(this, LogsPageCtrl);
 
         this.name = config.bootData.user.name;
+        window.clippy.load('Clippy', function (agent) {
+
+          agent.show();
+          agent.moveTo(300, 300);
+          agent.play('GetAttention');
+          agent.speak("It looks like you're writing a plugin \n\n Would you like help?");
+          agent.speak("Feel free to pass by our irc channel #grafana @ freenode");
+          agent.animate();
+
+          setInterval(function () {
+            agent.animate();
+          }, 30000);
+        });
       });
 
       _export('LogsPageCtrl', LogsPageCtrl);
