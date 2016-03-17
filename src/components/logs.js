@@ -6,7 +6,7 @@ export class LogsPageCtrl {
 
   constructor() {
     this.name = config.bootData.user.name;
-      window.clippy.load('Clippy', function(agent) {
+      window.clippy.load('Clippy', (agent) => {
 
         agent.show();
         agent.moveTo(300, 300);
