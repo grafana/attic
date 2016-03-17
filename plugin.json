@@ -21,8 +21,8 @@
     },
     "keywords": ["example app"],
     "logos": {
-      "small": "/img/small_logo.png",
-      "large": "/img/large_logo.png"
+      "small": "/src/img/small_logo.png",
+      "large": "/src/img/large_logo.png"
     },
     "links": [
       {"name": "Project site", "url": "http://project.com"},
