@@ -17,7 +17,7 @@ This is the README.md for Grafana App Plugin Example.
 Use the new grafana-cli tool to install the example app from the commandline:
 
 ```
-grafana-cli install example-app
+grafana-cli plugins install example-app
 ```
 
 The plugin will be installed into your grafana plugins directory; the default is /var/lib/grafana/plugins if you installed the grafana package.
