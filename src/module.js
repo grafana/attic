@@ -4,6 +4,6 @@ import {ExampleAppConfigCtrl} from './components/config';
 
 export {
   ExampleAppConfigCtrl as ConfigCtrl,
-  StreamPageCtrl,
-  LogsPageCtrl
+  StreamPageCtrl, //Matches pages.component in plugin.json
+  LogsPageCtrl //Matches pages.component in plugin.json
 };

@@ -1000,4 +1000,4 @@ System.register([], function (_export, _context) {
         }
     };
 });
-//# sourceMappingURL=custom_js_file.js.map
+//# sourceMappingURL=clippy.js.map

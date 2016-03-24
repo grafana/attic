@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['app/core/config', './clippy.css!css', './custom_js_file'], function (_export, _context) {
+System.register(['app/core/config', './clippy.css!', './clippy'], function (_export, _context) {
   var config, LogsPageCtrl;
 
   function _classCallCheck(instance, Constructor) {
@@ -12,7 +12,7 @@ System.register(['app/core/config', './clippy.css!css', './custom_js_file'], fun
   return {
     setters: [function (_appCoreConfig) {
       config = _appCoreConfig.default;
-    }, function (_clippyCssCss) {}, function (_custom_js_file) {}],
+    }, function (_clippyCss) {}, function (_clippy) {}],
     execute: function () {
       _export('LogsPageCtrl', LogsPageCtrl = function LogsPageCtrl() {
         _classCallCheck(this, LogsPageCtrl);
