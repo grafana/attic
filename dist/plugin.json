@@ -1,7 +1,7 @@
 {
   "type": "app",
   "name": "Example App",
-  "id": "example-app",
+  "id": "grafana-example-app",
 
   "pages": [
     { "name": "Live stream", "component": "StreamPageCtrl", "role": "Editor"},
@@ -25,8 +25,8 @@
       "large": "/src/img/large_logo.png"
     },
     "links": [
-      {"name": "Project site", "url": "http://project.com"},
-      {"name": "License & Terms", "url": "http://license.com"}
+      {"name": "Project site", "url": "https://github.com/grafana/example-app"},
+      {"name": "License & Terms", "url": "https://github.com/grafana/example-app/blob/master/LICENSE"}
     ],
     "version": "1.0.0",
     "updated": "2015-02-10"

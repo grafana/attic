@@ -1,5 +1,5 @@
 {
   "type": "panel",
   "name": "Example App Panel",
-  "id": "example-app-panel"
+  "id": "grafana-example-app-panel"
 }
