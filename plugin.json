@@ -1,6 +1,6 @@
 {
   "type": "app",
-  "name": "Example App",
+  "name": "Example",
   "id": "grafana-example-app",
 
   "pages": [
