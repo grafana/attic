@@ -1,6 +1,6 @@
 {
   "type": "app",
-  "name": "Example App",
+  "name": "Example",
   "id": "grafana-example-app",
 
   "pages": [
@@ -28,8 +28,8 @@
       {"name": "Project site", "url": "https://github.com/grafana/example-app"},
       {"name": "License & Terms", "url": "https://github.com/grafana/example-app/blob/master/LICENSE"}
     ],
-    "version": "1.0.0",
-    "updated": "2015-02-10"
+    "version": "1.0.1",
+    "updated": "2015-05-06"
   },
 
   "includes": [
