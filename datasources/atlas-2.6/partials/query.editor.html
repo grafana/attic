@@ -72,6 +72,20 @@
                    ng-model-options="{ debounce: 1000 }"
                    ng-change="get_data()">
         </div>
+        <div class="tight-form">
+            <div class="tight-form-item" style="width: 94px">
+                Alias
+            </div>
+            <input type="text"
+                   class="input-xlarge tight-form-input"
+                   ng-model="target.alias"
+                   spellcheck='false'
+                   placeholder="metric alias"
+                   data-min-length=0 data-items=100
+                   ng-model-onblur
+                   ng-model-options="{ debounce: 1000 }"
+                   ng-change="get_data()">
+        </div>
         <div class="tight-form" style="display: inline-block">
             <ul class="tight-form-list">
                 <li class="tight-form-item">

@@ -24,7 +24,7 @@ define(["angular",
 
             AtlasDatasource.prototype.query = function (options) {
                 var queries = [];
-                options.targets.forEach(function (target, index) {
+                options.targets.forEach(function (target) {
                     if (target.hide || !(target.rawQuery || target.metric)) {
                         return;
                     }
@@ -37,11 +37,17 @@ define(["angular",
                         if (!target.metric) {
                             return;
                         }
+                        if (target.groupBys) {
+                            target.groupBys = target.groupBys.filter(function (groupBy) {
+                                return groupBy.name && groupBy.name.length > 0;
+                            });
+                        }
+
                         var queryParts = [];
                         queryParts.push("name," + target.metric + ",:eq");
                         if (target.tags) {
                             var logicals = [];
-                            target.tags.forEach(function (tag, tagIndex) {
+                            target.tags.forEach(function (tag) {
                                 queryParts.push(tag.name);
                                 queryParts.push(tag.value);
                                 queryParts.push(":" + tag.matcher);
@@ -50,18 +56,32 @@ define(["angular",
                                 }
                                 logicals.push(":" + tag.logical);
                             });
-                            queryParts = queryParts.concat(logicals);
+                            queryParts = queryParts.concat(logicals.reverse());
                         }
                         if (target.aggregation) {
                             queryParts.push(":" + target.aggregation);
                         }
                         if (target.groupBys && target.groupBys.length > 0) {
                             queryParts.push("(");
-                            target.groupBys.forEach(function (groupBy, tagIndex) {
+                            target.groupBys.forEach(function (groupBy) {
                                 queryParts.push(groupBy.name);
                             });
                             queryParts.push(")");
                             queryParts.push(":by");
+                        }
+
+                        if (target.alias) {
+                            var legend = target.alias;
+                            if (target.groupBys && target.groupBys.length > 0) {
+                                var legendSuffixValue = _.map(target.groupBys,
+                                    function (groupBy) {
+                                        return ' $' + groupBy.name;
+                                    })
+                                    .join(' ');
+                                legend += ' ' + legendSuffixValue;
+                            }
+                            queryParts.push(legend);
+                            queryParts.push(':legend');
                         }
                         queries.push(queryParts.join(','));
                     }
@@ -78,8 +98,8 @@ define(["angular",
                 var params = {
                     q: fullQuery,
                     step: interval,
-                    s: new Date(options.range.from).getTime(),
-                    e: new Date(options.range.to).getTime(),
+                    s: options.rangeRaw.from,
+                    e: options.rangeRaw.to,
                     format: this.atlasFormat
                 };
 
@@ -97,6 +117,10 @@ define(["angular",
                         deferred.reject(error);
                     }
                     deferred.resolve(convertToTimeseries(response.data))
+                }, function (response) {
+                    console.error('Unable to load data. Response: %o', response.data ? response.data.message : response);
+                    var error = new Error("Unable to load data");
+                    deferred.reject(error);
                 });
                 return deferred.promise;
             };
@@ -104,17 +128,27 @@ define(["angular",
             function convertToTimeseries(result) {
                 var timeseriesData = _.map(result.legend, function (legend, index) {
                     var series = {target: legend, datapoints: []};
+                    if (legend.indexOf('NO DATA') > 0 || legend.indexOf('NO_DATA') > 0) {
+                        series.allIsNull = true;
+                        return series;
+                    }
+
                     var values = _.pluck(result.values, index);
 
+                    var notAllZero = false;
+                    var notAllNull = false;
                     for (var i = 0; i < values.length; i++) {
                         var value = values[i];
                         var timestamp = result.start + (i * result.step);
                         series.datapoints.push([value, timestamp]);
+                        notAllZero = notAllZero || value != 0;
+                        notAllNull = notAllNull || value != undefined;
                     }
-
+                    //hide zero and null results if configured
+                    series.allIsZero = !notAllZero;
+                    series.allIsNull = !notAllNull;
                     return series;
                 });
-
                 return {data: timeseriesData};
             }
 
