@@ -1,0 +1,194 @@
+<div class="tight-form" ng-controller="AtlasTargetCtrl">
+    <ul class="tight-form-list pull-right">
+        <li class="tight-form-item small" ng-show="target.datasource">
+            <em>{{target.datasource}}</em>
+        </li>
+        <li class="tight-form-item">
+            <div class="dropdown">
+                <a class="pointer dropdown-toggle" data-toggle="dropdown" tabindex="1">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li role="menuitem"><a tabindex="1" ng-click="toggleRawQuery()">Switch raw Atlas query input</a>
+                    </li>
+                    <li role="menuitem"><a tabindex="1" ng-click="duplicateDataQuery(target)">Duplicate</a></li>
+                    <li role="menuitem"><a tabindex="1" ng-click="moveDataQuery($index, $index-1)">Move up</a></li>
+                    <li role="menuitem"><a tabindex="1" ng-click="moveDataQuery($index, $index+1)">Move down</a></li>
+                </ul>
+            </div>
+        </li>
+
+        <li class="tight-form-item last">
+            <a class="pointer" tabindex="1" ng-click="removeDataQuery(target)">
+                <i class="fa fa-remove"></i>
+            </a>
+        </li>
+    </ul>
+
+    <ul class="tight-form-list">
+        <li class="tight-form-item" style="min-width: 15px; text-align: center">
+            {{target.refId}}
+        </li>
+        <li>
+            <a class="tight-form-item"
+               ng-click="target.hide = !target.hide; get_data();"
+               role="menuitem">
+                <i class="fa fa-eye"></i>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tight-form" ng-if="target.rawQueryInput">
+        <ul class="tight-form-list" role="menu">
+            <li class="tight-form-item" style="width: 94px">
+                Query
+            </li>
+            <li>
+                <input type="text"
+                       class="input-xxlarge tight-form-input"
+                       ng-model="target.rawQuery"
+                       spellcheck='false'
+                       placeholder="Raw Atlas query expression"
+                       data-min-length=0 data-items=100
+                       ng-model-onblur
+                       ng-model-options="{ debounce: 1000 }"
+                       ng-change="get_data()">
+            </li>
+        </ul>
+    </div>
+    <div ng-if="!target.rawQueryInput">
+        <div class="tight-form">
+            <div class="tight-form-item" style="width: 94px">
+                Metric
+            </div>
+            <input type="text"
+                   class="input-xxlarge tight-form-input"
+                   ng-model="target.metric"
+                   ng-required="true"
+                   spellcheck='false'
+                   placeholder="metric name"
+                   data-min-length=0 data-items=100
+                   ng-model-onblur
+                   ng-model-options="{ debounce: 1000 }"
+                   ng-change="get_data()">
+        </div>
+        <div class="tight-form">
+            <div class="tight-form-item" style="width: 94px">
+                Alias
+            </div>
+            <input type="text"
+                   class="input-xlarge tight-form-input"
+                   ng-model="target.alias"
+                   spellcheck='false'
+                   placeholder="metric alias"
+                   data-min-length=0 data-items=100
+                   ng-model-onblur
+                   ng-model-options="{ debounce: 1000 }"
+                   ng-change="get_data()">
+        </div>
+        <div class="tight-form" style="display: inline-block">
+            <ul class="tight-form-list">
+                <li class="tight-form-item">
+                    <button class="btn btn-inverse" ng-click="addTag()" ng-hide="datasource.meta.mixed">
+                        <i class="fa fa-plus"></i>&nbsp;
+                        Dimension
+                    </button>
+                </li>
+            </ul>
+
+            <ul class="tight-form-list" ng-if="target.tags && target.tags.length > 0" style="display: inline-block">
+                <li ng-repeat="tag in target.tags" style="margin-bottom: 10px">
+
+                    <select id="logical"
+                            ng-model="tag.logical"
+                            ng-options="logical for logical in atlas.logical track by logical"
+                            ng-change="get_data()"
+                            ng-required="true"
+                            ng-default="tag.logical"
+                            style="width: 70px; margin-bottom: 0">
+                    </select>
+
+                    <input type="text"
+                           class="input-large tight-form-input"
+                           ng-model="tag.name"
+                           spellcheck='false'
+                           placeholder="name"
+                           data-min-length=0 data-items=50
+                           ng-model-onblur
+                           ng-change="get_data()">
+
+                    <select id="notCondition"
+                            ng-model="tag.notCondition"
+                            ng-options="notCondition for notCondition in atlas.notCondition track by notCondition"
+                            style="width: 70px; margin-bottom: 0"
+                            ng-required="true"
+                            ng-change="get_data()">
+                    </select>
+
+                    <select id="matchers"
+                            ng-model="tag.matcher"
+                            ng-options="matcher for matcher in atlas.matchers track by matcher"
+                            style="width: 70px; margin-bottom: 0"
+                            ng-change="get_data()">
+                    </select>
+
+                    <input type="text"
+                           class="input-large tight-form-input"
+                           ng-model="tag.value"
+                           spellcheck='false'
+                           placeholder="value"
+                           data-min-length=0 data-items=50
+                           ng-model-onblur
+                           ng-change="get_data()">
+                    <a class="pointer" tabindex="1" ng-click="removeTag(tag)">
+                        <i class="fa fa-remove"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="tight-form" style="display: flex">
+            <ul class="tight-form-list">
+                <li class="tight-form-item" style="width: 94px">
+                    Aggregation
+                </li>
+                <li class="tight-form-item">
+                    <select id="aggregationSelect"
+                            ng-model="target.aggregation"
+                            ng-options="aggregation for aggregation in atlas.aggregations track by aggregation"
+                            style="width: 80px; margin-bottom: 0"
+                            ng-change="get_data()"
+                            ng-required="true">
+                    </select>
+                </li>
+            </ul>
+        </div>
+        <div class="tight-form">
+            <ul class="tight-form-list">
+                <li class="tight-form-item">
+                    <button class="btn btn-inverse" ng-click="addGroupBy()">
+                        <i class="fa fa-plus"></i>&nbsp;
+                        Group By
+                    </button>
+                </li>
+            </ul>
+
+            <ul class="tight-form-list" ng-if="target.groupBys && target.groupBys.length > 0"
+                style="display: inline-block">
+                <li ng-repeat="groupBy in target.groupBys" class="tight-form-item" style="margin-bottom: 10px">
+                    <input type="text"
+                           ng-model="groupBy.name"
+                           spellcheck='false'
+                           placeholder="group by"
+                           data-min-length=0 data-items=50
+                           ng-size="groupBy.name.length"
+                           ng-model-onblur
+                           ng-change="get_data()">
+                    <a class="pointer" tabindex="1" ng-click="removeGroupBy(groupBy)">
+                        <i class="fa fa-remove"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
