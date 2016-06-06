@@ -1,6 +1,8 @@
 'use strict';
 
 System.register(['./datasource'], function (_export, _context) {
+  "use strict";
+
   var ExampleAppDatasource, ExampleAppConfigCtrl;
 
   function _classCallCheck(instance, Constructor) {

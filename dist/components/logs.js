@@ -1,6 +1,8 @@
 'use strict';
 
 System.register(['app/core/config', './clippy.css!', './clippy'], function (_export, _context) {
+  "use strict";
+
   var config, LogsPageCtrl;
 
   function _classCallCheck(instance, Constructor) {
