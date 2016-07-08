@@ -1,6 +1,8 @@
 'use strict';
 
 System.register(['app/plugins/sdk', '../css/example-app.css!'], function (_export, _context) {
+  "use strict";
+
   var PanelCtrl, ExampleAppPanelCtrl;
 
   function _classCallCheck(instance, Constructor) {

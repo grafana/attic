@@ -1,6 +1,8 @@
 'use strict';
 
 System.register(['./components/logs', './components/stream', './components/config'], function (_export, _context) {
+  "use strict";
+
   var LogsPageCtrl, StreamPageCtrl, ExampleAppConfigCtrl;
   return {
     setters: [function (_componentsLogs) {
