@@ -1,0 +1,28 @@
+<query-editor-row query-ctrl="ctrl" can-collapse="false">
+  <div class="gf-form-inline">
+		<div class="gf-form">
+      <label class="gf-form-label query-keyword">Resource Group</label>
+			<input type="text" class="gf-form-input" ng-model="ctrl.target.resourceGroup" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword">Resource Provider Namespace</label>
+      <input type="text" class="gf-form-input" ng-model="ctrl.target.resourceProviderNamespace" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword">Resource Type</label>
+      <input type="text" class="gf-form-input" ng-model="ctrl.target.resourceType" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword">Resource Name</label>
+      <input type="text" class="gf-form-input" ng-model="ctrl.target.resourceName" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword">Api Version</label>
+      <input type="text" class="gf-form-input" ng-model="ctrl.target.apiVersion" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword">Filter</label>
+      <input type="text" class="gf-form-input" ng-model="ctrl.target.filter" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+    </div>
+  </div>
+</query-editor-row>
