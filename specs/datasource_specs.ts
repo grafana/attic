@@ -2,6 +2,7 @@ import {describe, beforeEach, it, sinon, expect, angularMocks} from './lib/commo
 import helpers from './lib/helpers.js';
 import AzureMonitorDatasource from '../src/datasource';
 import Q from 'q';
+import moment from 'moment';
 
 describe('AzureMonitorDatasource', function() {
   const ctx = new helpers.ServiceTestContext();
@@ -107,10 +108,14 @@ describe('AzureMonitorDatasource', function() {
 
     it('should return a list of datapoints', function() {
       const options = {
+        range: {
+          from: moment.utc('2017-08-22T20:00:00Z'),
+          to: moment.utc('2017-08-22T23:59:00Z'),
+        },
         targets: [
           {
             apiVersion: '2016-09-01',
-            filter: `(name.value eq 'Percentage CPU') and startTime eq 2017-08-21 and endTime eq 2017-08-23` +
+            filter: `(name.value eq 'Percentage CPU')` +
               ` and timeGrain eq duration'PT1H'`,
             refId: 'A',
             resourceGroup: 'test',

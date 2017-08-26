@@ -6,6 +6,7 @@ module.exports = function(config) {
       files: [
         'src/datasource.ts',
         'src/azure_monitor_query_builder.ts',
+        'src/azure_monitor_filter_builder.ts',
         'specs/lib/common.ts',
         'specs/lib/datemath.ts',
         'specs/lib/helpers.js',

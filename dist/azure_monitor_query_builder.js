@@ -1,6 +1,6 @@
 ///<reference path="app/headers/common.d.ts" />
-System.register(['lodash', 'moment'], function(exports_1) {
-    var lodash_1, moment_1;
+System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function(exports_1) {
+    var lodash_1, moment_1, azure_monitor_filter_builder_1;
     var AzureMonitorQueryBuilder;
     return {
         setters:[
@@ -9,6 +9,9 @@ System.register(['lodash', 'moment'], function(exports_1) {
             },
             function (moment_1_1) {
                 moment_1 = moment_1_1;
+            },
+            function (azure_monitor_filter_builder_1_1) {
+                azure_monitor_filter_builder_1 = azure_monitor_filter_builder_1_1;
             }],
         execute: function() {
             AzureMonitorQueryBuilder = (function () {
@@ -31,7 +34,8 @@ System.register(['lodash', 'moment'], function(exports_1) {
                         var resourceProviderNamespace = _this.templateSrv.replace(item.resourceProviderNamespace, options.scopedVars);
                         var resourceType = _this.templateSrv.replace(item.resourceType, options.scopedVars);
                         var apiVersion = _this.templateSrv.replace(item.apiVersion, options.scopedVars);
-                        var filter = _this.templateSrv.replace(item.filter, options.scopedVars);
+                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.filter, options.range.from, options.range.to);
+                        var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
                         var url = (_this.baseUrl + "/" + resourceGroup + "/providers/" + resourceProviderNamespace + "/" + resourceType + "/" + resourceName) +
                             ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&$filter=" + filter);
                         return {
