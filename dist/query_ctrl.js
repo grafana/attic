@@ -18,6 +18,8 @@ System.register(['app/plugins/sdk'], function(exports_1) {
                 /** @ngInject **/
                 function AzureMonitorQueryCtrl($scope, $injector) {
                     _super.call(this, $scope, $injector);
+                    this.target.timeGrain = 1;
+                    this.target.timeGrainUnit = 'hour';
                 }
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;

@@ -3,6 +3,9 @@ export default class AzureMonitorFilterBuilder {
     private filter;
     private from;
     private to;
-    constructor(filter: string, from: any, to: any);
+    private timeGrain;
+    private timeGrainUnit;
+    constructor(filter: string, from: any, to: any, timeGrain: number, timeGrainUnit: string);
     generateFilter(): string;
+    createISO8601Duration(): string;
 }

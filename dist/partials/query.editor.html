@@ -20,6 +20,11 @@
       <label class="gf-form-label query-keyword">Api Version</label>
       <input type="text" class="gf-form-input" ng-model="ctrl.target.apiVersion" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
     </div>
+    <div class="gf-form max-width-18">
+      <label class="gf-form-label query-keyword">Time Grain</label>
+      <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+      <select class="gf-form-input" ng-model="ctrl.target.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']"></select>
+    </div>
     <div class="gf-form">
       <label class="gf-form-label query-keyword">Filter</label>
       <input type="text" class="gf-form-input" ng-model="ctrl.target.filter" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">

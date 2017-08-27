@@ -29,7 +29,13 @@ export default class AzureMonitorQueryBuilder {
       const resourceProviderNamespace = this.templateSrv.replace(item.resourceProviderNamespace, options.scopedVars);
       const resourceType = this.templateSrv.replace(item.resourceType, options.scopedVars);
       const apiVersion = this.templateSrv.replace(item.apiVersion, options.scopedVars);
-      const filterBuilder = new AzureMonitorFilterBuilder(item.filter, options.range.from, options.range.to);
+      const filterBuilder = new AzureMonitorFilterBuilder(
+        item.filter,
+        options.range.from,
+        options.range.to,
+        item.timeGrain,
+        item.timeGrainUnit
+      );
       const filter = this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
 
       const url = `${this.baseUrl}/${resourceGroup}/providers/${resourceProviderNamespace}/${resourceType}/${resourceName}` +

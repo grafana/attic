@@ -122,6 +122,8 @@ describe('AzureMonitorDatasource', function() {
             resourceName: 'test',
             resourceProviderNamespace: 'Microsoft.Compute',
             resourceType: 'virtualMachines',
+            timeGrain: 1,
+            timeGrainUnit: 'hour',
           }
         ]
       };
