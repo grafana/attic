@@ -1,4 +1,4 @@
-///<reference path="app/headers/common.d.ts" />
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register([], function(exports_1) {
     var AzureMonitorFilterBuilder;
     return {

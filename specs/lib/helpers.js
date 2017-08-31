@@ -1,7 +1,7 @@
 define([
   'lodash',
   // 'app/core/config',
-  './datemath',
+  'app/core/utils/datemath',
  ], function(_, dateMath) {
    'use strict';
 

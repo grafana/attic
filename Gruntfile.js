@@ -6,7 +6,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.initConfig({
-    clean: ['src_gen', 'dist'],
+    clean: ['dist'],
 
     copy: {
       dist_js: {

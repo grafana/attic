@@ -4,17 +4,16 @@ module.exports = function(config) {
       frameworks: ['systemjs', 'mocha', 'expect', 'sinon'],
 
       files: [
-        'src/datasource.ts',
-        'src/azure_monitor_query_builder.ts',
-        'src/azure_monitor_filter_builder.ts',
-        'specs/lib/common.ts',
-        'specs/lib/datemath.ts',
-        'specs/lib/helpers.js',
         'specs/*.ts',
-        'node_modules/typescript/lib/typescript.js',
-        'node_modules/lodash/lodash.js',
-        'node_modules/moment/moment.js',
-        'node_modules/q/q.js',
+        'specs/lib/*.ts',
+        'specs/lib/helpers.js',
+        { pattern: 'src/**/*.ts', included: false },
+        { pattern: 'node_modules/grafana-sdk-mocks/**/*.ts', included: false },
+        { pattern: 'node_modules/grafana-sdk-mocks/**/*.js', included: false },
+        { pattern: 'node_modules/typescript/lib/typescript.js', included: false },
+        { pattern: 'node_modules/lodash/lodash.js', included: false },
+        { pattern: 'node_modules/moment/moment.js', included: false },
+        { pattern: 'node_modules/q/q.js', included: false },
       ],
 
       systemjs: {
@@ -30,17 +29,13 @@ module.exports = function(config) {
             'q': 'node_modules/q/q.js',
             'typescript': 'node_modules/typescript/lib/typescript.js',
             'plugin-typescript': 'node_modules/plugin-typescript/lib/plugin.js',
+            'app/': 'node_modules/grafana-sdk-mocks/app/',
           },
 
           map: {
               'plugin-typescript': 'node_modules/plugin-typescript/lib/',
-              'typescript': 'node_modules/typescript/'
-          },
-
-          meta: {
-            'typescript': {
-              'exports': 'ts'
-            }
+              'typescript': 'node_modules/typescript/',
+              'app/core/utils/kbn': 'node_modules/grafana-sdk-mocks/app/core/utils/kbn.js'
           },
 
           packages: {
@@ -55,21 +50,20 @@ module.exports = function(config) {
                     }
                 }
             },
-            'src/': {
+            'app': {
               'defaultExtension': 'ts',
               'meta': {
-                '*.ts': {
+                '*.js': {
                   'loader': 'typescript'
                 }
               }
             },
-            'specs/': {
-              'defaultJSExtensions': true,
+            'src': {
+              'defaultExtension': 'ts',
+            },
+            'specs': {
               'defaultExtension': 'ts',
               'meta': {
-                '*.ts': {
-                  'loader': 'typescript'
-                },
                 '*.js': {
                   'loader': 'typescript'
                 }
