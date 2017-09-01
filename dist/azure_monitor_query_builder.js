@@ -76,9 +76,23 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                 AzureMonitorQueryBuilder.prototype.annotationQuery = function (options) {
                 };
                 AzureMonitorQueryBuilder.prototype.metricFindQuery = function (query) {
+                    var url = "" + this.baseUrl + query;
+                    var list = [];
+                    return this.doRequest({
+                        url: url,
+                        method: 'GET'
+                    }).then(function (result) {
+                        for (var i = 0; i < result.data.value.length; i++) {
+                            list.push({
+                                text: result.data.value[i].name,
+                                value: result.data.value[i].name
+                            });
+                        }
+                        return list;
+                    });
                 };
                 AzureMonitorQueryBuilder.prototype.testDatasource = function () {
-                    var url = this.baseUrl + "?api-version=2016-09-01";
+                    var url = this.baseUrl + "?api-version=2017-06-01";
                     return this.doRequest({
                         url: url,
                         method: 'GET'

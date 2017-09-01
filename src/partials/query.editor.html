@@ -2,7 +2,11 @@
   <div class="gf-form-inline">
 		<div class="gf-form">
       <label class="gf-form-label query-keyword">Resource Group</label>
-			<input type="text" class="gf-form-input" ng-model="ctrl.target.resourceGroup" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+      <gf-form-dropdown model="ctrl.target.resourceGroup"
+        lookup-text="true"
+        get-options="ctrl.getOptions($query)"
+        on-change="ctrl.refresh()">
+      </gf-form-dropdown>
     </div>
     <div class="gf-form">
       <label class="gf-form-label query-keyword">Resource Provider Namespace</label>

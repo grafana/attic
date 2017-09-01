@@ -16,7 +16,7 @@ export default class AzureMonitorQueryBuilder {
         data: any[];
     };
     annotationQuery(options: any): void;
-    metricFindQuery(query: string): void;
+    metricFindQuery(query: string): any;
     testDatasource(): any;
     doRequest(options: any): any;
 }

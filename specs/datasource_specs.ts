@@ -45,7 +45,6 @@ describe('AzureMonitorDatasource', function() {
     });
 
     describe('and a list of resource groups is returned', function() {
-
       const response = {
         data: {
           value: [
@@ -72,7 +71,6 @@ describe('AzureMonitorDatasource', function() {
   });
 
   describe('When performing query', function() {
-
     const response = {
         value: [
           {
@@ -135,6 +133,35 @@ describe('AzureMonitorDatasource', function() {
         expect(results.data[0].datapoints[0][0]).to.equal(1.0503333333333331);
         expect(results.data[0].datapoints[2][1]).to.equal(1503442800000);
         expect(results.data[0].datapoints[2][0]).to.equal(1.0457499999999995);
+      });
+    });
+  });
+
+  describe('When performing metricFindQuery', function() {
+    const response = {
+      data: {
+        value: [
+          { name: 'grp1' },
+          { name: 'grp2' },
+        ]
+      },
+      status: 200,
+      statusText: 'OK'
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        return ctx.$q.when(response);
+      };
+    });
+
+    it('should return list of Resource Groups', function() {
+      return ctx.ds.metricFindQuery('?api-version=2017-06-01').then(function(results) {
+        expect(results.length).to.equal(2);
+        expect(results[0].text).to.equal('grp1');
+        expect(results[0].value).to.equal('grp1');
+        expect(results[1].text).to.equal('grp2');
+        expect(results[1].value).to.equal('grp2');
       });
     });
   });

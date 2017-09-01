@@ -85,10 +85,24 @@ export default class AzureMonitorQueryBuilder {
   }
 
   metricFindQuery(query: string) {
+    const url = `${this.baseUrl}${query}`;
+    const list = [];
+    return this.doRequest({
+      url: url,
+      method: 'GET'
+    }).then(result => {
+      for (let i = 0; i < result.data.value.length; i++) {
+        list.push({
+          text: result.data.value[i].name,
+          value: result.data.value[i].name
+        });
+      }
+      return list;
+    });
   }
 
   testDatasource() {
-    const url = `${this.baseUrl}?api-version=2016-09-01`;
+    const url = `${this.baseUrl}?api-version=2017-06-01`;
     return this.doRequest({
       url: url,
       method: 'GET'

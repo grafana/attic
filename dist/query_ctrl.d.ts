@@ -4,4 +4,5 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     static templateUrl: string;
     /** @ngInject **/
     constructor($scope: any, $injector: any);
+    getOptions(query: any): any;
 }

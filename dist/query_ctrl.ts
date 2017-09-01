@@ -9,7 +9,12 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   /** @ngInject **/
   constructor($scope, $injector) {
     super($scope, $injector);
+
     this.target.timeGrain = 1;
     this.target.timeGrainUnit = 'hour';
+  }
+
+  getOptions(query) {
+    return this.datasource.metricFindQuery('?api-version=2017-06-01');
   }
 }
