@@ -14,7 +14,11 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     this.target.timeGrainUnit = 'hour';
   }
 
-  getOptions(query) {
+  getResourceGroups(query) {
     return this.datasource.metricFindQuery('?api-version=2017-06-01');
+  }
+
+  getMetricDefinitions(query) {
+    return this.datasource.getMetricDefinitions(this.target.resourceGroup);
   }
 }

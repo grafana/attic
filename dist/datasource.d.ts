@@ -13,4 +13,5 @@ export default class AzureMonitorDatasource {
     annotationQuery(options: any): void;
     metricFindQuery(query: string): any;
     testDatasource(): any;
+    getMetricDefinitions(resourceGroup: string): any;
 }

@@ -21,8 +21,11 @@ System.register(['app/plugins/sdk'], function(exports_1) {
                     this.target.timeGrain = 1;
                     this.target.timeGrainUnit = 'hour';
                 }
-                AzureMonitorQueryCtrl.prototype.getOptions = function (query) {
+                AzureMonitorQueryCtrl.prototype.getResourceGroups = function (query) {
                     return this.datasource.metricFindQuery('?api-version=2017-06-01');
+                };
+                AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
+                    return this.datasource.getMetricDefinitions(this.target.resourceGroup);
                 };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;

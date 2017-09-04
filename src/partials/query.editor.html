@@ -4,17 +4,17 @@
       <label class="gf-form-label query-keyword">Resource Group</label>
       <gf-form-dropdown model="ctrl.target.resourceGroup"
         lookup-text="true"
-        get-options="ctrl.getOptions($query)"
+        get-options="ctrl.getResourceGroups($query)"
         on-change="ctrl.refresh()">
       </gf-form-dropdown>
     </div>
     <div class="gf-form">
-      <label class="gf-form-label query-keyword">Resource Provider Namespace</label>
-      <input type="text" class="gf-form-input" ng-model="ctrl.target.resourceProviderNamespace" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
-    </div>
-    <div class="gf-form">
-      <label class="gf-form-label query-keyword">Resource Type</label>
-      <input type="text" class="gf-form-input" ng-model="ctrl.target.resourceType" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+      <label class="gf-form-label query-keyword">Metric</label>
+      <gf-form-dropdown model="ctrl.target.metricDefinition"
+        lookup-text="true"
+        get-options="ctrl.getMetricDefinitions($query)"
+        on-change="ctrl.refresh()">
+      </gf-form-dropdown>
     </div>
     <div class="gf-form">
       <label class="gf-form-label query-keyword">Resource Name</label>

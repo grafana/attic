@@ -31,12 +31,11 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                     }).map(function (item) {
                         var resourceGroup = _this.templateSrv.replace(item.resourceGroup, options.scopedVars);
                         var resourceName = _this.templateSrv.replace(item.resourceName, options.scopedVars);
-                        var resourceProviderNamespace = _this.templateSrv.replace(item.resourceProviderNamespace, options.scopedVars);
-                        var resourceType = _this.templateSrv.replace(item.resourceType, options.scopedVars);
+                        var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
                         var apiVersion = _this.templateSrv.replace(item.apiVersion, options.scopedVars);
                         var filterBuilder = new azure_monitor_filter_builder_1.default(item.filter, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit);
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
-                        var url = (_this.baseUrl + "/" + resourceGroup + "/providers/" + resourceProviderNamespace + "/" + resourceType + "/" + resourceName) +
+                        var url = (_this.baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
                             ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&$filter=" + filter);
                         return {
                             refId: item.refId,
@@ -86,6 +85,22 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                             list.push({
                                 text: result.data.value[i].name,
                                 value: result.data.value[i].name
+                            });
+                        }
+                        return list;
+                    });
+                };
+                AzureMonitorQueryBuilder.prototype.getMetricDefinitions = function (resourceGroup) {
+                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
+                    var list = [];
+                    return this.doRequest({
+                        url: url,
+                        method: 'GET'
+                    }).then(function (result) {
+                        for (var i = 0; i < result.data.value.length; i++) {
+                            list.push({
+                                text: result.data.value[i].type,
+                                value: result.data.value[i].type
                             });
                         }
                         return list;

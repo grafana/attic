@@ -26,8 +26,7 @@ export default class AzureMonitorQueryBuilder {
     }).map(item => {
       const resourceGroup = this.templateSrv.replace(item.resourceGroup, options.scopedVars);
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
-      const resourceProviderNamespace = this.templateSrv.replace(item.resourceProviderNamespace, options.scopedVars);
-      const resourceType = this.templateSrv.replace(item.resourceType, options.scopedVars);
+      const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
       const apiVersion = this.templateSrv.replace(item.apiVersion, options.scopedVars);
       const filterBuilder = new AzureMonitorFilterBuilder(
         item.filter,
@@ -38,7 +37,7 @@ export default class AzureMonitorQueryBuilder {
       );
       const filter = this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
 
-      const url = `${this.baseUrl}/${resourceGroup}/providers/${resourceProviderNamespace}/${resourceType}/${resourceName}` +
+      const url = `${this.baseUrl}/${resourceGroup}/providers/${metricDefinition}/${resourceName}` +
         `/providers/microsoft.insights/metrics?api-version=${apiVersion}&$filter=${filter}`;
 
       return {
@@ -86,6 +85,7 @@ export default class AzureMonitorQueryBuilder {
 
   metricFindQuery(query: string) {
     const url = `${this.baseUrl}${query}`;
+
     const list = [];
     return this.doRequest({
       url: url,
@@ -99,6 +99,25 @@ export default class AzureMonitorQueryBuilder {
       }
       return list;
     });
+  }
+
+  getMetricDefinitions(resourceGroup: string) {
+    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
+    const list = [];
+
+    return this.doRequest({
+      url: url,
+      method: 'GET'
+    }).then(result => {
+      for (let i = 0; i < result.data.value.length; i++) {
+        list.push({
+          text: result.data.value[i].type,
+          value: result.data.value[i].type
+        });
+      }
+      return list;
+    });
+
   }
 
   testDatasource() {

@@ -100,6 +100,7 @@ describe('AzureMonitorDatasource', function() {
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
+        expect(options.url).to.contain('/test/providers/Microsoft.Compute/virtualMachines/test/providers/microsoft.insights/metrics');
         return ctx.$q.when({data: response, status: 200});
       };
     });
@@ -118,8 +119,7 @@ describe('AzureMonitorDatasource', function() {
             refId: 'A',
             resourceGroup: 'test',
             resourceName: 'test',
-            resourceProviderNamespace: 'Microsoft.Compute',
-            resourceType: 'virtualMachines',
+            metricDefinition: 'Microsoft.Compute/virtualMachines',
             timeGrain: 1,
             timeGrainUnit: 'hour',
           }
@@ -162,6 +162,44 @@ describe('AzureMonitorDatasource', function() {
         expect(results[0].value).to.equal('grp1');
         expect(results[1].text).to.equal('grp2');
         expect(results[1].value).to.equal('grp2');
+      });
+    });
+  });
+
+  describe('When performing getMetricDefinitions', function() {
+    const response = {
+      data: {
+        value: [
+          {
+            name: 'Failure Anomalies - nodeapp',
+            type: 'microsoft.insights/alertrules',
+          },
+          {
+            name: 'nodesapp',
+            type: 'microsoft.insights/components',
+            kind: 'Node.JS',
+          }
+        ]
+      },
+      status: 200,
+      statusText: 'OK'
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+        expect(options.url).to.be(baseUrl + '/nodesapp/resources?api-version=2017-06-01');
+        return ctx.$q.when(response);
+      };
+    });
+
+    it('should return list of Metric Definitions', function() {
+      return ctx.ds.getMetricDefinitions('nodesapp').then(function(results) {
+        expect(results.length).to.equal(2);
+        expect(results[0].text).to.equal('microsoft.insights/alertrules');
+        expect(results[0].value).to.equal('microsoft.insights/alertrules');
+        expect(results[1].text).to.equal('microsoft.insights/components');
+        expect(results[1].value).to.equal('microsoft.insights/components');
       });
     });
   });
