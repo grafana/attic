@@ -33,6 +33,9 @@ System.register(['./azure_monitor_query_builder'], function(exports_1) {
                 AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
                     return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
                 };
+                AzureMonitorDatasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
+                    return this.azureMonitorQueryBuilder.getResourceNames(resourceGroup, metricDefinition);
+                };
                 return AzureMonitorDatasource;
             })();
             exports_1("default", AzureMonitorDatasource);

@@ -34,4 +34,8 @@ export default class AzureMonitorDatasource {
   getMetricDefinitions(resourceGroup: string) {
     return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
   }
+
+  getResourceNames(resourceGroup: string, metricDefinition: string) {
+    return this.azureMonitorQueryBuilder.getResourceNames(resourceGroup, metricDefinition);
+  }
 }

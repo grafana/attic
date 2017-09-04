@@ -21,4 +21,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   getMetricDefinitions(query) {
     return this.datasource.getMetricDefinitions(this.target.resourceGroup);
   }
+
+  getResourceNames(query) {
+    return this.datasource.getResourceNames(this.target.resourceGroup, this.target.metricDefinition);
+  }
 }

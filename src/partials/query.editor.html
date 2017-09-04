@@ -18,7 +18,11 @@
     </div>
     <div class="gf-form">
       <label class="gf-form-label query-keyword">Resource Name</label>
-      <input type="text" class="gf-form-input" ng-model="ctrl.target.resourceName" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+      <gf-form-dropdown model="ctrl.target.resourceName"
+      lookup-text="true"
+      get-options="ctrl.getResourceNames($query)"
+      on-change="ctrl.refresh()">
+    </gf-form-dropdown>
     </div>
     <div class="gf-form">
       <label class="gf-form-label query-keyword">Api Version</label>

@@ -120,6 +120,27 @@ export default class AzureMonitorQueryBuilder {
 
   }
 
+  getResourceNames(resourceGroup: string, metricDefinition: string) {
+    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
+    const list = [];
+
+    return this.doRequest({
+      url: url,
+      method: 'GET'
+    }).then(result => {
+      for (let i = 0; i < result.data.value.length; i++) {
+        if (result.data.value[i].type === metricDefinition) {
+          list.push({
+            text: result.data.value[i].name,
+            value: result.data.value[i].name
+          });
+        }
+      }
+      return list;
+    });
+
+  }
+
   testDatasource() {
     const url = `${this.baseUrl}?api-version=2017-06-01`;
     return this.doRequest({

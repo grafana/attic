@@ -61,4 +61,28 @@ describe('AzureMonitorQueryCtrl', function() {
       });
     });
   });
+
+  describe('when getOptions for the ResourceNames dropdown is called', function() {
+    const response = [
+      {text: 'test1', value: 'test1'},
+      {text: 'test2', value: 'test2'},
+    ];
+
+    beforeEach(function() {
+      queryCtrl.target.resourceGroup = 'test';
+      queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
+      queryCtrl.datasource.getResourceNames = function(resourceGroup, metricDefinition) {
+        expect(resourceGroup).to.be('test');
+        expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
+        return this.$q.when(response);
+      };
+    });
+
+    it('should return a list of Resource Names', function() {
+      return queryCtrl.getResourceNames('').then(result => {
+        expect(result[0].text).to.be('test1');
+        expect(result[1].text).to.be('test2');
+      });
+    });
+  });
 });

@@ -203,4 +203,40 @@ describe('AzureMonitorDatasource', function() {
       });
     });
   });
+
+  describe('When performing getResourceNames', function() {
+    const response = {
+      data: {
+        value: [
+          {
+            name: 'Failure Anomalies - nodeapp',
+            type: 'microsoft.insights/alertrules',
+          },
+          {
+            name: 'nodeapp',
+            type: 'microsoft.insights/components',
+            kind: 'Node.JS',
+          }
+        ]
+      },
+      status: 200,
+      statusText: 'OK'
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+        expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2017-06-01');
+        return ctx.$q.when(response);
+      };
+    });
+
+    it('should return list of Metric Definitions', function() {
+      return ctx.ds.getResourceNames('nodeapp', 'microsoft.insights/components').then(function(results) {
+        expect(results.length).to.equal(1);
+        expect(results[0].text).to.equal('nodeapp');
+        expect(results[0].value).to.equal('nodeapp');
+      });
+    });
+  });
 });

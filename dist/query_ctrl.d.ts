@@ -6,4 +6,5 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     constructor($scope: any, $injector: any);
     getResourceGroups(query: any): any;
     getMetricDefinitions(query: any): any;
+    getResourceNames(query: any): any;
 }

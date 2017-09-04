@@ -27,6 +27,9 @@ System.register(['app/plugins/sdk'], function(exports_1) {
                 AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
                     return this.datasource.getMetricDefinitions(this.target.resourceGroup);
                 };
+                AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
+                    return this.datasource.getResourceNames(this.target.resourceGroup, this.target.metricDefinition);
+                };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;
             })(sdk_1.QueryCtrl);

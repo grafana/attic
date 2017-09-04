@@ -106,6 +106,24 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                         return list;
                     });
                 };
+                AzureMonitorQueryBuilder.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
+                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
+                    var list = [];
+                    return this.doRequest({
+                        url: url,
+                        method: 'GET'
+                    }).then(function (result) {
+                        for (var i = 0; i < result.data.value.length; i++) {
+                            if (result.data.value[i].type === metricDefinition) {
+                                list.push({
+                                    text: result.data.value[i].name,
+                                    value: result.data.value[i].name
+                                });
+                            }
+                        }
+                        return list;
+                    });
+                };
                 AzureMonitorQueryBuilder.prototype.testDatasource = function () {
                     var url = this.baseUrl + "?api-version=2017-06-01";
                     return this.doRequest({
