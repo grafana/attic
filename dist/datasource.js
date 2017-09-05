@@ -1,5 +1,5 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register(['./azure_monitor_query_builder'], function(exports_1) {
+System.register(['./azure_monitor/azure_monitor_query_builder'], function(exports_1) {
     var azure_monitor_query_builder_1;
     var AzureMonitorDatasource;
     return {

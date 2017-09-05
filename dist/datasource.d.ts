@@ -1,5 +1,5 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-import AzureMonitorQueryBuilder from './azure_monitor_query_builder';
+import AzureMonitorQueryBuilder from './azure_monitor/azure_monitor_query_builder';
 export default class AzureMonitorDatasource {
     private backendSrv;
     private templateSrv;

@@ -1,5 +1,5 @@
 import {describe, beforeEach, it, sinon, expect, angularMocks} from './lib/common';
-import AzureMonitorFilterBuilder from '../src/azure_monitor_filter_builder';
+import AzureMonitorFilterBuilder from '../src/azure_monitor/azure_monitor_filter_builder';
 import moment from 'moment';
 
 describe('AzureMonitorFilterBuilder', function() {

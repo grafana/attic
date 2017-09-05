@@ -1,9 +1,9 @@
-///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import _ from 'lodash';
-import moment from 'moment';
 import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
 import UrlBuilder from './url_builder';
+import ResponseParser from './response_parser';
 
 export default class AzureMonitorQueryBuilder {
   id: number;
@@ -65,7 +65,7 @@ export default class AzureMonitorQueryBuilder {
 
     return this.$q.all(promises).then(results => {
       return { data: _.flatten(results) };
-    }).then(this.processQueryResult);
+    }).then(ResponseParser.parseQueryResult);
   }
 
   doQueries(queries) {
@@ -74,44 +74,20 @@ export default class AzureMonitorQueryBuilder {
     });
   }
 
-  processQueryResult(result) {
-    const data = [];
-    for (let i = 0; i < result.data.length; i++) {
-      const dataPoints = [];
-      for (let j = 0; j < result.data[i].data.value[0].data.length; j++) {
-        const epoch = moment(result.data[i].data.value[0].data[j].timeStamp).valueOf();
-        dataPoints.push([result.data[i].data.value[0].data[j].average, epoch]);
-      }
-      data.push({target: result.data[i].data.value[0].name.value, datapoints: dataPoints});
-    }
-    return {data: data};
-  }
-
   annotationQuery(options) {
   }
 
   metricFindQuery(query: string) {
     const url = `${this.baseUrl}${query}`;
     return this.doRequest(url).then(result => {
-      return this.parseResponseValues(result, 'name', 'name');
+      return ResponseParser.parseResponseValues(result, 'name', 'name');
     });
-  }
-
-  parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {
-    const list = [];
-    for (let i = 0; i < result.data.value.length; i++) {
-      list.push({
-        text: _.get(result.data.value[i], textFieldName),
-        value: _.get(result.data.value[i], valueFieldName)
-      });
-    }
-    return list;
   }
 
   getMetricDefinitions(resourceGroup: string) {
     const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
     return this.doRequest(url).then(result => {
-      return this.parseResponseValues(result, 'type', 'type');
+      return ResponseParser.parseResponseValues(result, 'type', 'type');
     });
   }
 
@@ -141,7 +117,7 @@ export default class AzureMonitorQueryBuilder {
     );
 
     return this.doRequest(url).then(result => {
-      return this.parseResponseValues(result, 'name.localizedValue', 'name.value');
+      return ResponseParser.parseResponseValues(result, 'name.localizedValue', 'name.value');
     });
   }
 
