@@ -17,8 +17,10 @@ export default class AzureMonitorQueryBuilder {
     };
     annotationQuery(options: any): void;
     metricFindQuery(query: string): any;
+    parseResponseValues(result: any, textFieldName: string, valueFieldName: string): any[];
     getMetricDefinitions(resourceGroup: string): any;
     getResourceNames(resourceGroup: string, metricDefinition: string): any;
+    getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
     testDatasource(): any;
-    doRequest(options: any): any;
+    doRequest(url: any): any;
 }

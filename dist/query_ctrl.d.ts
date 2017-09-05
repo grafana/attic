@@ -7,4 +7,5 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     getResourceGroups(query: any): any;
     getMetricDefinitions(query: any): any;
     getResourceNames(query: any): any;
+    getMetricNames(query: any): any;
 }

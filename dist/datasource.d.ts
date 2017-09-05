@@ -15,4 +15,5 @@ export default class AzureMonitorDatasource {
     testDatasource(): any;
     getMetricDefinitions(resourceGroup: string): any;
     getResourceNames(resourceGroup: string, metricDefinition: string): any;
+    getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
 }

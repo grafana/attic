@@ -4,7 +4,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 export default class AzureMonitorFilterBuilder {
-  constructor(private filter: string, private from, private to, private timeGrain: number, private timeGrainUnit: string) {
+  constructor(private metricName: string, private from, private to, private timeGrain: number, private timeGrainUnit: string) {
   }
 
   generateFilter() {
@@ -12,10 +12,10 @@ export default class AzureMonitorFilterBuilder {
     const timeGrainCondition = ` and timeGrain eq duration'${this.createISO8601Duration()}'`;
     const timeCondition = dateTimeCondition + timeGrainCondition;
 
-    if (!this.filter || this.filter.trim().length === 0) {
+    if (!this.metricName || this.metricName.trim().length === 0) {
       return timeCondition;
     }
-    return `${timeCondition} and ${this.filter}`;
+    return `${timeCondition} and (name.value eq '${this.metricName}')`;
   }
 
   createISO8601Duration() {

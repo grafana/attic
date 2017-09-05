@@ -85,4 +85,30 @@ describe('AzureMonitorQueryCtrl', function() {
       });
     });
   });
+
+  describe('when getOptions for the Metric Names dropdown is called', function() {
+    const response = [
+      {text: 'metric1', value: 'metric1'},
+      {text: 'metric2', value: 'metric2'},
+    ];
+
+    beforeEach(function() {
+      queryCtrl.target.resourceGroup = 'test';
+      queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
+      queryCtrl.target.resourceName = 'test';
+      queryCtrl.datasource.getMetricNames = function(resourceGroup, metricDefinition, resourceName) {
+        expect(resourceGroup).to.be('test');
+        expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
+        expect(resourceName).to.be('test');
+        return this.$q.when(response);
+      };
+    });
+
+    it('should return a list of Metric Names', function() {
+      return queryCtrl.getMetricNames('').then(result => {
+        expect(result[0].text).to.be('metric1');
+        expect(result[1].text).to.be('metric2');
+      });
+    });
+  });
 });

@@ -30,6 +30,9 @@ System.register(['app/plugins/sdk'], function(exports_1) {
                 AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
                     return this.datasource.getResourceNames(this.target.resourceGroup, this.target.metricDefinition);
                 };
+                AzureMonitorQueryCtrl.prototype.getMetricNames = function (query) {
+                    return this.datasource.getMetricNames(this.target.resourceGroup, this.target.metricDefinition, this.target.resourceName);
+                };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;
             })(sdk_1.QueryCtrl);

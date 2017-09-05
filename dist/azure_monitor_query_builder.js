@@ -32,8 +32,8 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                         var resourceGroup = _this.templateSrv.replace(item.resourceGroup, options.scopedVars);
                         var resourceName = _this.templateSrv.replace(item.resourceName, options.scopedVars);
                         var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
-                        var apiVersion = _this.templateSrv.replace(item.apiVersion, options.scopedVars);
-                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.filter, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit);
+                        var apiVersion = '2016-09-01';
+                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit);
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
                         var url = (_this.baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
                             ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&$filter=" + filter);
@@ -57,7 +57,7 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                 AzureMonitorQueryBuilder.prototype.doQueries = function (queries) {
                     var _this = this;
                     return lodash_1.default.map(queries, function (query) {
-                        return _this.doRequest({ url: query.url, method: 'GET' });
+                        return _this.doRequest(query.url);
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.processQueryResult = function (result) {
@@ -75,44 +75,33 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                 AzureMonitorQueryBuilder.prototype.annotationQuery = function (options) {
                 };
                 AzureMonitorQueryBuilder.prototype.metricFindQuery = function (query) {
+                    var _this = this;
                     var url = "" + this.baseUrl + query;
-                    var list = [];
-                    return this.doRequest({
-                        url: url,
-                        method: 'GET'
-                    }).then(function (result) {
-                        for (var i = 0; i < result.data.value.length; i++) {
-                            list.push({
-                                text: result.data.value[i].name,
-                                value: result.data.value[i].name
-                            });
-                        }
-                        return list;
+                    return this.doRequest(url).then(function (result) {
+                        return _this.parseResponseValues(result, 'name', 'name');
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.getMetricDefinitions = function (resourceGroup) {
-                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
+                AzureMonitorQueryBuilder.prototype.parseResponseValues = function (result, textFieldName, valueFieldName) {
                     var list = [];
-                    return this.doRequest({
-                        url: url,
-                        method: 'GET'
-                    }).then(function (result) {
-                        for (var i = 0; i < result.data.value.length; i++) {
-                            list.push({
-                                text: result.data.value[i].type,
-                                value: result.data.value[i].type
-                            });
-                        }
-                        return list;
+                    for (var i = 0; i < result.data.value.length; i++) {
+                        list.push({
+                            text: lodash_1.default.get(result.data.value[i], textFieldName),
+                            value: lodash_1.default.get(result.data.value[i], valueFieldName)
+                        });
+                    }
+                    return list;
+                };
+                AzureMonitorQueryBuilder.prototype.getMetricDefinitions = function (resourceGroup) {
+                    var _this = this;
+                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
+                    return this.doRequest(url).then(function (result) {
+                        return _this.parseResponseValues(result, 'type', 'type');
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
                     var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
                     var list = [];
-                    return this.doRequest({
-                        url: url,
-                        method: 'GET'
-                    }).then(function (result) {
+                    return this.doRequest(url).then(function (result) {
                         for (var i = 0; i < result.data.value.length; i++) {
                             if (result.data.value[i].type === metricDefinition) {
                                 list.push({
@@ -124,12 +113,17 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                         return list;
                     });
                 };
+                AzureMonitorQueryBuilder.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
+                    var _this = this;
+                    var url = (this.baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
+                        "/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01";
+                    return this.doRequest(url).then(function (result) {
+                        return _this.parseResponseValues(result, 'name.localizedValue', 'name.value');
+                    });
+                };
                 AzureMonitorQueryBuilder.prototype.testDatasource = function () {
                     var url = this.baseUrl + "?api-version=2017-06-01";
-                    return this.doRequest({
-                        url: url,
-                        method: 'GET'
-                    }).then(function (response) {
+                    return this.doRequest(url).then(function (response) {
                         if (response.status === 200) {
                             return {
                                 status: 'success',
@@ -159,9 +153,11 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                         };
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.doRequest = function (options) {
-                    options.url = this.url + options.url;
-                    return this.backendSrv.datasourceRequest(options);
+                AzureMonitorQueryBuilder.prototype.doRequest = function (url) {
+                    return this.backendSrv.datasourceRequest({
+                        url: this.url + url,
+                        method: 'GET'
+                    });
                 };
                 return AzureMonitorQueryBuilder;
             })();

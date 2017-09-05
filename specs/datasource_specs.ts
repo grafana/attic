@@ -231,11 +231,54 @@ describe('AzureMonitorDatasource', function() {
       };
     });
 
-    it('should return list of Metric Definitions', function() {
+    it('should return list of Resource Names', function() {
       return ctx.ds.getResourceNames('nodeapp', 'microsoft.insights/components').then(function(results) {
         expect(results.length).to.equal(1);
         expect(results[0].text).to.equal('nodeapp');
         expect(results[0].value).to.equal('nodeapp');
+      });
+    });
+  });
+
+  describe('When performing getMetricNames', function() {
+    const response = {
+      data: {
+        value: [
+          {
+            name: {
+              value: 'UsedCapacity',
+              localizedValue: 'Used capacity'
+            }
+          },
+          {
+            name: {
+              value: 'FreeCapacity',
+              localizedValue: 'Free capacity'
+            }
+          },
+        ]
+      },
+      status: 200,
+      statusText: 'OK'
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
+        const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
+          '/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01';
+        expect(options.url).to.be(expected);
+        return ctx.$q.when(response);
+      };
+    });
+
+    it('should return list of Metric Definitions', function() {
+      return ctx.ds.getMetricNames('nodeapp', 'microsoft.insights/components', 'resource1').then(function(results) {
+        expect(results.length).to.equal(2);
+        expect(results[0].text).to.equal('Used capacity');
+        expect(results[0].value).to.equal('UsedCapacity');
+        expect(results[1].text).to.equal('Free capacity');
+        expect(results[1].value).to.equal('FreeCapacity');
       });
     });
   });

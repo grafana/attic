@@ -5,8 +5,8 @@ System.register([], function(exports_1) {
         setters:[],
         execute: function() {
             AzureMonitorFilterBuilder = (function () {
-                function AzureMonitorFilterBuilder(filter, from, to, timeGrain, timeGrainUnit) {
-                    this.filter = filter;
+                function AzureMonitorFilterBuilder(metricName, from, to, timeGrain, timeGrainUnit) {
+                    this.metricName = metricName;
                     this.from = from;
                     this.to = to;
                     this.timeGrain = timeGrain;
@@ -16,10 +16,10 @@ System.register([], function(exports_1) {
                     var dateTimeCondition = "startTime eq " + this.from.utc().format() + " and endTime eq " + this.to.utc().format();
                     var timeGrainCondition = " and timeGrain eq duration'" + this.createISO8601Duration() + "'";
                     var timeCondition = dateTimeCondition + timeGrainCondition;
-                    if (!this.filter || this.filter.trim().length === 0) {
+                    if (!this.metricName || this.metricName.trim().length === 0) {
                         return timeCondition;
                     }
-                    return timeCondition + " and " + this.filter;
+                    return timeCondition + " and (name.value eq '" + this.metricName + "')";
                 };
                 AzureMonitorFilterBuilder.prototype.createISO8601Duration = function () {
                     var timeGrainUnit = this.timeGrainUnit || 'hour';

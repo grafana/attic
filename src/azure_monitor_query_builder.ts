@@ -27,14 +27,15 @@ export default class AzureMonitorQueryBuilder {
       const resourceGroup = this.templateSrv.replace(item.resourceGroup, options.scopedVars);
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
-      const apiVersion = this.templateSrv.replace(item.apiVersion, options.scopedVars);
+      const apiVersion = '2016-09-01';
       const filterBuilder = new AzureMonitorFilterBuilder(
-        item.filter,
+        item.metricName,
         options.range.from,
         options.range.to,
         item.timeGrain,
         item.timeGrainUnit
       );
+
       const filter = this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
 
       const url = `${this.baseUrl}/${resourceGroup}/providers/${metricDefinition}/${resourceName}` +
@@ -63,7 +64,7 @@ export default class AzureMonitorQueryBuilder {
 
   doQueries(queries) {
     return _.map(queries, query => {
-      return this.doRequest({url: query.url, method: 'GET'});
+      return this.doRequest(query.url);
     });
   }
 
@@ -85,49 +86,34 @@ export default class AzureMonitorQueryBuilder {
 
   metricFindQuery(query: string) {
     const url = `${this.baseUrl}${query}`;
-
-    const list = [];
-    return this.doRequest({
-      url: url,
-      method: 'GET'
-    }).then(result => {
-      for (let i = 0; i < result.data.value.length; i++) {
-        list.push({
-          text: result.data.value[i].name,
-          value: result.data.value[i].name
-        });
-      }
-      return list;
+    return this.doRequest(url).then(result => {
+      return this.parseResponseValues(result, 'name', 'name');
     });
+  }
+
+  parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {
+    const list = [];
+    for (let i = 0; i < result.data.value.length; i++) {
+      list.push({
+        text: _.get(result.data.value[i], textFieldName),
+        value: _.get(result.data.value[i], valueFieldName)
+      });
+    }
+    return list;
   }
 
   getMetricDefinitions(resourceGroup: string) {
     const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
-    const list = [];
-
-    return this.doRequest({
-      url: url,
-      method: 'GET'
-    }).then(result => {
-      for (let i = 0; i < result.data.value.length; i++) {
-        list.push({
-          text: result.data.value[i].type,
-          value: result.data.value[i].type
-        });
-      }
-      return list;
+    return this.doRequest(url).then(result => {
+      return this.parseResponseValues(result, 'type', 'type');
     });
-
   }
 
   getResourceNames(resourceGroup: string, metricDefinition: string) {
     const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
     const list = [];
 
-    return this.doRequest({
-      url: url,
-      method: 'GET'
-    }).then(result => {
+    return this.doRequest(url).then(result => {
       for (let i = 0; i < result.data.value.length; i++) {
         if (result.data.value[i].type === metricDefinition) {
           list.push({
@@ -138,15 +124,20 @@ export default class AzureMonitorQueryBuilder {
       }
       return list;
     });
+  }
 
+  getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string) {
+    const url = `${this.baseUrl}/${resourceGroup}/providers/${metricDefinition}/${resourceName}` +
+    `/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01`;
+
+    return this.doRequest(url).then(result => {
+      return this.parseResponseValues(result, 'name.localizedValue', 'name.value');
+    });
   }
 
   testDatasource() {
     const url = `${this.baseUrl}?api-version=2017-06-01`;
-    return this.doRequest({
-      url: url,
-      method: 'GET'
-    }).then(response => {
+    return this.doRequest(url).then(response => {
       if (response.status === 200) {
         return {
           status: 'success',
@@ -174,8 +165,10 @@ export default class AzureMonitorQueryBuilder {
     });
   }
 
-  doRequest(options) {
-    options.url = this.url + options.url;
-    return this.backendSrv.datasourceRequest(options);
+  doRequest(url) {
+    return this.backendSrv.datasourceRequest({
+      url: this.url + url,
+      method: 'GET'
+    });
   }
 }
