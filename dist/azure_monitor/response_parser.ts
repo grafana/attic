@@ -8,11 +8,16 @@ export default class ResponseParser {
     const data = [];
     for (let i = 0; i < result.data.length; i++) {
       const dataPoints = [];
-      for (let j = 0; j < result.data[i].data.value[0].data.length; j++) {
-        const epoch = moment(result.data[i].data.value[0].data[j].timeStamp).valueOf();
-        dataPoints.push([result.data[i].data.value[0].data[j].average, epoch]);
+      for (let j = 0; j < result.data[i].data.value.length; j++) {
+        for (let k = 0; k < result.data[i].data.value[j].data.length; k++) {
+          const epoch = moment(result.data[i].data.value[j].data[k].timeStamp).valueOf();
+          const keys = _.keys(result.data[i].data.value[j].data[k]);
+          if (keys.length === 2) {
+            dataPoints.push([result.data[i].data.value[j].data[k][keys[1]], epoch]);
+          }
+        }
+        data.push({target: result.data[i].data.value[j].name.value, datapoints: dataPoints});
       }
-      data.push({target: result.data[i].data.value[0].name.value, datapoints: dataPoints});
     }
     return {data: data};
   }

@@ -1,19 +1,20 @@
 <query-editor-row query-ctrl="ctrl" can-collapse="false">
   <div class="gf-form-inline">
 		<div class="gf-form">
-      <label class="gf-form-label query-keyword">Resource Group</label>
+      <label class="gf-form-label query-keyword width-9">Resource Group</label>
       <gf-form-dropdown model="ctrl.target.resourceGroup"
         lookup-text="true"
         get-options="ctrl.getResourceGroups($query)"
-        on-change="ctrl.refresh()">
+        on-change="ctrl.onResourceGroupChange()">
       </gf-form-dropdown>
     </div>
     <div class="gf-form">
       <label class="gf-form-label query-keyword">Metric Namespace</label>
       <gf-form-dropdown model="ctrl.target.metricDefinition"
         lookup-text="true"
+        allow-custom="true"
         get-options="ctrl.getMetricDefinitions($query)"
-        on-change="ctrl.refresh()">
+        on-change="ctrl.onMetricDefinitionChange()">
       </gf-form-dropdown>
     </div>
     <div class="gf-form">
@@ -21,7 +22,7 @@
       <gf-form-dropdown model="ctrl.target.resourceName"
       lookup-text="true"
       get-options="ctrl.getResourceNames($query)"
-      on-change="ctrl.refresh()">
+      on-change="ctrl.onResourceNameChange()">
     </gf-form-dropdown>
     </div>
     <div class="gf-form">
@@ -32,8 +33,10 @@
         on-change="ctrl.refresh()">
       </gf-form-dropdown>
     </div>
-    <div class="gf-form max-width-18">
-      <label class="gf-form-label query-keyword">Time Grain</label>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form max-width-20">
+      <label class="gf-form-label query-keyword width-9">Time Grain</label>
       <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
       <select class="gf-form-input" ng-model="ctrl.target.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']"></select>
     </div>

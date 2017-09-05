@@ -8,4 +8,8 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     getMetricDefinitions(query: any): any;
     getResourceNames(query: any): any;
     getMetricNames(query: any): any;
+    onResourceGroupChange(): void;
+    onMetricDefinitionChange(): void;
+    onResourceNameChange(): void;
+    onMetricNameChange(): void;
 }

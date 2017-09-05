@@ -7,8 +7,6 @@ describe('AzureMonitorQueryCtrl', function() {
   let queryCtrl;
 
   beforeEach(function() {
-    AzureMonitorQueryCtrl.prototype.panelCtrl = {panel: {}};
-    AzureMonitorQueryCtrl.prototype.target = {target: ''};
     queryCtrl = new AzureMonitorQueryCtrl({}, {});
     queryCtrl.datasource = {$q: Q};
   });
@@ -41,73 +39,113 @@ describe('AzureMonitorQueryCtrl', function() {
   });
 
   describe('when getOptions for the Metric Definition dropdown is called', function() {
-    const response = [
-      {text: 'Microsoft.Compute/virtualMachines', value: 'Microsoft.Compute/virtualMachines'},
-      {text: 'Microsoft.Network/publicIPAddresses', value: 'Microsoft.Network/publicIPAddresses'},
-    ];
+    describe('and resource group has a value', function() {
+      const response = [
+        {text: 'Microsoft.Compute/virtualMachines', value: 'Microsoft.Compute/virtualMachines'},
+        {text: 'Microsoft.Network/publicIPAddresses', value: 'Microsoft.Network/publicIPAddresses'},
+      ];
 
-    beforeEach(function() {
-      queryCtrl.target.resourceGroup = 'test';
-      queryCtrl.datasource.getMetricDefinitions = function(query) {
-        expect(query).to.be('test');
-        return this.$q.when(response);
-      };
-    });
+      beforeEach(function() {
+        queryCtrl.target.resourceGroup = 'test';
+        queryCtrl.datasource.getMetricDefinitions = function(query) {
+          expect(query).to.be('test');
+          return this.$q.when(response);
+        };
+      });
 
-    it('should return a list of Metric Definitions', function() {
-      return queryCtrl.getMetricDefinitions('').then(result => {
-        expect(result[0].text).to.be('Microsoft.Compute/virtualMachines');
-        expect(result[1].text).to.be('Microsoft.Network/publicIPAddresses');
+      it('should return a list of Metric Definitions', function() {
+        return queryCtrl.getMetricDefinitions('').then(result => {
+          expect(result[0].text).to.be('Microsoft.Compute/virtualMachines');
+          expect(result[1].text).to.be('Microsoft.Network/publicIPAddresses');
+        });
       });
     });
+
+    describe('and resource group has no value', function() {
+      beforeEach(function() {
+        queryCtrl.target.resourceGroup = '';
+      });
+
+      it('should return without making a call to datasource', function() {
+        expect(queryCtrl.getMetricDefinitions('')).to.be(undefined);
+      });
+    });
+
   });
 
   describe('when getOptions for the ResourceNames dropdown is called', function() {
-    const response = [
-      {text: 'test1', value: 'test1'},
-      {text: 'test2', value: 'test2'},
-    ];
+    describe('and resourceGroup and metricDefinition have values', function() {
+      const response = [
+        {text: 'test1', value: 'test1'},
+        {text: 'test2', value: 'test2'},
+      ];
 
-    beforeEach(function() {
-      queryCtrl.target.resourceGroup = 'test';
-      queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
-      queryCtrl.datasource.getResourceNames = function(resourceGroup, metricDefinition) {
-        expect(resourceGroup).to.be('test');
-        expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
-        return this.$q.when(response);
-      };
+      beforeEach(function() {
+        queryCtrl.target.resourceGroup = 'test';
+        queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
+        queryCtrl.datasource.getResourceNames = function(resourceGroup, metricDefinition) {
+          expect(resourceGroup).to.be('test');
+          expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
+          return this.$q.when(response);
+        };
+      });
+
+      it('should return a list of Resource Names', function() {
+        return queryCtrl.getResourceNames('').then(result => {
+          expect(result[0].text).to.be('test1');
+          expect(result[1].text).to.be('test2');
+        });
+      });
     });
 
-    it('should return a list of Resource Names', function() {
-      return queryCtrl.getResourceNames('').then(result => {
-        expect(result[0].text).to.be('test1');
-        expect(result[1].text).to.be('test2');
+    describe('and resourceGroup and metricDefinition do not have values', function() {
+      beforeEach(function() {
+        queryCtrl.target.resourceGroup = '';
+        queryCtrl.target.metricDefinition = '';
+      });
+
+      it('should return without making a call to datasource', function() {
+        expect(queryCtrl.getResourceNames('')).to.be(undefined);
       });
     });
   });
 
   describe('when getOptions for the Metric Names dropdown is called', function() {
-    const response = [
-      {text: 'metric1', value: 'metric1'},
-      {text: 'metric2', value: 'metric2'},
-    ];
+    describe('and resourceGroup, metricDefinition and resourceName have values', function() {
+      const response = [
+        {text: 'metric1', value: 'metric1'},
+        {text: 'metric2', value: 'metric2'},
+      ];
 
-    beforeEach(function() {
-      queryCtrl.target.resourceGroup = 'test';
-      queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
-      queryCtrl.target.resourceName = 'test';
-      queryCtrl.datasource.getMetricNames = function(resourceGroup, metricDefinition, resourceName) {
-        expect(resourceGroup).to.be('test');
-        expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
-        expect(resourceName).to.be('test');
-        return this.$q.when(response);
-      };
+      beforeEach(function() {
+        queryCtrl.target.resourceGroup = 'test';
+        queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
+        queryCtrl.target.resourceName = 'test';
+        queryCtrl.datasource.getMetricNames = function(resourceGroup, metricDefinition, resourceName) {
+          expect(resourceGroup).to.be('test');
+          expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
+          expect(resourceName).to.be('test');
+          return this.$q.when(response);
+        };
+      });
+
+      it('should return a list of Metric Names', function() {
+        return queryCtrl.getMetricNames('').then(result => {
+          expect(result[0].text).to.be('metric1');
+          expect(result[1].text).to.be('metric2');
+        });
+      });
     });
 
-    it('should return a list of Metric Names', function() {
-      return queryCtrl.getMetricNames('').then(result => {
-        expect(result[0].text).to.be('metric1');
-        expect(result[1].text).to.be('metric2');
+    describe('and resourceGroup, metricDefinition and resourceName do not have values', function() {
+      beforeEach(function() {
+        queryCtrl.target.resourceGroup = '';
+        queryCtrl.target.metricDefinition = '';
+        queryCtrl.target.resourceName = '';
+      });
+
+      it('should return without making a call to datasource', function() {
+        expect(queryCtrl.getMetricNames('')).to.be(undefined);
       });
     });
   });

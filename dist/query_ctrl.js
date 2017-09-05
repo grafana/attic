@@ -25,13 +25,41 @@ System.register(['app/plugins/sdk'], function(exports_1) {
                     return this.datasource.metricFindQuery('?api-version=2017-06-01');
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
+                    if (!this.target.resourceGroup) {
+                        return;
+                    }
                     return this.datasource.getMetricDefinitions(this.target.resourceGroup);
                 };
                 AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
+                    if (!this.target.resourceGroup || !this.target.metricDefinition) {
+                        return;
+                    }
                     return this.datasource.getResourceNames(this.target.resourceGroup, this.target.metricDefinition);
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricNames = function (query) {
+                    if (!this.target.resourceGroup || !this.target.metricDefinition
+                        || !this.target.resourceName) {
+                        return;
+                    }
                     return this.datasource.getMetricNames(this.target.resourceGroup, this.target.metricDefinition, this.target.resourceName);
+                };
+                AzureMonitorQueryCtrl.prototype.onResourceGroupChange = function () {
+                    this.target.metricDefinition = '';
+                    this.target.resourceName = '';
+                    this.target.metricName = '';
+                };
+                AzureMonitorQueryCtrl.prototype.onMetricDefinitionChange = function () {
+                    this.target.resourceName = '';
+                    this.target.metricName = '';
+                };
+                AzureMonitorQueryCtrl.prototype.onResourceNameChange = function () {
+                    this.target.metricName = '';
+                };
+                AzureMonitorQueryCtrl.prototype.onMetricNameChange = function () {
+                    if (this.target.resourceGroup && this.target.metricDefinition
+                        && this.target.resourceName) {
+                        this.refresh();
+                    }
                 };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;

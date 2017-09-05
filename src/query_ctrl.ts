@@ -19,14 +19,48 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getMetricDefinitions(query) {
+    if (!this.target.resourceGroup) {
+      return;
+    }
     return this.datasource.getMetricDefinitions(this.target.resourceGroup);
   }
 
   getResourceNames(query) {
+    if (!this.target.resourceGroup || !this.target.metricDefinition) {
+      return;
+    }
+
     return this.datasource.getResourceNames(this.target.resourceGroup, this.target.metricDefinition);
   }
 
   getMetricNames(query) {
+    if (!this.target.resourceGroup || !this.target.metricDefinition
+      || !this.target.resourceName) {
+      return;
+    }
+
     return this.datasource.getMetricNames(this.target.resourceGroup, this.target.metricDefinition, this.target.resourceName);
+  }
+
+  onResourceGroupChange() {
+    this.target.metricDefinition = '';
+    this.target.resourceName = '';
+    this.target.metricName = '';
+  }
+
+  onMetricDefinitionChange() {
+    this.target.resourceName = '';
+    this.target.metricName = '';
+  }
+
+  onResourceNameChange() {
+    this.target.metricName = '';
+  }
+
+  onMetricNameChange() {
+    if (this.target.resourceGroup && this.target.metricDefinition
+      && this.target.resourceName){
+      this.refresh();
+    }
   }
 }

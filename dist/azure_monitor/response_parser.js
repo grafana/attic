@@ -18,11 +18,16 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     var data = [];
                     for (var i = 0; i < result.data.length; i++) {
                         var dataPoints = [];
-                        for (var j = 0; j < result.data[i].data.value[0].data.length; j++) {
-                            var epoch = moment_1.default(result.data[i].data.value[0].data[j].timeStamp).valueOf();
-                            dataPoints.push([result.data[i].data.value[0].data[j].average, epoch]);
+                        for (var j = 0; j < result.data[i].data.value.length; j++) {
+                            for (var k = 0; k < result.data[i].data.value[j].data.length; k++) {
+                                var epoch = moment_1.default(result.data[i].data.value[j].data[k].timeStamp).valueOf();
+                                var keys = lodash_1.default.keys(result.data[i].data.value[j].data[k]);
+                                if (keys.length === 2) {
+                                    dataPoints.push([result.data[i].data.value[j].data[k][keys[1]], epoch]);
+                                }
+                            }
+                            data.push({ target: result.data[i].data.value[j].name.value, datapoints: dataPoints });
                         }
-                        data.push({ target: result.data[i].data.value[0].name.value, datapoints: dataPoints });
                     }
                     return { data: data };
                 };
