@@ -38,7 +38,7 @@
     <div class="gf-form max-width-20">
       <label class="gf-form-label query-keyword width-9">Time Grain</label>
       <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
-      <select class="gf-form-input" ng-model="ctrl.target.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']"></select>
+      <select class="gf-form-input" ng-model="ctrl.target.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']" ng-change="ctrl.refresh()"></select>
     </div>
   </div>
 </query-editor-row>
