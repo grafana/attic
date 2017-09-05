@@ -1,6 +1,6 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function(exports_1) {
-    var lodash_1, moment_1, azure_monitor_filter_builder_1;
+System.register(['lodash', 'moment', './azure_monitor_filter_builder', './url_builder'], function(exports_1) {
+    var lodash_1, moment_1, azure_monitor_filter_builder_1, url_builder_1;
     var AzureMonitorQueryBuilder;
     return {
         setters:[
@@ -12,6 +12,9 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
             },
             function (azure_monitor_filter_builder_1_1) {
                 azure_monitor_filter_builder_1 = azure_monitor_filter_builder_1_1;
+            },
+            function (url_builder_1_1) {
+                url_builder_1 = url_builder_1_1;
             }],
         execute: function() {
             AzureMonitorQueryBuilder = (function () {
@@ -35,8 +38,7 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                         var apiVersion = '2016-09-01';
                         var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit);
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
-                        var url = (_this.baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
-                            ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&$filter=" + filter);
+                        var url = url_builder_1.default.buildAzureMonitorQueryUrl(_this.baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter);
                         return {
                             refId: item.refId,
                             intervalMs: options.intervalMs,
@@ -115,8 +117,7 @@ System.register(['lodash', 'moment', './azure_monitor_filter_builder'], function
                 };
                 AzureMonitorQueryBuilder.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
                     var _this = this;
-                    var url = (this.baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
-                        "/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01";
+                    var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName);
                     return this.doRequest(url).then(function (result) {
                         return _this.parseResponseValues(result, 'name.localizedValue', 'name.value');
                     });

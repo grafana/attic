@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
+import UrlBuilder from './url_builder';
 
 export default class AzureMonitorQueryBuilder {
   id: number;
@@ -16,7 +17,6 @@ export default class AzureMonitorQueryBuilder {
     this.id = instanceSettings.id;
     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
     this.baseUrl = `/azuremonitor/subscriptions/${this.subscriptionId}/resourceGroups`;
-
     this.url = instanceSettings.url;
   }
 
@@ -38,8 +38,14 @@ export default class AzureMonitorQueryBuilder {
 
       const filter = this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
 
-      const url = `${this.baseUrl}/${resourceGroup}/providers/${metricDefinition}/${resourceName}` +
-        `/providers/microsoft.insights/metrics?api-version=${apiVersion}&$filter=${filter}`;
+      const url = UrlBuilder.buildAzureMonitorQueryUrl(
+        this.baseUrl,
+        resourceGroup,
+        metricDefinition,
+        resourceName,
+        apiVersion,
+        filter
+      );
 
       return {
         refId: item.refId,
@@ -127,8 +133,12 @@ export default class AzureMonitorQueryBuilder {
   }
 
   getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string) {
-    const url = `${this.baseUrl}/${resourceGroup}/providers/${metricDefinition}/${resourceName}` +
-    `/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01`;
+    const url = UrlBuilder.buildAzureMonitorGetMetricNamesUrl(
+      this.baseUrl,
+      resourceGroup,
+      metricDefinition,
+      resourceName
+    );
 
     return this.doRequest(url).then(result => {
       return this.parseResponseValues(result, 'name.localizedValue', 'name.value');
