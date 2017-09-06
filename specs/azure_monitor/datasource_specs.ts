@@ -1,11 +1,14 @@
-import {describe, beforeEach, it, sinon, expect, angularMocks} from './lib/common';
-import helpers from './lib/helpers.js';
-import AzureMonitorDatasource from '../src/datasource';
+import {describe, beforeEach, it, sinon, expect, angularMocks} from '../lib/common';
+import AzureMonitorDatasource from '../../src/datasource';
+import TemplateSrvStub from '../lib/template_srv_stub';
 import Q from 'q';
 import moment from 'moment';
 
 describe('AzureMonitorDatasource', function() {
-  const ctx = new helpers.ServiceTestContext();
+  let ctx: any = {
+    backendSrv: {},
+    templateSrv: new TemplateSrvStub()
+  };
 
   beforeEach(function() {
     ctx.$q = Q;

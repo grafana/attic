@@ -4,9 +4,9 @@ module.exports = function(config) {
       frameworks: ['systemjs', 'mocha', 'expect', 'sinon'],
 
       files: [
-        'specs/*.ts',
+        'specs/*specs.ts',
+        'specs/**/*specs.ts',
         'specs/lib/*.ts',
-        'specs/lib/helpers.js',
         { pattern: 'src/**/*.ts', included: false },
         { pattern: 'node_modules/grafana-sdk-mocks/**/*.ts', included: false },
         { pattern: 'node_modules/grafana-sdk-mocks/**/*.js', included: false },
