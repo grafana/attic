@@ -19,7 +19,7 @@ export default class ResponseParser {
         data.push({target: result.data[i].data.value[j].name.value, datapoints: dataPoints});
       }
     }
-    return {data: data};
+    return data;
   }
 
   static parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {

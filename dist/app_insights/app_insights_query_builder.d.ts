@@ -10,8 +10,10 @@ export default class AppInsightsQueryBuilder {
     applicationId: string;
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
     isConfigured(): boolean;
-    query(options: any): void;
+    query(options: any): any;
+    doQueries(queries: any): any;
     annotationQuery(options: any): void;
     metricFindQuery(query: string): void;
     testDatasource(): any;
+    doRequest(url: any): any;
 }

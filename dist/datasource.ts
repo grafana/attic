@@ -19,7 +19,24 @@ export default class AzureMonitorDatasource {
   }
 
   query(options) {
-   return this.azureMonitorQueryBuilder.query(options);
+    const promises = [];
+    const azureMonitorOptions = options;
+    const appInsightsTargets = _.cloneDeep(options);
+
+    azureMonitorOptions.targets = _.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
+    appInsightsTargets.targets = _.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
+
+    if (azureMonitorOptions.targets.length > 0) {
+      promises.push(this.azureMonitorQueryBuilder.query(azureMonitorOptions));
+    }
+
+    if (appInsightsTargets.targets.length > 0) {
+      promises.push(this.appInsightsQueryBuilder.query(appInsightsTargets));
+    }
+
+    return this.$q.all(promises).then(results => {
+      return { data: _.flatten(results) };
+    });
   }
 
   annotationQuery(options) {

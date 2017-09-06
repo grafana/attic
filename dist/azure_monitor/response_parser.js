@@ -29,7 +29,7 @@ System.register(['moment', 'lodash'], function(exports_1) {
                             data.push({ target: result.data[i].data.value[j].name.value, datapoints: dataPoints });
                         }
                     }
-                    return { data: data };
+                    return data;
                 };
                 ResponseParser.parseResponseValues = function (result, textFieldName, valueFieldName) {
                     var list = [];

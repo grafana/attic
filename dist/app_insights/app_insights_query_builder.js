@@ -1,8 +1,15 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register([], function(exports_1) {
+System.register(['lodash', './response_parser'], function(exports_1) {
+    var lodash_1, response_parser_1;
     var AppInsightsQueryBuilder;
     return {
-        setters:[],
+        setters:[
+            function (lodash_1_1) {
+                lodash_1 = lodash_1_1;
+            },
+            function (response_parser_1_1) {
+                response_parser_1 = response_parser_1_1;
+            }],
         execute: function() {
             AppInsightsQueryBuilder = (function () {
                 function AppInsightsQueryBuilder(instanceSettings, backendSrv, templateSrv, $q) {
@@ -19,6 +26,34 @@ System.register([], function(exports_1) {
                     return this.applicationId && this.applicationId.length > 0;
                 };
                 AppInsightsQueryBuilder.prototype.query = function (options) {
+                    var _this = this;
+                    var queries = lodash_1.default.filter(options.targets, function (item) {
+                        return item.hide !== true;
+                    }).map(function (target) {
+                        var item = target.appInsights;
+                        var url = "" + _this.baseUrl + item.query;
+                        return {
+                            refId: target.refId,
+                            intervalMs: options.intervalMs,
+                            maxDataPoints: options.maxDataPoints,
+                            datasourceId: _this.id,
+                            url: url,
+                            format: options.format,
+                        };
+                    });
+                    if (queries.length === 0) {
+                        return this.$q.when({ data: [] });
+                    }
+                    var promises = this.doQueries(queries);
+                    return this.$q.all(promises).then(function (results) {
+                        return { data: lodash_1.default.flatten(results) };
+                    }).then(response_parser_1.default.parseQueryResult);
+                };
+                AppInsightsQueryBuilder.prototype.doQueries = function (queries) {
+                    var _this = this;
+                    return lodash_1.default.map(queries, function (query) {
+                        return _this.doRequest(query.url);
+                    });
                 };
                 AppInsightsQueryBuilder.prototype.annotationQuery = function (options) {
                 };
@@ -26,10 +61,7 @@ System.register([], function(exports_1) {
                 };
                 AppInsightsQueryBuilder.prototype.testDatasource = function () {
                     var url = this.baseUrl + "/metrics/metadata";
-                    return this.backendSrv.datasourceRequest({
-                        url: this.url + url,
-                        method: 'GET'
-                    }).then(function (response) {
+                    return this.doRequest(url).then(function (response) {
                         if (response.status === 200) {
                             return {
                                 status: 'success',
@@ -53,6 +85,12 @@ System.register([], function(exports_1) {
                             status: 'error',
                             message: message
                         };
+                    });
+                };
+                AppInsightsQueryBuilder.prototype.doRequest = function (url) {
+                    return this.backendSrv.datasourceRequest({
+                        url: this.url + url,
+                        method: 'GET'
                     });
                 };
                 return AppInsightsQueryBuilder;

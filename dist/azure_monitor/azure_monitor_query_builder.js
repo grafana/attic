@@ -51,7 +51,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
                         var url = url_builder_1.default.buildAzureMonitorQueryUrl(_this.baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter);
                         return {
-                            refId: item.refId,
+                            refId: target.refId,
                             intervalMs: options.intervalMs,
                             maxDataPoints: options.maxDataPoints,
                             datasourceId: _this.id,

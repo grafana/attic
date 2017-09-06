@@ -83,6 +83,7 @@ describe('AzureMonitorDatasource', function() {
         {
           apiVersion: '2016-09-01',
           refId: 'A',
+          queryType: 'Azure Monitor',
           azureMonitor: {
             resourceGroup: 'test',
             resourceName: 'test',

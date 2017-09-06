@@ -1,6 +1,7 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import _ from 'lodash';
+import ResponseParser from './response_parser';
 
 export default class AppInsightsQueryBuilder {
   id: number;
@@ -21,6 +22,37 @@ export default class AppInsightsQueryBuilder {
   }
 
   query(options) {
+    const queries = _.filter(options.targets, item => {
+      return item.hide !== true;
+    }).map(target => {
+      const item = target.appInsights;
+      const url = `${this.baseUrl}${item.query}`;
+
+      return {
+        refId: target.refId,
+        intervalMs: options.intervalMs,
+        maxDataPoints: options.maxDataPoints,
+        datasourceId: this.id,
+        url: url,
+        format: options.format,
+      };
+    });
+
+    if (queries.length === 0) {
+      return this.$q.when({data: []});
+    }
+
+    const promises = this.doQueries(queries);
+
+    return this.$q.all(promises).then(results => {
+      return { data: _.flatten(results) };
+    }).then(ResponseParser.parseQueryResult);
+  }
+
+  doQueries(queries) {
+    return _.map(queries, query => {
+      return this.doRequest(query.url);
+    });
   }
 
   annotationQuery(options) {
@@ -31,10 +63,7 @@ export default class AppInsightsQueryBuilder {
 
   testDatasource() {
     const url = `${this.baseUrl}/metrics/metadata`;
-    return this.backendSrv.datasourceRequest({
-      url: this.url + url,
-      method: 'GET'
-    }).then(response => {
+    return this.doRequest(url).then(response => {
       if (response.status === 200) {
         return {
           status: 'success',
@@ -58,6 +87,13 @@ export default class AppInsightsQueryBuilder {
         status: 'error',
         message: message
       };
+    });
+  }
+
+  doRequest(url) {
+    return this.backendSrv.datasourceRequest({
+      url: this.url + url,
+      method: 'GET'
     });
   }
 }

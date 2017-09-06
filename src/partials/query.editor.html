@@ -50,9 +50,9 @@
   </div>
   <div ng-show="ctrl.target.queryType === 'Application Insights'">
     <div class="gf-form-inline">
-      <div class="gf-form max-width-20">
+      <div class="gf-form">
           <label class="gf-form-label query-keyword width-9">Query</label>
-          <input type="text" class="gf-form-input" ng-model="ctrl.target.appInsights.query" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+          <input type="text" class="gf-form-input width-30" ng-model="ctrl.target.appInsights.query" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
       </div>
     </div>
   </div>

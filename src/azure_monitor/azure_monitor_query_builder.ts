@@ -59,7 +59,7 @@ export default class AzureMonitorQueryBuilder {
       );
 
       return {
-        refId: item.refId,
+        refId: target.refId,
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,

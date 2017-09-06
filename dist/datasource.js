@@ -26,7 +26,20 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                     this.appInsightsQueryBuilder = new app_insights_query_builder_1.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
                 }
                 AzureMonitorDatasource.prototype.query = function (options) {
-                    return this.azureMonitorQueryBuilder.query(options);
+                    var promises = [];
+                    var azureMonitorOptions = options;
+                    var appInsightsTargets = lodash_1.default.cloneDeep(options);
+                    azureMonitorOptions.targets = lodash_1.default.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
+                    appInsightsTargets.targets = lodash_1.default.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
+                    if (azureMonitorOptions.targets.length > 0) {
+                        promises.push(this.azureMonitorQueryBuilder.query(azureMonitorOptions));
+                    }
+                    if (appInsightsTargets.targets.length > 0) {
+                        promises.push(this.appInsightsQueryBuilder.query(appInsightsTargets));
+                    }
+                    return this.$q.all(promises).then(function (results) {
+                        return { data: lodash_1.default.flatten(results) };
+                    });
                 };
                 AzureMonitorDatasource.prototype.annotationQuery = function (options) {
                     return this.azureMonitorQueryBuilder.annotationQuery(options);
