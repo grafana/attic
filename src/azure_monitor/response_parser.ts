@@ -7,19 +7,42 @@ export default class ResponseParser {
   static parseQueryResult(result) {
     const data = [];
     for (let i = 0; i < result.data.length; i++) {
-      const dataPoints = [];
       for (let j = 0; j < result.data[i].data.value.length; j++) {
-        for (let k = 0; k < result.data[i].data.value[j].data.length; k++) {
-          const epoch = moment(result.data[i].data.value[j].data[k].timeStamp).valueOf();
-          const keys = _.keys(result.data[i].data.value[j].data[k]);
-          if (keys.length === 2) {
-            dataPoints.push([result.data[i].data.value[j].data[k][keys[1]], epoch]);
-          }
-        }
-        data.push({target: result.data[i].data.value[j].name.value, datapoints: dataPoints});
+        data.push({
+          target: result.data[i].data.value[j].name.value,
+          datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].data)
+        });
       }
     }
     return data;
+  }
+
+  static convertDataToPoints(timeSeriesData) {
+    const dataPoints = [];
+
+    for (let k = 0; k < timeSeriesData.length; k++) {
+      const epoch = ResponseParser.dateTimeToEpoch(timeSeriesData[k].timeStamp);
+      const aggKey = ResponseParser.getKeyForAggregationField(timeSeriesData[k]);
+
+      if (aggKey) {
+        dataPoints.push([timeSeriesData[k][aggKey], epoch]);
+      }
+    }
+
+    return dataPoints;
+  }
+
+  static dateTimeToEpoch(dateTime) {
+    return moment(dateTime).valueOf();
+  }
+
+  static getKeyForAggregationField(dataObj) {
+    const keys = _.keys(dataObj);
+    if (keys.length < 2) {
+      return;
+    }
+
+    return _.intersection(keys, ['total', 'average', 'maximum']);
   }
 
   static parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {

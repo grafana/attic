@@ -17,19 +17,35 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 ResponseParser.parseQueryResult = function (result) {
                     var data = [];
                     for (var i = 0; i < result.data.length; i++) {
-                        var dataPoints = [];
                         for (var j = 0; j < result.data[i].data.value.length; j++) {
-                            for (var k = 0; k < result.data[i].data.value[j].data.length; k++) {
-                                var epoch = moment_1.default(result.data[i].data.value[j].data[k].timeStamp).valueOf();
-                                var keys = lodash_1.default.keys(result.data[i].data.value[j].data[k]);
-                                if (keys.length === 2) {
-                                    dataPoints.push([result.data[i].data.value[j].data[k][keys[1]], epoch]);
-                                }
-                            }
-                            data.push({ target: result.data[i].data.value[j].name.value, datapoints: dataPoints });
+                            data.push({
+                                target: result.data[i].data.value[j].name.value,
+                                datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].data)
+                            });
                         }
                     }
                     return data;
+                };
+                ResponseParser.convertDataToPoints = function (timeSeriesData) {
+                    var dataPoints = [];
+                    for (var k = 0; k < timeSeriesData.length; k++) {
+                        var epoch = ResponseParser.dateTimeToEpoch(timeSeriesData[k].timeStamp);
+                        var aggKey = ResponseParser.getKeyForAggregationField(timeSeriesData[k]);
+                        if (aggKey) {
+                            dataPoints.push([timeSeriesData[k][aggKey], epoch]);
+                        }
+                    }
+                    return dataPoints;
+                };
+                ResponseParser.dateTimeToEpoch = function (dateTime) {
+                    return moment_1.default(dateTime).valueOf();
+                };
+                ResponseParser.getKeyForAggregationField = function (dataObj) {
+                    var keys = lodash_1.default.keys(dataObj);
+                    if (keys.length < 2) {
+                        return;
+                    }
+                    return lodash_1.default.intersection(keys, ['total', 'average', 'maximum']);
                 };
                 ResponseParser.parseResponseValues = function (result, textFieldName, valueFieldName) {
                     var list = [];
