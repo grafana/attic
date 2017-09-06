@@ -1,5 +1,6 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import AzureMonitorQueryBuilder from './azure_monitor/azure_monitor_query_builder';
+import AppInsightsQueryBuilder from './app_insights/app_insights_query_builder';
 export default class AzureMonitorDatasource {
     private backendSrv;
     private templateSrv;
@@ -7,6 +8,7 @@ export default class AzureMonitorDatasource {
     id: number;
     name: string;
     azureMonitorQueryBuilder: AzureMonitorQueryBuilder;
+    appInsightsQueryBuilder: AppInsightsQueryBuilder;
     /** @ngInject */
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
     query(options: any): any;

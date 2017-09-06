@@ -12,21 +12,32 @@ export default class AzureMonitorQueryBuilder {
   resourceGroup: string;
   resourceName: string;
   url: string;
+  defaultDropdownValue = 'select';
 
-  constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
+  constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
     this.baseUrl = `/azuremonitor/subscriptions/${this.subscriptionId}/resourceGroups`;
     this.url = instanceSettings.url;
   }
 
+  isConfigured() {
+    return this.subscriptionId && this.subscriptionId.length > 0;
+  }
+
   query(options) {
     const queries = _.filter(options.targets, item => {
-      return item.hide !== true;
-    }).map(item => {
+      return item.hide !== true
+        && item.azureMonitor.resourceGroup && item.azureMonitor.resourceGroup !== this.defaultDropdownValue
+        && item.azureMonitor.resourceName && item.azureMonitor.resourceName !== this.defaultDropdownValue
+        && item.azureMonitor.metricDefinition && item.azureMonitor.metricDefinition !== this.defaultDropdownValue
+        && item.azureMonitor.metricName && item.azureMonitor.metricName !== this.defaultDropdownValue;
+    }).map(target => {
+      const item = target.azureMonitor;
       const resourceGroup = this.templateSrv.replace(item.resourceGroup, options.scopedVars);
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
+      const metricName = this.templateSrv.replace(item.metricName, options.scopedVars);
       const apiVersion = '2016-09-01';
       const filterBuilder = new AzureMonitorFilterBuilder(
         item.metricName,
@@ -133,7 +144,9 @@ export default class AzureMonitorQueryBuilder {
       }
     })
     .catch(error => {
-      let message = error.statusText ? error.statusText + ': ' : '';
+      let message = 'Azure Monitor: ';
+      message += error.statusText ? error.statusText + ': ' : '';
+
       if (error.data && error.data.error && error.data.error.code) {
         message += error.data.error.code + '. ' + error.data.error.message;
       } else if (error.data && error.data.error) {
@@ -141,12 +154,11 @@ export default class AzureMonitorQueryBuilder {
       } else if (error.data) {
         message += error.data;
       } else {
-        message = "Cannot connect to Azure Monitor REST API.";
+        message += 'Cannot connect to Azure Monitor REST API.';
       }
       return {
-        status: "error",
-        message: message,
-        title: "Error"
+        status: 'error',
+        message: message
       };
     });
   }

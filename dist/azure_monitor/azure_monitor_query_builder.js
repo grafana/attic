@@ -19,22 +19,33 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
         execute: function() {
             AzureMonitorQueryBuilder = (function () {
                 function AzureMonitorQueryBuilder(instanceSettings, backendSrv, templateSrv, $q) {
+                    this.instanceSettings = instanceSettings;
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
                     this.$q = $q;
+                    this.defaultDropdownValue = 'select';
                     this.id = instanceSettings.id;
                     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
                     this.baseUrl = "/azuremonitor/subscriptions/" + this.subscriptionId + "/resourceGroups";
                     this.url = instanceSettings.url;
                 }
+                AzureMonitorQueryBuilder.prototype.isConfigured = function () {
+                    return this.subscriptionId && this.subscriptionId.length > 0;
+                };
                 AzureMonitorQueryBuilder.prototype.query = function (options) {
                     var _this = this;
                     var queries = lodash_1.default.filter(options.targets, function (item) {
-                        return item.hide !== true;
-                    }).map(function (item) {
+                        return item.hide !== true
+                            && item.azureMonitor.resourceGroup && item.azureMonitor.resourceGroup !== _this.defaultDropdownValue
+                            && item.azureMonitor.resourceName && item.azureMonitor.resourceName !== _this.defaultDropdownValue
+                            && item.azureMonitor.metricDefinition && item.azureMonitor.metricDefinition !== _this.defaultDropdownValue
+                            && item.azureMonitor.metricName && item.azureMonitor.metricName !== _this.defaultDropdownValue;
+                    }).map(function (target) {
+                        var item = target.azureMonitor;
                         var resourceGroup = _this.templateSrv.replace(item.resourceGroup, options.scopedVars);
                         var resourceName = _this.templateSrv.replace(item.resourceName, options.scopedVars);
                         var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
+                        var metricName = _this.templateSrv.replace(item.metricName, options.scopedVars);
                         var apiVersion = '2016-09-01';
                         var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit);
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
@@ -109,7 +120,8 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         }
                     })
                         .catch(function (error) {
-                        var message = error.statusText ? error.statusText + ': ' : '';
+                        var message = 'Azure Monitor: ';
+                        message += error.statusText ? error.statusText + ': ' : '';
                         if (error.data && error.data.error && error.data.error.code) {
                             message += error.data.error.code + '. ' + error.data.error.message;
                         }
@@ -120,12 +132,11 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             message += error.data;
                         }
                         else {
-                            message = "Cannot connect to Azure Monitor REST API.";
+                            message += 'Cannot connect to Azure Monitor REST API.';
                         }
                         return {
-                            status: "error",
-                            message: message,
-                            title: "Error"
+                            status: 'error',
+                            message: message
                         };
                     });
                 };

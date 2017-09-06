@@ -42,7 +42,7 @@ describe('AzureMonitorDatasource', function() {
       it('should return error status and a detailed error message', function() {
         return ctx.ds.testDatasource().then(function(results) {
           expect(results.status).to.equal('error');
-          expect(results.message).to.equal('Bad Request: InvalidApiVersionParameter. An error message.');
+          expect(results.message).to.equal('1. Azure Monitor: Bad Request: InvalidApiVersionParameter. An error message. ');
         });
       });
     });
@@ -82,14 +82,15 @@ describe('AzureMonitorDatasource', function() {
       targets: [
         {
           apiVersion: '2016-09-01',
-          filter: `(name.value eq 'Percentage CPU')` +
-            ` and timeGrain eq duration'PT1H'`,
           refId: 'A',
-          resourceGroup: 'test',
-          resourceName: 'test',
-          metricDefinition: 'Microsoft.Compute/virtualMachines',
-          timeGrain: 1,
-          timeGrainUnit: 'hour',
+          azureMonitor: {
+            resourceGroup: 'test',
+            resourceName: 'test',
+            metricDefinition: 'Microsoft.Compute/virtualMachines',
+            metricName: 'Percentage CPU',
+            timeGrain: 1,
+            timeGrainUnit: 'hour',
+          }
         }
       ]
     };

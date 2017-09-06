@@ -13,8 +13,19 @@ describe('AzureMonitorQueryCtrl', function() {
 
   describe('init query_ctrl variables', function() {
     it('time grain variables should be initialized', function() {
-      expect(queryCtrl.target.timeGrain).to.be(1);
-      expect(queryCtrl.target.timeGrainUnit).to.be('hour');
+      expect(queryCtrl.target.azureMonitor.timeGrain).to.be(1);
+      expect(queryCtrl.target.azureMonitor.timeGrainUnit).to.be('hour');
+    });
+
+    it('should set default query type to Azure Monitor', function() {
+      expect(queryCtrl.target.queryType).to.be('Azure Monitor');
+    });
+
+    it('should set query parts to select', function() {
+      expect(queryCtrl.target.azureMonitor.resourceGroup).to.be('select');
+      expect(queryCtrl.target.azureMonitor.metricDefinition).to.be('select');
+      expect(queryCtrl.target.azureMonitor.resourceName).to.be('select');
+      expect(queryCtrl.target.azureMonitor.metricName).to.be('select');
     });
   });
 
@@ -46,7 +57,7 @@ describe('AzureMonitorQueryCtrl', function() {
       ];
 
       beforeEach(function() {
-        queryCtrl.target.resourceGroup = 'test';
+        queryCtrl.target.azureMonitor.resourceGroup = 'test';
         queryCtrl.datasource.getMetricDefinitions = function(query) {
           expect(query).to.be('test');
           return this.$q.when(response);
@@ -63,7 +74,7 @@ describe('AzureMonitorQueryCtrl', function() {
 
     describe('and resource group has no value', function() {
       beforeEach(function() {
-        queryCtrl.target.resourceGroup = '';
+        queryCtrl.target.azureMonitor.resourceGroup = 'select';
       });
 
       it('should return without making a call to datasource', function() {
@@ -81,8 +92,8 @@ describe('AzureMonitorQueryCtrl', function() {
       ];
 
       beforeEach(function() {
-        queryCtrl.target.resourceGroup = 'test';
-        queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
+        queryCtrl.target.azureMonitor.resourceGroup = 'test';
+        queryCtrl.target.azureMonitor.metricDefinition = 'Microsoft.Compute/virtualMachines';
         queryCtrl.datasource.getResourceNames = function(resourceGroup, metricDefinition) {
           expect(resourceGroup).to.be('test');
           expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
@@ -100,8 +111,8 @@ describe('AzureMonitorQueryCtrl', function() {
 
     describe('and resourceGroup and metricDefinition do not have values', function() {
       beforeEach(function() {
-        queryCtrl.target.resourceGroup = '';
-        queryCtrl.target.metricDefinition = '';
+        queryCtrl.target.azureMonitor.resourceGroup = 'select';
+        queryCtrl.target.azureMonitor.metricDefinition = 'select';
       });
 
       it('should return without making a call to datasource', function() {
@@ -118,9 +129,9 @@ describe('AzureMonitorQueryCtrl', function() {
       ];
 
       beforeEach(function() {
-        queryCtrl.target.resourceGroup = 'test';
-        queryCtrl.target.metricDefinition = 'Microsoft.Compute/virtualMachines';
-        queryCtrl.target.resourceName = 'test';
+        queryCtrl.target.azureMonitor.resourceGroup = 'test';
+        queryCtrl.target.azureMonitor.metricDefinition = 'Microsoft.Compute/virtualMachines';
+        queryCtrl.target.azureMonitor.resourceName = 'test';
         queryCtrl.datasource.getMetricNames = function(resourceGroup, metricDefinition, resourceName) {
           expect(resourceGroup).to.be('test');
           expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
@@ -139,9 +150,9 @@ describe('AzureMonitorQueryCtrl', function() {
 
     describe('and resourceGroup, metricDefinition and resourceName do not have values', function() {
       beforeEach(function() {
-        queryCtrl.target.resourceGroup = '';
-        queryCtrl.target.metricDefinition = '';
-        queryCtrl.target.resourceName = '';
+        queryCtrl.target.azureMonitor.resourceGroup = 'select';
+        queryCtrl.target.azureMonitor.metricDefinition = 'select';
+        queryCtrl.target.azureMonitor.resourceName = 'select';
       });
 
       it('should return without making a call to datasource', function() {

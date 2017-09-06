@@ -17,7 +17,7 @@
   "routes": [
     {
       "path": "azuremonitor",
-      "method": "*",
+      "method": "GET",
       "url": "https://management.azure.com",
       "tokenAuth": {
         "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
@@ -28,6 +28,14 @@
           "resource": "https://management.azure.com/"
         }
       }
+    },
+    {
+      "path": "appinsights",
+      "method": "GET",
+      "url": "https://api.applicationinsights.io",
+      "headers": [
+        {"name": "X-API-Key", "content": "{{.SecureJsonData.appInsightsApiKey}}"}
+      ]
     }
   ],
 

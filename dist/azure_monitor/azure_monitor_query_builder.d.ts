@@ -1,5 +1,6 @@
 /// <reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 export default class AzureMonitorQueryBuilder {
+    private instanceSettings;
     private backendSrv;
     private templateSrv;
     private $q;
@@ -9,7 +10,9 @@ export default class AzureMonitorQueryBuilder {
     resourceGroup: string;
     resourceName: string;
     url: string;
+    defaultDropdownValue: string;
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
+    isConfigured(): boolean;
     query(options: any): any;
     doQueries(queries: any): any;
     annotationQuery(options: any): void;

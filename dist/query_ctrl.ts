@@ -6,12 +6,25 @@ import {QueryCtrl} from 'app/plugins/sdk';
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
 
+  defaultDropdownValue = 'select';
+
+  defaults = {
+    queryType: 'Azure Monitor',
+    azureMonitor: {
+      resourceGroup: this.defaultDropdownValue,
+      metricDefinition: this.defaultDropdownValue,
+      resourceName: this.defaultDropdownValue,
+      metricName: this.defaultDropdownValue,
+      timeGrain: 1,
+      timeGrainUnit: 'hour'
+    }
+  };
+
   /** @ngInject **/
   constructor($scope, $injector) {
     super($scope, $injector);
 
-    this.target.timeGrain = 1;
-    this.target.timeGrainUnit = 'hour';
+    _.defaultsDeep(this.target, this.defaults);
   }
 
   getResourceGroups(query) {
@@ -19,47 +32,54 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getMetricDefinitions(query) {
-    if (!this.target.resourceGroup) {
+    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
       return;
     }
-    return this.datasource.getMetricDefinitions(this.target.resourceGroup);
+    return this.datasource.getMetricDefinitions(this.target.azureMonitor.resourceGroup);
   }
 
   getResourceNames(query) {
-    if (!this.target.resourceGroup || !this.target.metricDefinition) {
+    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue
+      || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
       return;
     }
 
-    return this.datasource.getResourceNames(this.target.resourceGroup, this.target.metricDefinition);
+    return this.datasource.getResourceNames(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition);
   }
 
   getMetricNames(query) {
-    if (!this.target.resourceGroup || !this.target.metricDefinition
-      || !this.target.resourceName) {
+    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue
+      || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue
+      || !this.target.azureMonitor.resourceName || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
       return;
     }
 
-    return this.datasource.getMetricNames(this.target.resourceGroup, this.target.metricDefinition, this.target.resourceName);
+    return this.datasource.getMetricNames(
+      this.target.azureMonitor.resourceGroup,
+      this.target.azureMonitor.metricDefinition,
+      this.target.azureMonitor.resourceName
+    );
   }
 
   onResourceGroupChange() {
-    this.target.metricDefinition = '';
-    this.target.resourceName = '';
-    this.target.metricName = '';
+    this.target.azureMonitor.metricDefinition = this.defaultDropdownValue;
+    this.target.azureMonitor.resourceName = this.defaultDropdownValue;
+    this.target.azureMonitor.metricName = this.defaultDropdownValue;
   }
 
   onMetricDefinitionChange() {
-    this.target.resourceName = '';
-    this.target.metricName = '';
+    this.target.azureMonitor.resourceName = this.defaultDropdownValue;
+    this.target.azureMonitor.metricName = this.defaultDropdownValue;
   }
 
   onResourceNameChange() {
-    this.target.metricName = '';
+    this.target.azureMonitor.metricName = this.defaultDropdownValue;
   }
 
   onMetricNameChange() {
-    if (this.target.resourceGroup && this.target.metricDefinition
-      && this.target.resourceName){
+    if (this.target.azureMonitor.resourceGroup && this.target.azureMonitor.resourceGroup !== this.defaultDropdownValue
+      && this.target.azureMonitor.metricDefinition && this.target.azureMonitor.metricDefinition !== this.defaultDropdownValue
+      && this.target.azureMonitor.resourceName && this.target.azureMonitor.resourceName !== this.defaultDropdownValue){
       this.refresh();
     }
   }
