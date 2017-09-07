@@ -22,6 +22,13 @@ module.exports = function(grunt) {
         src: ['*.html'],
         dest: 'dist/partials/'
       },
+      dist_css: {
+        expand: true,
+        flatten: true,
+        cwd: 'src/css',
+        src: ['*.css'],
+        dest: 'dist/css/'
+      },
       dist_statics: {
         expand: true,
         flatten: true,
@@ -48,7 +55,7 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ['src/**/*.ts', 'src/**/*.html', 'src/plugin.json', 'README.md'],
+      files: ['src/**/*.ts', 'src/**/*.html', 'src/**/*.css', 'src/plugin.json', 'README.md'],
       tasks: ['default'],
       options: {
         debounceDelay: 250,
@@ -61,6 +68,7 @@ module.exports = function(grunt) {
     'copy:dist_js',
     'typescript:build',
     'copy:dist_html',
+    'copy:dist_css',
     'copy:dist_statics'
   ]);
 };

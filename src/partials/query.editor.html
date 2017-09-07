@@ -12,7 +12,8 @@
         <gf-form-dropdown model="ctrl.target.azureMonitor.resourceGroup"
           lookup-text="true"
           get-options="ctrl.getResourceGroups($query)"
-          on-change="ctrl.onResourceGroupChange()">
+          on-change="ctrl.onResourceGroupChange()"
+          css-class="width-7">
         </gf-form-dropdown>
       </div>
       <div class="gf-form">
@@ -20,7 +21,8 @@
         <gf-form-dropdown model="ctrl.target.azureMonitor.metricDefinition"
           lookup-text="true"
           get-options="ctrl.getMetricDefinitions($query)"
-          on-change="ctrl.onMetricDefinitionChange()">
+          on-change="ctrl.onMetricDefinitionChange()"
+          css-class="width-25">
         </gf-form-dropdown>
       </div>
       <div class="gf-form">
@@ -28,7 +30,8 @@
         <gf-form-dropdown model="ctrl.target.azureMonitor.resourceName"
         lookup-text="true"
         get-options="ctrl.getResourceNames($query)"
-        on-change="ctrl.onResourceNameChange()">
+        on-change="ctrl.onResourceNameChange()"
+        css-class="width-10">
       </gf-form-dropdown>
       </div>
       <div class="gf-form">
@@ -36,7 +39,8 @@
         <gf-form-dropdown model="ctrl.target.azureMonitor.metricName"
           lookup-text="true"
           get-options="ctrl.getMetricNames($query)"
-          on-change="ctrl.refresh()">
+          on-change="ctrl.refresh()"
+          css-class="width-12">
         </gf-form-dropdown>
       </div>
     </div>
