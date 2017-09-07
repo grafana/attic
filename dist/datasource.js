@@ -27,7 +27,7 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                 }
                 AzureMonitorDatasource.prototype.query = function (options) {
                     var promises = [];
-                    var azureMonitorOptions = options;
+                    var azureMonitorOptions = lodash_1.default.cloneDeep(options);
                     var appInsightsTargets = lodash_1.default.cloneDeep(options);
                     azureMonitorOptions.targets = lodash_1.default.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
                     appInsightsTargets.targets = lodash_1.default.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);

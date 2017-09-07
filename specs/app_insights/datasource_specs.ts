@@ -124,47 +124,145 @@ describe('AppInsightsDatasource', function() {
       ]
     };
 
-    const response = {
-      value: {
-        start: '2017-08-30T15:53:58.845Z',
-        end: '2017-09-06T15:53:58.845Z',
-        interval: 'PT1H',
-        segments: [
-          {
-            start: "2017-08-30T15:53:58.845Z",
-            end: "2017-08-30T16:00:00.000Z",
-            'exceptions/server': {
-              sum: 3
-            }
-          },
-          {
-            start: "2017-08-30T16:00:00.000Z",
-            end: "2017-08-30T17:00:00.000Z",
-            'exceptions/server': {
-              sum: 66
-            }
+    describe('and with a single value', function() {
+      const response = {
+        value: {
+          start: '2017-08-30T15:53:58.845Z',
+          end: '2017-09-06T15:53:58.845Z',
+          'exceptions/server': {
+            sum: 100
           }
-        ]
-      }
-    };
-
-    beforeEach(function() {
-      ctx.backendSrv.datasourceRequest = function(options) {
-        expect(options.url).to.contain('/metrics/exceptions/server');
-        return ctx.$q.when({data: response, status: 200});
+        }
       };
-    });
 
-    it('should return a list of datapoints', function() {
-      return ctx.ds.query(options).then(function(results) {
-        expect(results.data.length).to.be(1);
-        expect(results.data[0].target).to.equal('exceptions/server');
-        expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
-        expect(results.data[0].datapoints[0][0]).to.equal(3);
-        expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);
-        expect(results.data[0].datapoints[1][0]).to.equal(66);
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          expect(options.url).to.contain('/metrics/exceptions/server');
+          return ctx.$q.when({data: response, status: 200});
+        };
+      });
+
+      it('should return a single datapoint', function() {
+        return ctx.ds.query(options).then(function(results) {
+          expect(results.data.length).to.be(1);
+          expect(results.data[0].datapoints.length).to.be(1);
+          expect(results.data[0].target).to.equal('exceptions/server');
+          expect(results.data[0].datapoints[0][1]).to.equal(1504713238845);
+          expect(results.data[0].datapoints[0][0]).to.equal(100);
+        });
       });
     });
 
+    describe('and without a group by', function() {
+      const response = {
+        value: {
+          start: '2017-08-30T15:53:58.845Z',
+          end: '2017-09-06T15:53:58.845Z',
+          interval: 'PT1H',
+          segments: [
+            {
+              start: "2017-08-30T15:53:58.845Z",
+              end: "2017-08-30T16:00:00.000Z",
+              'exceptions/server': {
+                sum: 3
+              }
+            },
+            {
+              start: "2017-08-30T16:00:00.000Z",
+              end: "2017-08-30T17:00:00.000Z",
+              'exceptions/server': {
+                sum: 66
+              }
+            }
+          ]
+        }
+      };
+
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          expect(options.url).to.contain('/metrics/exceptions/server');
+          return ctx.$q.when({data: response, status: 200});
+        };
+      });
+
+      it('should return a list of datapoints', function() {
+        return ctx.ds.query(options).then(function(results) {
+          expect(results.data.length).to.be(1);
+          expect(results.data[0].datapoints.length).to.be(2);
+          expect(results.data[0].target).to.equal('exceptions/server');
+          expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
+          expect(results.data[0].datapoints[0][0]).to.equal(3);
+          expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);
+          expect(results.data[0].datapoints[1][0]).to.equal(66);
+        });
+      });
+    });
+
+    describe('and with a group by', function() {
+      const response = {
+        value: {
+          start: '2017-08-30T15:53:58.845Z',
+          end: '2017-09-06T15:53:58.845Z',
+          interval: 'PT1H',
+          segments:  [
+            {
+              start: '2017-08-30T15:53:58.845Z',
+              end: '2017-08-30T16:00:00.000Z',
+              segments: [
+                {
+                  'exceptions/server': {
+                    sum: 10
+                  },
+                  'client/city': 'Miami'
+                },
+                {
+                 'exceptions/server': {
+                    sum: 1
+                  },
+                  'client/city': "San Jose"
+                }
+              ]
+            },
+            {
+              start: '2017-08-30T16:00:00.000Z',
+              end: '2017-08-30T17:00:00.000Z',
+              segments: [
+                {
+                 'exceptions/server': {
+                    sum: 20
+                  },
+                  'client/city': 'Miami'
+                },
+                {
+                 'exceptions/server': {
+                    sum: 2
+                  },
+                  'client/city': 'San Antonio'
+                }
+              ]
+            }
+          ]
+        }
+      };
+
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          expect(options.url).to.contain('/metrics/exceptions/server');
+          return ctx.$q.when({data: response, status: 200});
+        };
+      });
+
+      it('should return a list of datapoints', function() {
+        return ctx.ds.query(options).then(function(results) {
+          expect(results.data.length).to.be(3);
+          expect(results.data[0].datapoints.length).to.be(2);
+          expect(results.data[0].target).to.equal('exceptions/server{client/city="Miami"}');
+          expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
+          expect(results.data[0].datapoints[0][0]).to.equal(10);
+          expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);
+          expect(results.data[0].datapoints[1][0]).to.equal(20);
+        });
+      });
+    });
   });
 });

@@ -20,7 +20,7 @@ export default class AzureMonitorDatasource {
 
   query(options) {
     const promises = [];
-    const azureMonitorOptions = options;
+    const azureMonitorOptions = _.cloneDeep(options);
     const appInsightsTargets = _.cloneDeep(options);
 
     azureMonitorOptions.targets = _.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
