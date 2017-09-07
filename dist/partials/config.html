@@ -4,7 +4,7 @@
 	<div class="gf-form-inline">
 		<div class="gf-form">
 			<span class="gf-form-label width-9">Subscription Id</span>
-			<input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.subscriptionId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" required></input>
+			<input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.subscriptionId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
           Text on where to find it.
       </info-popover>
@@ -13,7 +13,7 @@
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-9">Tenant Id</span>
-      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.tenantId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" required></input>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.tenantId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
           Text on where to find it.
       </info-popover>
@@ -22,7 +22,7 @@
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-9">Client Id</span>
-      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.clientId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" required></input>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.clientId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
           Text on where to find it.
       </info-popover>
@@ -31,7 +31,7 @@
   <div class="gf-form-inline" ng-if="!ctrl.current.secureJsonFields.clientSecret">
     <div class="gf-form">
       <span class="gf-form-label width-9">Client Secret</span>
-      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.clientSecret' placeholder="" required></input>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.clientSecret' placeholder=""></input>
       <info-popover mode="right-absolute">
           Text on where to find it.
       </info-popover>
@@ -49,8 +49,8 @@
 <div class="gf-form-group">
   <div class="gf-form-inline" ng-if="!ctrl.current.secureJsonFields.appInsightsApiKey">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Client Secret</span>
-      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.appInsightsApiKey' placeholder="" required></input>
+      <span class="gf-form-label width-9">API Key</span>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.appInsightsApiKey' placeholder=""></input>
       <info-popover mode="right-absolute">
         Section 2 of the quickstart show where to find the key: <a href="https://dev.applicationinsights.io/quickstart/">https://dev.applicationinsights.io/quickstart/</a>
       </info-popover>
@@ -64,7 +64,7 @@
 	<div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-9">Application Id</span>
-      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.appInsightsAppId' placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required></input>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.appInsightsAppId' placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></input>
       <info-popover mode="right-absolute">
         Text on where to find it.
       </info-popover>
