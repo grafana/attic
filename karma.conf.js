@@ -8,9 +8,11 @@ module.exports = function(config) {
         'specs/**/*specs.ts',
         'specs/lib/*.ts',
         { pattern: 'src/**/*.ts', included: false },
+        { pattern: 'src/css/*.css', included: false },
         { pattern: 'node_modules/grafana-sdk-mocks/**/*.ts', included: false },
         { pattern: 'node_modules/grafana-sdk-mocks/**/*.js', included: false },
         { pattern: 'node_modules/typescript/lib/typescript.js', included: false },
+        { pattern: 'node_modules/systemjs-plugin-css/css.js', included: false },
         { pattern: 'node_modules/lodash/lodash.js', included: false },
         { pattern: 'node_modules/moment/moment.js', included: false },
         { pattern: 'node_modules/q/q.js', included: false },
@@ -29,11 +31,13 @@ module.exports = function(config) {
             'q': 'node_modules/q/q.js',
             'typescript': 'node_modules/typescript/lib/typescript.js',
             'plugin-typescript': 'node_modules/plugin-typescript/lib/plugin.js',
+            'css': 'node_modules/systemjs-plugin-css/css.js',
             'app/': 'node_modules/grafana-sdk-mocks/app/',
           },
 
           map: {
               'plugin-typescript': 'node_modules/plugin-typescript/lib/',
+              css: 'node_modules/systemjs-plugin-css/css.js',
               'typescript': 'node_modules/typescript/',
               'app/core/utils/kbn': 'node_modules/grafana-sdk-mocks/app/core/utils/kbn.js'
           },
@@ -60,6 +64,9 @@ module.exports = function(config) {
             },
             'src': {
               'defaultExtension': 'ts',
+              meta: {
+                '*.css': { loader: 'css' }
+              }
             },
             'specs': {
               'defaultExtension': 'ts',
