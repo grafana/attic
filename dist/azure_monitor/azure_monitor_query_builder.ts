@@ -163,10 +163,16 @@ export default class AzureMonitorQueryBuilder {
     });
   }
 
-  doRequest(url) {
+  doRequest(url, maxRetries = 1) {
     return this.backendSrv.datasourceRequest({
       url: this.url + url,
       method: 'GET'
+    }).catch(error => {
+      if (maxRetries > 0) {
+        return this.doRequest(url, maxRetries - 1);
+      }
+
+      throw error;
     });
   }
 }

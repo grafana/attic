@@ -28,20 +28,27 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     _.defaultsDeep(this.target, this.defaults);
   }
 
+  /* Azure Monitor Section */
   getResourceGroups(query) {
+    if (this.target.queryType !== 'Azure Monitor') {
+      return;
+    }
+
     return this.datasource.metricFindQuery('?api-version=2017-06-01');
   }
 
   getMetricDefinitions(query) {
-    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
+    if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
+      || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
       return;
     }
     return this.datasource.getMetricDefinitions(this.target.azureMonitor.resourceGroup);
   }
 
   getResourceNames(query) {
-    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue
-      || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
+    if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
+      || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue || !this.target.azureMonitor.metricDefinition
+      || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
       return;
     }
 
@@ -49,9 +56,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getMetricNames(query) {
-    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue
-      || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue
-      || !this.target.azureMonitor.resourceName || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
+    if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
+      || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue || !this.target.azureMonitor.metricDefinition
+      || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue || !this.target.azureMonitor.resourceName
+      || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
       return;
     }
 
@@ -84,4 +92,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       this.refresh();
     }
   }
+
+  /* Application Insights Section */
+
 }

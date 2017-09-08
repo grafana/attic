@@ -15,5 +15,5 @@ export default class AppInsightsQueryBuilder {
     annotationQuery(options: any): void;
     metricFindQuery(query: string): void;
     testDatasource(): any;
-    doRequest(url: any): any;
+    doRequest(url: any, maxRetries?: number): any;
 }

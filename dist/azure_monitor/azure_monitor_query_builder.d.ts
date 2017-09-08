@@ -21,5 +21,5 @@ export default class AzureMonitorQueryBuilder {
     getResourceNames(resourceGroup: string, metricDefinition: string): any;
     getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
     testDatasource(): any;
-    doRequest(url: any): any;
+    doRequest(url: any, maxRetries?: number): any;
 }

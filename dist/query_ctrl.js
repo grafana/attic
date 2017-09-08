@@ -36,26 +36,33 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
                 }
+                /* Azure Monitor Section */
                 AzureMonitorQueryCtrl.prototype.getResourceGroups = function (query) {
+                    if (this.target.queryType !== 'Azure Monitor') {
+                        return;
+                    }
                     return this.datasource.metricFindQuery('?api-version=2017-06-01');
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
-                    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
+                    if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
+                        || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
                         return;
                     }
                     return this.datasource.getMetricDefinitions(this.target.azureMonitor.resourceGroup);
                 };
                 AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
-                    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue
-                        || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
+                    if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
+                        || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue || !this.target.azureMonitor.metricDefinition
+                        || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
                         return;
                     }
                     return this.datasource.getResourceNames(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition);
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricNames = function (query) {
-                    if (!this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue
-                        || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue
-                        || !this.target.azureMonitor.resourceName || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
+                    if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
+                        || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue || !this.target.azureMonitor.metricDefinition
+                        || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue || !this.target.azureMonitor.resourceName
+                        || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
                         return;
                     }
                     return this.datasource.getMetricNames(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition, this.target.azureMonitor.resourceName);

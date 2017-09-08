@@ -87,10 +87,17 @@ System.register(['lodash', './response_parser'], function(exports_1) {
                         };
                     });
                 };
-                AppInsightsQueryBuilder.prototype.doRequest = function (url) {
+                AppInsightsQueryBuilder.prototype.doRequest = function (url, maxRetries) {
+                    var _this = this;
+                    if (maxRetries === void 0) { maxRetries = 1; }
                     return this.backendSrv.datasourceRequest({
                         url: this.url + url,
                         method: 'GET'
+                    }).catch(function (error) {
+                        if (maxRetries > 0) {
+                            return _this.doRequest(url, maxRetries - 1);
+                        }
+                        throw error;
                     });
                 };
                 return AppInsightsQueryBuilder;
