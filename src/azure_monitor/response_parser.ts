@@ -42,7 +42,7 @@ export default class ResponseParser {
       return;
     }
 
-    return _.intersection(keys, ['total', 'average', 'maximum']);
+    return _.intersection(keys, ['total', 'average', 'maximum', 'minimum', 'count']);
   }
 
   static parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {
@@ -54,5 +54,15 @@ export default class ResponseParser {
       });
     }
     return list;
+  }
+
+  static parseAggregations(result: any, metricName: string) {
+    const metricData = _.find(result.data.value, o => {
+      return _.get(o, 'name.value') === metricName;
+    });
+    return {
+      primaryAggType: metricData.primaryAggregationType,
+      supportedAggTypes: metricData.supportedAggregationTypes
+    };
   }
 }

@@ -18,7 +18,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
   });
 
-  describe('with an empty filter string and 1 minute time grain', function() {
+  describe('with a metric name and 1 minute time grain', function() {
     beforeEach(function() {
       builder = new AzureMonitorFilterBuilder(
         'Percentage CPU',
@@ -37,7 +37,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
   });
 
-  describe('with an empty filter string and 1 day time grain', function() {
+  describe('with a metric name and 1 day time grain', function() {
     beforeEach(function() {
       builder = new AzureMonitorFilterBuilder('Percentage CPU', moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'), 1, 'day');
     });
@@ -46,6 +46,22 @@ describe('AzureMonitorFilterBuilder', function() {
       const filter = `startTime eq 2017-08-22T06:00:00Z `+
         `and endTime eq 2017-08-22T07:00:00Z ` +
         `and timeGrain eq duration'P1D' ` +
+        `and (name.value eq 'Percentage CPU')`;
+      expect(builder.generateFilter()).to.equal(filter);
+    });
+  });
+
+  describe('with a metric name and 1 day time grain and an aggregation', function() {
+    beforeEach(function() {
+      builder = new AzureMonitorFilterBuilder('Percentage CPU', moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'), 1, 'day');
+      builder.setAggregation('Maximum');
+    });
+
+    it('should add time grain to the filter in ISO_8601 format', function() {
+      const filter = `startTime eq 2017-08-22T06:00:00Z `+
+        `and endTime eq 2017-08-22T07:00:00Z ` +
+        `and timeGrain eq duration'P1D' ` +
+        `and aggregationType eq 'Maximum' ` +
         `and (name.value eq 'Percentage CPU')`;
       expect(builder.generateFilter()).to.equal(filter);
     });

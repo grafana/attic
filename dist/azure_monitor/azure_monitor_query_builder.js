@@ -48,6 +48,9 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         var metricName = _this.templateSrv.replace(item.metricName, options.scopedVars);
                         var apiVersion = '2016-09-01';
                         var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit);
+                        if (item.aggregation) {
+                            filterBuilder.setAggregation(item.aggregation);
+                        }
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
                         var url = url_builder_1.default.buildAzureMonitorQueryUrl(_this.baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter);
                         return {
@@ -106,6 +109,12 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName);
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'name.localizedValue', 'name.value');
+                    });
+                };
+                AzureMonitorQueryBuilder.prototype.getAggregations = function (resourceGroup, metricDefinition, resourceName, metricName) {
+                    var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName);
+                    return this.doRequest(url).then(function (result) {
+                        return response_parser_1.default.parseAggregations(result, metricName);
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.testDatasource = function () {

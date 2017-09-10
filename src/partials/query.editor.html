@@ -13,7 +13,7 @@
           lookup-text="true"
           get-options="ctrl.getResourceGroups($query)"
           on-change="ctrl.onResourceGroupChange()"
-          css-class="width-7">
+          css-class="width-10">
         </gf-form-dropdown>
       </div>
       <div class="gf-form">
@@ -39,12 +39,16 @@
         <gf-form-dropdown model="ctrl.target.azureMonitor.metricName"
           lookup-text="true"
           get-options="ctrl.getMetricNames($query)"
-          on-change="ctrl.refresh()"
+          on-change="ctrl.onMetricNameChange()"
           css-class="width-12">
         </gf-form-dropdown>
       </div>
     </div>
     <div class="gf-form-inline">
+      <div class="gf-form max-width-20">
+        <label class="gf-form-label query-keyword width-10">Aggregation</label>
+        <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.aggregation" ng-options="f as f for f in ctrl.target.azureMonitor.aggOptions" ng-change="ctrl.refresh()"></select>
+      </div>
       <div class="gf-form max-width-20">
         <label class="gf-form-label query-keyword width-10">Time Grain</label>
         <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.azureMonitor.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">

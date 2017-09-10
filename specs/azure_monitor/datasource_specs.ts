@@ -302,13 +302,29 @@ describe('AzureMonitorDatasource', function() {
             name: {
               value: 'UsedCapacity',
               localizedValue: 'Used capacity'
-            }
+            },
+            unit: 'CountPerSecond',
+            primaryAggregationType: 'Total',
+            supportedAggregationTypes: [
+              'None',
+              'Average',
+              'Minimum',
+              'Maximum',
+              'Total',
+              'Count'
+            ]
           },
           {
             name: {
               value: 'FreeCapacity',
               localizedValue: 'Free capacity'
-            }
+            },
+            unit: 'CountPerSecond',
+            primaryAggregationType: 'Average',
+            supportedAggregationTypes: [
+              'None',
+              'Average',
+            ]
           },
         ]
       },
@@ -333,6 +349,62 @@ describe('AzureMonitorDatasource', function() {
         expect(results[0].value).to.equal('UsedCapacity');
         expect(results[1].text).to.equal('Free capacity');
         expect(results[1].value).to.equal('FreeCapacity');
+      });
+    });
+  });
+
+  describe('When performing getAggregations', function() {
+    const response = {
+      data: {
+        value: [
+          {
+            name: {
+              value: 'UsedCapacity',
+              localizedValue: 'Used capacity'
+            },
+            unit: 'CountPerSecond',
+            primaryAggregationType: 'Total',
+            supportedAggregationTypes: [
+              'None',
+              'Average',
+              'Minimum',
+              'Maximum',
+              'Total',
+              'Count'
+            ]
+          },
+          {
+            name: {
+              value: 'FreeCapacity',
+              localizedValue: 'Free capacity'
+            },
+            unit: 'CountPerSecond',
+            primaryAggregationType: 'Average',
+            supportedAggregationTypes: [
+              'None',
+              'Average',
+            ]
+          },
+        ]
+      },
+      status: 200,
+      statusText: 'OK'
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
+        const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
+          '/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01';
+        expect(options.url).to.be(expected);
+        return ctx.$q.when(response);
+      };
+    });
+
+    it('should return Aggregation metadata for a Metric', function() {
+      return ctx.ds.getAggregations('nodeapp', 'microsoft.insights/components', 'resource1', 'UsedCapacity').then(function(results) {
+        expect(results.primaryAggType).to.equal('Total');
+        expect(results.supportedAggTypes.length).to.equal(6);
       });
     });
   });

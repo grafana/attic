@@ -160,4 +160,32 @@ describe('AzureMonitorQueryCtrl', function() {
       });
     });
   });
+
+  describe('when onMetricNameChange is triggered for the Metric Names dropdown', function() {
+    const response = {
+      primaryAggType: 'Average',
+      supportAggOptions: ['Average', 'Total'],
+    };
+
+    beforeEach(function() {
+      queryCtrl.target.azureMonitor.resourceGroup = 'test';
+      queryCtrl.target.azureMonitor.metricDefinition = 'Microsoft.Compute/virtualMachines';
+      queryCtrl.target.azureMonitor.resourceName = 'test';
+      queryCtrl.target.azureMonitor.metricName = 'Percentage CPU';
+      queryCtrl.datasource.getAggregations = function(resourceGroup, metricDefinition, resourceName, metricName) {
+        expect(resourceGroup).to.be('test');
+        expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
+        expect(resourceName).to.be('test');
+        expect(metricName).to.be('Percentage CPU');
+        return this.$q.when(response);
+      };
+    });
+
+    it('should set the options and default selecteed value for the Aggregations dropdown', function() {
+      queryCtrl.onMetricNameChange().then(() => {
+        expect(queryCtrl.target.azureMonitor.aggregation).to.be('Average');
+        expect(queryCtrl.target.azureMonitor.aggOptions).to.be(['Average', 'Total']);
+      });
+    });
+  });
 });

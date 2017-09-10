@@ -5,7 +5,9 @@ export default class AzureMonitorFilterBuilder {
     private to;
     private timeGrain;
     private timeGrainUnit;
+    aggregation: string;
     constructor(metricName: string, from: any, to: any, timeGrain: number, timeGrainUnit: string);
+    setAggregation(agg: any): void;
     generateFilter(): string;
     createISO8601Duration(): string;
 }

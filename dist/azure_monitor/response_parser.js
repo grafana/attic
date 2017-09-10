@@ -45,7 +45,7 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     if (keys.length < 2) {
                         return;
                     }
-                    return lodash_1.default.intersection(keys, ['total', 'average', 'maximum']);
+                    return lodash_1.default.intersection(keys, ['total', 'average', 'maximum', 'minimum', 'count']);
                 };
                 ResponseParser.parseResponseValues = function (result, textFieldName, valueFieldName) {
                     var list = [];
@@ -56,6 +56,15 @@ System.register(['moment', 'lodash'], function(exports_1) {
                         });
                     }
                     return list;
+                };
+                ResponseParser.parseAggregations = function (result, metricName) {
+                    var metricData = lodash_1.default.find(result.data.value, function (o) {
+                        return lodash_1.default.get(o, 'name.value') === metricName;
+                    });
+                    return {
+                        primaryAggType: metricData.primaryAggregationType,
+                        supportedAggTypes: metricData.supportedAggregationTypes
+                    };
                 };
                 return ResponseParser;
             })();

@@ -86,11 +86,20 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   onMetricNameChange() {
-    if (this.target.azureMonitor.resourceGroup && this.target.azureMonitor.resourceGroup !== this.defaultDropdownValue
-      && this.target.azureMonitor.metricDefinition && this.target.azureMonitor.metricDefinition !== this.defaultDropdownValue
-      && this.target.azureMonitor.resourceName && this.target.azureMonitor.resourceName !== this.defaultDropdownValue){
-      this.refresh();
+    if (!this.target.azureMonitor.metricName || this.target.azureMonitor.metricName === this.defaultDropdownValue) {
+      return;
     }
+
+    return this.datasource.getAggregations(
+      this.target.azureMonitor.resourceGroup,
+      this.target.azureMonitor.metricDefinition,
+      this.target.azureMonitor.resourceName,
+      this.target.azureMonitor.metricName
+    ).then(aggData => {
+      this.target.azureMonitor.aggOptions = aggData.supportedAggTypes;
+      this.target.azureMonitor.aggregation = aggData.primaryAggType;
+      return this.refresh();
+    });
   }
 
   /* Application Insights Section */

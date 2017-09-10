@@ -4,18 +4,30 @@ import _ from 'lodash';
 import moment from 'moment';
 
 export default class AzureMonitorFilterBuilder {
+  aggregation: string;
+
   constructor(private metricName: string, private from, private to, private timeGrain: number, private timeGrainUnit: string) {
+  }
+
+  setAggregation(agg) {
+    this.aggregation = agg;
   }
 
   generateFilter() {
     const dateTimeCondition = `startTime eq ${this.from.utc().format()} and endTime eq ${this.to.utc().format()}`;
     const timeGrainCondition = ` and timeGrain eq duration'${this.createISO8601Duration()}'`;
     const timeCondition = dateTimeCondition + timeGrainCondition;
+    let filter = timeCondition;
 
-    if (!this.metricName || this.metricName.trim().length === 0) {
-      return timeCondition;
+    if (this.aggregation) {
+      filter += ` and aggregationType eq '${this.aggregation}'`;
     }
-    return `${timeCondition} and (name.value eq '${this.metricName}')`;
+
+    if (this.metricName && this.metricName.trim().length > 0) {
+      filter += ` and (name.value eq '${this.metricName}')`;
+    }
+
+    return filter;
   }
 
   createISO8601Duration() {

@@ -12,14 +12,21 @@ System.register([], function(exports_1) {
                     this.timeGrain = timeGrain;
                     this.timeGrainUnit = timeGrainUnit;
                 }
+                AzureMonitorFilterBuilder.prototype.setAggregation = function (agg) {
+                    this.aggregation = agg;
+                };
                 AzureMonitorFilterBuilder.prototype.generateFilter = function () {
                     var dateTimeCondition = "startTime eq " + this.from.utc().format() + " and endTime eq " + this.to.utc().format();
                     var timeGrainCondition = " and timeGrain eq duration'" + this.createISO8601Duration() + "'";
                     var timeCondition = dateTimeCondition + timeGrainCondition;
-                    if (!this.metricName || this.metricName.trim().length === 0) {
-                        return timeCondition;
+                    var filter = timeCondition;
+                    if (this.aggregation) {
+                        filter += " and aggregationType eq '" + this.aggregation + "'";
                     }
-                    return timeCondition + " and (name.value eq '" + this.metricName + "')";
+                    if (this.metricName && this.metricName.trim().length > 0) {
+                        filter += " and (name.value eq '" + this.metricName + "')";
+                    }
+                    return filter;
                 };
                 AzureMonitorFilterBuilder.prototype.createISO8601Duration = function () {
                     var timeGrainUnit = this.timeGrainUnit || 'hour';

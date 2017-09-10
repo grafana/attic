@@ -23,5 +23,5 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     onResourceGroupChange(): void;
     onMetricDefinitionChange(): void;
     onResourceNameChange(): void;
-    onMetricNameChange(): void;
+    onMetricNameChange(): any;
 }

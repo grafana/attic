@@ -47,6 +47,10 @@ export default class AzureMonitorQueryBuilder {
         item.timeGrainUnit
       );
 
+      if (item.aggregation) {
+        filterBuilder.setAggregation(item.aggregation);
+      }
+
       const filter = this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
 
       const url = UrlBuilder.buildAzureMonitorQueryUrl(
@@ -129,6 +133,19 @@ export default class AzureMonitorQueryBuilder {
 
     return this.doRequest(url).then(result => {
       return ResponseParser.parseResponseValues(result, 'name.localizedValue', 'name.value');
+    });
+  }
+
+  getAggregations(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
+    const url = UrlBuilder.buildAzureMonitorGetMetricNamesUrl(
+      this.baseUrl,
+      resourceGroup,
+      metricDefinition,
+      resourceName
+    );
+
+    return this.doRequest(url).then(result => {
+      return ResponseParser.parseAggregations(result, metricName);
     });
   }
 
