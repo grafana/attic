@@ -1,6 +1,7 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import _ from 'lodash';
+import AppInsightsQuerystringBuilder from './app_insights_querystring_builder';
 import ResponseParser from './response_parser';
 
 export default class AppInsightsQueryBuilder {
@@ -26,7 +27,12 @@ export default class AppInsightsQueryBuilder {
       return item.hide !== true;
     }).map(target => {
       const item = target.appInsights;
-      const url = `${this.baseUrl}${item.query}`;
+      const querystringBuilder = new AppInsightsQuerystringBuilder(
+        options.range.from,
+        options.range.to
+      );
+
+      const url = `${this.baseUrl}${item.query}&${querystringBuilder.generate()}`;
 
       return {
         refId: target.refId,

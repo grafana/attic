@@ -1,11 +1,14 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register(['lodash', './response_parser'], function(exports_1) {
-    var lodash_1, response_parser_1;
+System.register(['lodash', './app_insights_querystring_builder', './response_parser'], function(exports_1) {
+    var lodash_1, app_insights_querystring_builder_1, response_parser_1;
     var AppInsightsQueryBuilder;
     return {
         setters:[
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
+            },
+            function (app_insights_querystring_builder_1_1) {
+                app_insights_querystring_builder_1 = app_insights_querystring_builder_1_1;
             },
             function (response_parser_1_1) {
                 response_parser_1 = response_parser_1_1;
@@ -31,7 +34,8 @@ System.register(['lodash', './response_parser'], function(exports_1) {
                         return item.hide !== true;
                     }).map(function (target) {
                         var item = target.appInsights;
-                        var url = "" + _this.baseUrl + item.query;
+                        var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to);
+                        var url = "" + _this.baseUrl + item.query + "&" + querystringBuilder.generate();
                         return {
                             refId: target.refId,
                             intervalMs: options.intervalMs,
