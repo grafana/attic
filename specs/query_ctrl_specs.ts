@@ -42,6 +42,11 @@ describe('AzureMonitorQueryCtrl', function() {
           expect(query).to.be('?api-version=2017-06-01');
           return this.$q.when(response);
         };
+        queryCtrl.datasource.azureMonitorQueryBuilder = {
+          isConfigured: function() {
+            return true;
+          }
+        };
       });
 
       it('should return a list of Resource Groups', function() {
