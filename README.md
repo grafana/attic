@@ -7,7 +7,7 @@ The Azure Monitor Data Source plugin supports Azure Monitor and Application Insi
 To install and build the plugin:
 
 1. `git clone` this project into your `data/plugins` subdirectory in your Grafana instance.
-2. `npm install`
+2. `yarn install --pure-lockfile`
 3. `grunt`
 4. `karma start --single-run` to run the tests once.
 5. Restart your Grafana server to start using the plugin in Grafana (Grafana only needs to be restarted once).
