@@ -13,6 +13,10 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
             timeGrain: number;
             timeGrainUnit: string;
         };
+        appInsights: {
+            metricName: string;
+            groupBy: string;
+        };
     };
     /** @ngInject **/
     constructor($scope: any, $injector: any);
@@ -24,4 +28,6 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     onMetricDefinitionChange(): void;
     onResourceNameChange(): void;
     onMetricNameChange(): any;
+    getAppInsightsMetricNames(): any;
+    onAppInsightsMetricNameChange(): any;
 }

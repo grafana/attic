@@ -8,4 +8,10 @@ export default class ResponseParser {
     static getMetricFieldKey(segment: any): any;
     static getKeyForAggregationField(dataObj: any): any;
     static dateTimeToEpoch(dateTime: any): any;
+    static parseMetricNames(result: any): any[];
+    static parseMetadata(result: any, metricName: string): {
+        primaryAggType: any;
+        supportedAggTypes: any;
+        supportedGroupBy: any;
+    };
 }

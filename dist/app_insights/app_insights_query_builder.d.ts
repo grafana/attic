@@ -16,4 +16,6 @@ export default class AppInsightsQueryBuilder {
     metricFindQuery(query: string): void;
     testDatasource(): any;
     doRequest(url: any, maxRetries?: number): any;
+    getMetricNames(): any;
+    getMetricMetadata(metricName: string): any;
 }

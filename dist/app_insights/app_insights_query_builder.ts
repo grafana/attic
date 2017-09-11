@@ -14,7 +14,7 @@ export default class AppInsightsQueryBuilder {
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.applicationId = instanceSettings.jsonData.appInsightsAppId;
-    this.baseUrl = `/appinsights/${this.version}/apps/${this.applicationId}`;
+    this.baseUrl = `/appinsights/${this.version}/apps/${this.applicationId}/metrics`;
     this.url = instanceSettings.url;
   }
 
@@ -32,7 +32,10 @@ export default class AppInsightsQueryBuilder {
         options.range.to
       );
 
-      const url = `${this.baseUrl}${item.query}&${querystringBuilder.generate()}`;
+      querystringBuilder.setGroupBy(item.groupBy);
+      querystringBuilder.setAggregation(item.aggregation);
+
+      const url = `${this.baseUrl}/${item.metricName}?${querystringBuilder.generate()}&${item.query}`;
 
       return {
         refId: target.refId,
@@ -68,7 +71,7 @@ export default class AppInsightsQueryBuilder {
   }
 
   testDatasource() {
-    const url = `${this.baseUrl}/metrics/metadata`;
+    const url = `${this.baseUrl}/metadata`;
     return this.doRequest(url).then(response => {
       if (response.status === 200) {
         return {
@@ -106,6 +109,18 @@ export default class AppInsightsQueryBuilder {
       }
 
       throw error;
+    });
+  }
+
+  getMetricNames() {
+    const url = `${this.baseUrl}/metadata`;
+    return this.doRequest(url).then(ResponseParser.parseMetricNames);
+  }
+
+  getMetricMetadata(metricName: string) {
+    const url = `${this.baseUrl}/metadata`;
+    return this.doRequest(url).then(result => {
+      return ResponseParser.parseMetadata(result, metricName);
     });
   }
 }

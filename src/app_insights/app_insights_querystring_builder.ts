@@ -4,12 +4,30 @@ import _ from 'lodash';
 import moment from 'moment';
 
 export default class AppInsightsQuerystringBuilder {
+  aggregation = '';
+  groupBy = '';
+
   constructor(private from, private to) {
   }
 
-  generate() {
-    const dateTimeCondition = `timespan=${this.from.utc().format()}/${this.to.utc().format()}`;
+  setAggregation(aggregation) {
+    this.aggregation = aggregation;
+  }
 
-    return `${dateTimeCondition}`;
+  setGroupBy(groupBy) {
+    this.groupBy = groupBy;
+  }
+
+  generate() {
+    let querystring = `timespan=${this.from.utc().format()}/${this.to.utc().format()}`;
+
+    if (this.aggregation && this.aggregation.length > 0) {
+      querystring += `&aggregation=${this.aggregation}`;
+    }
+
+    if (this.groupBy && this.groupBy.length > 0) {
+      querystring += `&segment=${this.groupBy}`;
+    }
+    return querystring;
   }
 }

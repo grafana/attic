@@ -118,7 +118,9 @@ describe('AppInsightsDatasource', function() {
           refId: 'A',
           queryType: 'Application Insights',
           appInsights: {
-            query: '/metrics/exceptions/server?timespan=P7D&interval=PT1H'
+            metricName: 'exceptions/server',
+            groupBy: '',
+            query: ''
           }
         }
       ]
@@ -153,7 +155,7 @@ describe('AppInsightsDatasource', function() {
       });
     });
 
-    describe('and without a group by', function() {
+    describe('and with an interval group and without a segment group by', function() {
       const response = {
         value: {
           start: '2017-08-30T15:53:58.845Z',
@@ -179,8 +181,10 @@ describe('AppInsightsDatasource', function() {
       };
 
       beforeEach(function() {
+        options.targets[0].appInsights.query = 'interval=PT30M';
         ctx.backendSrv.datasourceRequest = function(options) {
           expect(options.url).to.contain('/metrics/exceptions/server');
+          expect(options.url).to.contain('interval=PT30M');
           return ctx.$q.when({data: response, status: 200});
         };
       });
@@ -246,8 +250,11 @@ describe('AppInsightsDatasource', function() {
       };
 
       beforeEach(function() {
+        options.targets[0].appInsights.query = '';
+        options.targets[0].appInsights.groupBy = 'client/city';
         ctx.backendSrv.datasourceRequest = function(options) {
           expect(options.url).to.contain('/metrics/exceptions/server');
+          expect(options.url).to.contain('segment=client/city');
           return ctx.$q.when({data: response, status: 200});
         };
       });
@@ -264,5 +271,85 @@ describe('AppInsightsDatasource', function() {
         });
       });
     });
+  });
+
+  describe('When getting Metric Names', function() {
+    const response = {
+      metrics: {
+        'exceptions/server': {},
+        'requests/count': {},
+      }
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        expect(options.url).to.contain('/metrics/metadata');
+        return ctx.$q.when({data: response, status: 200});
+      };
+    });
+
+    it('should return a list of datapoints', function() {
+      return ctx.ds.getAppInsightsMetricNames().then(function(results) {
+        expect(results.length).to.be(2);
+        expect(results[0].text).to.be('exceptions/server');
+        expect(results[0].value).to.be('exceptions/server');
+        expect(results[1].text).to.be('requests/count');
+        expect(results[1].value).to.be('requests/count');
+      });
+    });
+
+  });
+
+  describe('When getting Metric Metadata', function() {
+    const response = {
+      metrics: {
+        'exceptions/server': {
+          supportedAggregations: [
+            'sum'
+          ],
+          supportedGroupBy: {
+            all: [
+               'client/os',
+               'client/city',
+               'client/browser',
+            ]
+          },
+          defaultAggregation: 'sum'
+        },
+        'requests/count': {
+          supportedAggregations: [
+            'avg', 'sum', 'total'
+          ],
+          supportedGroupBy: {
+            all: [
+                'client/os',
+                'client/city',
+                'client/browser',
+            ]
+          },
+          defaultAggregation: 'avg'
+        },
+      }
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        expect(options.url).to.contain('/metrics/metadata');
+        return ctx.$q.when({data: response, status: 200});
+      };
+    });
+
+    it('should return a list of datapoints', function() {
+      return ctx.ds.getAppInsightsMetricMetadata('requests/count').then(function(results) {
+        expect(results.primaryAggType).to.equal('avg');
+        expect(results.supportedAggTypes).to.contain('avg');
+        expect(results.supportedAggTypes).to.contain('sum');
+        expect(results.supportedAggTypes).to.contain('total');
+        expect(results.supportedGroupBy).to.contain('client/os');
+        expect(results.supportedGroupBy).to.contain('client/city');
+        expect(results.supportedGroupBy).to.contain('client/browser');
+      });
+    });
+
   });
 });

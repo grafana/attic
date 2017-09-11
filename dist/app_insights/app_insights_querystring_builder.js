@@ -8,10 +8,24 @@ System.register([], function(exports_1) {
                 function AppInsightsQuerystringBuilder(from, to) {
                     this.from = from;
                     this.to = to;
+                    this.aggregation = '';
+                    this.groupBy = '';
                 }
+                AppInsightsQuerystringBuilder.prototype.setAggregation = function (aggregation) {
+                    this.aggregation = aggregation;
+                };
+                AppInsightsQuerystringBuilder.prototype.setGroupBy = function (groupBy) {
+                    this.groupBy = groupBy;
+                };
                 AppInsightsQuerystringBuilder.prototype.generate = function () {
-                    var dateTimeCondition = "timespan=" + this.from.utc().format() + "/" + this.to.utc().format();
-                    return "" + dateTimeCondition;
+                    var querystring = "timespan=" + this.from.utc().format() + "/" + this.to.utc().format();
+                    if (this.aggregation && this.aggregation.length > 0) {
+                        querystring += "&aggregation=" + this.aggregation;
+                    }
+                    if (this.groupBy && this.groupBy.length > 0) {
+                        querystring += "&segment=" + this.groupBy;
+                    }
+                    return querystring;
                 };
                 return AppInsightsQuerystringBuilder;
             })();

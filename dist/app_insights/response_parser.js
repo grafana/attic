@@ -89,6 +89,25 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 ResponseParser.dateTimeToEpoch = function (dateTime) {
                     return moment_1.default(dateTime).valueOf();
                 };
+                ResponseParser.parseMetricNames = function (result) {
+                    var keys = lodash_1.default.keys(result.data.metrics);
+                    var list = [];
+                    for (var i = 0; i < keys.length; i++) {
+                        list.push({
+                            text: keys[i],
+                            value: keys[i]
+                        });
+                    }
+                    return list;
+                };
+                ResponseParser.parseMetadata = function (result, metricName) {
+                    var metric = result.data.metrics[metricName];
+                    return {
+                        primaryAggType: metric.defaultAggregation,
+                        supportedAggTypes: metric.supportedAggregations,
+                        supportedGroupBy: metric.supportedGroupBy.all
+                    };
+                };
                 return ResponseParser;
             })();
             exports_1("default", ResponseParser);

@@ -1,66 +1,110 @@
 <query-editor-row query-ctrl="ctrl" can-collapse="false">
   <div class="gf-form-inline">
-    <div class="gf-form max-width-22">
-      <label class="gf-form-label query-keyword width-10">Service</label>
-      <select class="gf-form-input" ng-model="ctrl.target.queryType" ng-options="f as f for f in ['Application Insights', 'Azure Monitor']"></select>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword width-9">Service</label>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.queryType" ng-options="f as f for f in ['Application Insights', 'Azure Monitor']"></select>
+      </div>
+    </div>
+    <div class="gf-form gf-form--grow">
+      <div class="gf-form-label gf-form-label--grow"></div>
     </div>
   </div>
   <div ng-show="ctrl.target.queryType === 'Azure Monitor'">
     <div class="gf-form-inline">
       <div class="gf-form">
-        <label class="gf-form-label query-keyword width-10">Resource Group</label>
+        <label class="gf-form-label query-keyword width-9">Resource Group</label>
         <gf-form-dropdown model="ctrl.target.azureMonitor.resourceGroup"
           lookup-text="true"
           get-options="ctrl.getResourceGroups($query)"
           on-change="ctrl.onResourceGroupChange()"
-          css-class="width-10">
+          css-class="min-width-12">
         </gf-form-dropdown>
       </div>
       <div class="gf-form">
-        <label class="gf-form-label query-keyword width-10">Metric Namespace</label>
+        <label class="gf-form-label query-keyword width-9">Namespace</label>
         <gf-form-dropdown model="ctrl.target.azureMonitor.metricDefinition"
           lookup-text="true"
           get-options="ctrl.getMetricDefinitions($query)"
           on-change="ctrl.onMetricDefinitionChange()"
-          css-class="width-22">
+          css-class="min-width-20">
         </gf-form-dropdown>
       </div>
       <div class="gf-form">
-        <label class="gf-form-label query-keyword width-10">Resource Name</label>
+        <label class="gf-form-label query-keyword width-9">Resource Name</label>
         <gf-form-dropdown model="ctrl.target.azureMonitor.resourceName"
-        lookup-text="true"
-        get-options="ctrl.getResourceNames($query)"
-        on-change="ctrl.onResourceNameChange()"
-        css-class="width-10">
-      </gf-form-dropdown>
-      </div>
-      <div class="gf-form">
-        <label class="gf-form-label query-keyword width-10">Metric Name</label>
-        <gf-form-dropdown model="ctrl.target.azureMonitor.metricName"
           lookup-text="true"
-          get-options="ctrl.getMetricNames($query)"
-          on-change="ctrl.onMetricNameChange()"
-          css-class="width-12">
+          get-options="ctrl.getResourceNames($query)"
+          on-change="ctrl.onResourceNameChange()"
+          css-class="min-width-10">
         </gf-form-dropdown>
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
     <div class="gf-form-inline">
-      <div class="gf-form max-width-20">
-        <label class="gf-form-label query-keyword width-10">Aggregation</label>
-        <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.aggregation" ng-options="f as f for f in ctrl.target.azureMonitor.aggOptions" ng-change="ctrl.refresh()"></select>
+      <div class="gf-form">
+          <label class="gf-form-label query-keyword width-9">Metric</label>
+          <gf-form-dropdown model="ctrl.target.azureMonitor.metricName"
+            lookup-text="true"
+            get-options="ctrl.getMetricNames($query)"
+            on-change="ctrl.onMetricNameChange()"
+            css-class="min-width-12">
+          </gf-form-dropdown>
+        </div>
+      <div class="gf-form gf-form--grow aggregation-dropdown-wrapper">
+        <label class="gf-form-label query-keyword width-9">Aggregation</label>
+        <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+          <select class="gf-form-input width-11" ng-model="ctrl.target.azureMonitor.aggregation" ng-options="f as f for f in ctrl.target.azureMonitor.aggOptions" ng-change="ctrl.refresh()"></select>
+        </div>
+        <div class="gf-form-label gf-form-label--grow"></div>
       </div>
-      <div class="gf-form max-width-20">
-        <label class="gf-form-label query-keyword width-10">Time Grain</label>
-        <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.azureMonitor.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
-        <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']" ng-change="ctrl.refresh()"></select>
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-9">Time Grain</label>
+        <input type="text" class="gf-form-input width-3" ng-model="ctrl.target.azureMonitor.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+      </div>
+      <div class="gf-form">
+        <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent timegrainunit-dropdown-wrapper">
+          <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']" ng-change="ctrl.refresh()"></select>
+        </div>
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
   </div>
+
   <div ng-show="ctrl.target.queryType === 'Application Insights'">
     <div class="gf-form-inline">
       <div class="gf-form">
+        <label class="gf-form-label query-keyword width-9">Metric</label>
+        <gf-form-dropdown model="ctrl.target.appInsights.metricName"
+          lookup-text="true"
+          get-options="ctrl.getAppInsightsMetricNames($query)"
+          on-change="ctrl.onAppInsightsMetricNameChange()"
+          css-class="min-width-20">
+        </gf-form-dropdown>
+      </div>
+      <div class="gf-form max-width-20">
+        <label class="gf-form-label query-keyword width-9">Aggregation</label>
+        <select class="gf-form-input" ng-model="ctrl.target.appInsights.aggregation" ng-options="f as f for f in ctrl.target.appInsights.aggOptions" ng-change="ctrl.refresh()"></select>
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div>
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-9">Group By</label>
+        <select class="gf-form-input" ng-model="ctrl.target.appInsights.groupBy" ng-options="f as f for f in ctrl.target.appInsights.groupByOptions" ng-change="ctrl.refresh()"></select>
+      </div>
+      <div class="gf-form">
           <label class="gf-form-label query-keyword width-9">Query</label>
           <input type="text" class="gf-form-input width-30" ng-model="ctrl.target.appInsights.query" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
   </div>

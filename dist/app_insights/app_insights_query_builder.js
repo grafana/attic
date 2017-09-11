@@ -22,7 +22,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     this.version = 'beta';
                     this.id = instanceSettings.id;
                     this.applicationId = instanceSettings.jsonData.appInsightsAppId;
-                    this.baseUrl = "/appinsights/" + this.version + "/apps/" + this.applicationId;
+                    this.baseUrl = "/appinsights/" + this.version + "/apps/" + this.applicationId + "/metrics";
                     this.url = instanceSettings.url;
                 }
                 AppInsightsQueryBuilder.prototype.isConfigured = function () {
@@ -35,7 +35,9 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     }).map(function (target) {
                         var item = target.appInsights;
                         var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to);
-                        var url = "" + _this.baseUrl + item.query + "&" + querystringBuilder.generate();
+                        querystringBuilder.setGroupBy(item.groupBy);
+                        querystringBuilder.setAggregation(item.aggregation);
+                        var url = _this.baseUrl + "/" + item.metricName + "?" + querystringBuilder.generate() + "&" + item.query;
                         return {
                             refId: target.refId,
                             intervalMs: options.intervalMs,
@@ -64,7 +66,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                 AppInsightsQueryBuilder.prototype.metricFindQuery = function (query) {
                 };
                 AppInsightsQueryBuilder.prototype.testDatasource = function () {
-                    var url = this.baseUrl + "/metrics/metadata";
+                    var url = this.baseUrl + "/metadata";
                     return this.doRequest(url).then(function (response) {
                         if (response.status === 200) {
                             return {
@@ -102,6 +104,16 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                             return _this.doRequest(url, maxRetries - 1);
                         }
                         throw error;
+                    });
+                };
+                AppInsightsQueryBuilder.prototype.getMetricNames = function () {
+                    var url = this.baseUrl + "/metadata";
+                    return this.doRequest(url).then(response_parser_1.default.parseMetricNames);
+                };
+                AppInsightsQueryBuilder.prototype.getMetricMetadata = function (metricName) {
+                    var url = this.baseUrl + "/metadata";
+                    return this.doRequest(url).then(function (result) {
+                        return response_parser_1.default.parseMetadata(result, metricName);
                     });
                 };
                 return AppInsightsQueryBuilder;

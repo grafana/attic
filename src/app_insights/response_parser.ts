@@ -93,4 +93,27 @@ export default class ResponseParser {
   static dateTimeToEpoch(dateTime) {
     return moment(dateTime).valueOf();
   }
+
+  static parseMetricNames(result) {
+    const keys = _.keys(result.data.metrics);
+
+    const list = [];
+    for (let i = 0; i < keys.length; i++) {
+      list.push({
+        text: keys[i],
+        value: keys[i]
+      });
+    }
+    return list;
+  }
+
+  static parseMetadata(result: any, metricName: string) {
+    const metric = result.data.metrics[metricName];
+
+    return {
+      primaryAggType: metric.defaultAggregation,
+      supportedAggTypes: metric.supportedAggregations,
+      supportedGroupBy: metric.supportedGroupBy.all
+    };
+  }
 }

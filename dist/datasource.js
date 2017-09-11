@@ -78,6 +78,7 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                         };
                     });
                 };
+                /* Azure Monitor REST API methods */
                 AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
                     return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
                 };
@@ -89,6 +90,13 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                 };
                 AzureMonitorDatasource.prototype.getAggregations = function (resourceGroup, metricDefinition, resourceName, metricName) {
                     return this.azureMonitorQueryBuilder.getAggregations(resourceGroup, metricDefinition, resourceName, metricName);
+                };
+                /* Application Insights API method */
+                AzureMonitorDatasource.prototype.getAppInsightsMetricNames = function () {
+                    return this.appInsightsQueryBuilder.getMetricNames();
+                };
+                AzureMonitorDatasource.prototype.getAppInsightsMetricMetadata = function (metricName) {
+                    return this.appInsightsQueryBuilder.getMetricMetadata(metricName);
                 };
                 return AzureMonitorDatasource;
             })();

@@ -18,6 +18,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       metricName: this.defaultDropdownValue,
       timeGrain: 1,
       timeGrainUnit: 'hour'
+    },
+    appInsights: {
+      metricName: this.defaultDropdownValue,
+      groupBy: '',
     }
   };
 
@@ -30,7 +34,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   /* Azure Monitor Section */
   getResourceGroups(query) {
-    if (this.target.queryType !== 'Azure Monitor') {
+    if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorQueryBuilder.isConfigured()) {
       return;
     }
 
@@ -103,5 +107,21 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   /* Application Insights Section */
+  getAppInsightsMetricNames() {
+    return this.datasource.getAppInsightsMetricNames();
+  }
 
+  onAppInsightsMetricNameChange() {
+    if (!this.target.appInsights.metricName || this.target.appInsights.metricName === this.defaultDropdownValue) {
+      return;
+    }
+
+    return this.datasource.getAppInsightsMetricMetadata(this.target.appInsights.metricName)
+      .then(aggData => {
+        this.target.appInsights.aggOptions = aggData.supportedAggTypes;
+        this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
+        this.target.appInsights.aggregation = aggData.primaryAggType;
+        return this.refresh();
+      });
+  }
 }

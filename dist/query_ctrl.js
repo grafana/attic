@@ -32,13 +32,17 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                             metricName: this.defaultDropdownValue,
                             timeGrain: 1,
                             timeGrainUnit: 'hour'
+                        },
+                        appInsights: {
+                            metricName: this.defaultDropdownValue,
+                            groupBy: '',
                         }
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
                 }
                 /* Azure Monitor Section */
                 AzureMonitorQueryCtrl.prototype.getResourceGroups = function (query) {
-                    if (this.target.queryType !== 'Azure Monitor') {
+                    if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorQueryBuilder.isConfigured()) {
                         return;
                     }
                     return this.datasource.metricFindQuery('?api-version=2017-06-01');
@@ -87,6 +91,23 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     return this.datasource.getAggregations(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition, this.target.azureMonitor.resourceName, this.target.azureMonitor.metricName).then(function (aggData) {
                         _this.target.azureMonitor.aggOptions = aggData.supportedAggTypes;
                         _this.target.azureMonitor.aggregation = aggData.primaryAggType;
+                        return _this.refresh();
+                    });
+                };
+                /* Application Insights Section */
+                AzureMonitorQueryCtrl.prototype.getAppInsightsMetricNames = function () {
+                    return this.datasource.getAppInsightsMetricNames();
+                };
+                AzureMonitorQueryCtrl.prototype.onAppInsightsMetricNameChange = function () {
+                    var _this = this;
+                    if (!this.target.appInsights.metricName || this.target.appInsights.metricName === this.defaultDropdownValue) {
+                        return;
+                    }
+                    return this.datasource.getAppInsightsMetricMetadata(this.target.appInsights.metricName)
+                        .then(function (aggData) {
+                        _this.target.appInsights.aggOptions = aggData.supportedAggTypes;
+                        _this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
+                        _this.target.appInsights.aggregation = aggData.primaryAggType;
                         return _this.refresh();
                     });
                 };

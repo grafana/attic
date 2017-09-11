@@ -85,6 +85,7 @@ export default class AzureMonitorDatasource {
     });
   }
 
+  /* Azure Monitor REST API methods */
   getMetricDefinitions(resourceGroup: string) {
     return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
   }
@@ -99,5 +100,14 @@ export default class AzureMonitorDatasource {
 
   getAggregations(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
     return this.azureMonitorQueryBuilder.getAggregations(resourceGroup, metricDefinition, resourceName, metricName);
+  }
+
+  /* Application Insights API method */
+  getAppInsightsMetricNames() {
+    return this.appInsightsQueryBuilder.getMetricNames();
+  }
+
+  getAppInsightsMetricMetadata(metricName) {
+    return this.appInsightsQueryBuilder.getMetricMetadata(metricName);
   }
 }
