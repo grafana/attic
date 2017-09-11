@@ -20,4 +20,4 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 #### v0.0.1
 
-- Fetches metrics from the Azure Monitor REST API
+- First version. Can show metrics from both the Azure Monitor service and the Application Insights service. Can combine metrics from both services on the same dashboard.

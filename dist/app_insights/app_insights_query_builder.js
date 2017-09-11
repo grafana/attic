@@ -37,7 +37,8 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to);
                         querystringBuilder.setGroupBy(item.groupBy);
                         querystringBuilder.setAggregation(item.aggregation);
-                        var url = _this.baseUrl + "/" + item.metricName + "?" + querystringBuilder.generate() + "&" + item.query;
+                        querystringBuilder.setInterval(item.timeGrain, item.timeGrainUnit);
+                        var url = _this.baseUrl + "/" + item.metricName + "?" + querystringBuilder.generate();
                         return {
                             refId: target.refId,
                             intervalMs: options.intervalMs,

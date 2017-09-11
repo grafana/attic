@@ -2,10 +2,13 @@
 
 import _ from 'lodash';
 import moment from 'moment';
+import TimeGrainConverter from '../time_grain_converter';
 
 export default class AppInsightsQuerystringBuilder {
   aggregation = '';
   groupBy = '';
+  timeGrain = '';
+  timeGrainUnit = '';
 
   constructor(private from, private to) {
   }
@@ -18,6 +21,11 @@ export default class AppInsightsQuerystringBuilder {
     this.groupBy = groupBy;
   }
 
+  setInterval(timeGrain, timeGrainUnit) {
+    this.timeGrain = timeGrain;
+    this.timeGrainUnit = timeGrainUnit;
+  }
+
   generate() {
     let querystring = `timespan=${this.from.utc().format()}/${this.to.utc().format()}`;
 
@@ -27,6 +35,10 @@ export default class AppInsightsQuerystringBuilder {
 
     if (this.groupBy && this.groupBy.length > 0) {
       querystring += `&segment=${this.groupBy}`;
+    }
+
+    if (this.timeGrain && this.timeGrainUnit) {
+      querystring += `&interval=${TimeGrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit)}`;
     }
     return querystring;
   }

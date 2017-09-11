@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import moment from 'moment';
+import TimegrainConverter from '../time_grain_converter';
 
 export default class AzureMonitorFilterBuilder {
   aggregation: string;
@@ -15,7 +16,8 @@ export default class AzureMonitorFilterBuilder {
 
   generateFilter() {
     const dateTimeCondition = `startTime eq ${this.from.utc().format()} and endTime eq ${this.to.utc().format()}`;
-    const timeGrainCondition = ` and timeGrain eq duration'${this.createISO8601Duration()}'`;
+    const timeGrain = TimegrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
+    const timeGrainCondition = ` and timeGrain eq duration'${timeGrain}'`;
     const timeCondition = dateTimeCondition + timeGrainCondition;
     let filter = timeCondition;
 
@@ -28,16 +30,5 @@ export default class AzureMonitorFilterBuilder {
     }
 
     return filter;
-  }
-
-  createISO8601Duration() {
-    const timeGrainUnit = this.timeGrainUnit || 'hour';
-    const timeGrain = this.timeGrain || 1;
-
-    if (timeGrainUnit === 'hour' || timeGrainUnit === 'minute') {
-      return `PT${timeGrain}${timeGrainUnit[0].toUpperCase()}`;
-    }
-
-    return `P${timeGrain}${timeGrainUnit[0].toUpperCase()}`;
   }
 }

@@ -34,8 +34,9 @@ export default class AppInsightsQueryBuilder {
 
       querystringBuilder.setGroupBy(item.groupBy);
       querystringBuilder.setAggregation(item.aggregation);
+      querystringBuilder.setInterval(item.timeGrain, item.timeGrainUnit);
 
-      const url = `${this.baseUrl}/${item.metricName}?${querystringBuilder.generate()}&${item.query}`;
+      const url = `${this.baseUrl}/${item.metricName}?${querystringBuilder.generate()}`;
 
       return {
         refId: target.refId,

@@ -1,8 +1,12 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register([], function(exports_1) {
+System.register(['../time_grain_converter'], function(exports_1) {
+    var time_grain_converter_1;
     var AzureMonitorFilterBuilder;
     return {
-        setters:[],
+        setters:[
+            function (time_grain_converter_1_1) {
+                time_grain_converter_1 = time_grain_converter_1_1;
+            }],
         execute: function() {
             AzureMonitorFilterBuilder = (function () {
                 function AzureMonitorFilterBuilder(metricName, from, to, timeGrain, timeGrainUnit) {
@@ -17,7 +21,8 @@ System.register([], function(exports_1) {
                 };
                 AzureMonitorFilterBuilder.prototype.generateFilter = function () {
                     var dateTimeCondition = "startTime eq " + this.from.utc().format() + " and endTime eq " + this.to.utc().format();
-                    var timeGrainCondition = " and timeGrain eq duration'" + this.createISO8601Duration() + "'";
+                    var timeGrain = time_grain_converter_1.default.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
+                    var timeGrainCondition = " and timeGrain eq duration'" + timeGrain + "'";
                     var timeCondition = dateTimeCondition + timeGrainCondition;
                     var filter = timeCondition;
                     if (this.aggregation) {
@@ -27,14 +32,6 @@ System.register([], function(exports_1) {
                         filter += " and (name.value eq '" + this.metricName + "')";
                     }
                     return filter;
-                };
-                AzureMonitorFilterBuilder.prototype.createISO8601Duration = function () {
-                    var timeGrainUnit = this.timeGrainUnit || 'hour';
-                    var timeGrain = this.timeGrain || 1;
-                    if (timeGrainUnit === 'hour' || timeGrainUnit === 'minute') {
-                        return "PT" + timeGrain + timeGrainUnit[0].toUpperCase();
-                    }
-                    return "P" + timeGrain + timeGrainUnit[0].toUpperCase();
                 };
                 return AzureMonitorFilterBuilder;
             })();

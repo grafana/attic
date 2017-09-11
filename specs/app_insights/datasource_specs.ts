@@ -120,7 +120,8 @@ describe('AppInsightsDatasource', function() {
           appInsights: {
             metricName: 'exceptions/server',
             groupBy: '',
-            query: ''
+            timeGrain: '',
+            timeGrainUnit: ''
           }
         }
       ]
@@ -181,7 +182,8 @@ describe('AppInsightsDatasource', function() {
       };
 
       beforeEach(function() {
-        options.targets[0].appInsights.query = 'interval=PT30M';
+        options.targets[0].appInsights.timeGrain = '30';
+        options.targets[0].appInsights.timeGrainUnit = 'minute';
         ctx.backendSrv.datasourceRequest = function(options) {
           expect(options.url).to.contain('/metrics/exceptions/server');
           expect(options.url).to.contain('interval=PT30M');
