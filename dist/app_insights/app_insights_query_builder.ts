@@ -32,7 +32,9 @@ export default class AppInsightsQueryBuilder {
         options.range.to
       );
 
-      querystringBuilder.setGroupBy(item.groupBy);
+      if (item.groupBy !== 'none') {
+        querystringBuilder.setGroupBy(item.groupBy);
+      }
       querystringBuilder.setAggregation(item.aggregation);
       querystringBuilder.setInterval(item.timeGrain, item.timeGrainUnit);
 

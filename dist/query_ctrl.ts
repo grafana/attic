@@ -124,4 +124,15 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
         return this.refresh();
       });
   }
+
+  getAppInsightsGroupBySegments(query) {
+    return _.map(this.target.appInsights.groupByOptions, option => {
+      return {text: option, value: option};
+    });
+  }
+
+  resetAppInsightsGroupBy() {
+    this.target.appInsights.groupBy = 'none';
+    this.refresh();
+  }
 }

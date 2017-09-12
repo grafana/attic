@@ -111,6 +111,15 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         return _this.refresh();
                     });
                 };
+                AzureMonitorQueryCtrl.prototype.getAppInsightsGroupBySegments = function (query) {
+                    return lodash_1.default.map(this.target.appInsights.groupByOptions, function (option) {
+                        return { text: option, value: option };
+                    });
+                };
+                AzureMonitorQueryCtrl.prototype.resetAppInsightsGroupBy = function () {
+                    this.target.appInsights.groupBy = 'none';
+                    this.refresh();
+                };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;
             })(sdk_1.QueryCtrl);

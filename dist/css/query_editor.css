@@ -10,8 +10,8 @@
   min-width: 20rem;
 }
 
-select.gf-form-input {
-  height: 2.65rem;
+.gf-form-select-wrapper select.gf-form-input {
+  height: 2.64rem;
 }
 
 .gf-form-select-wrapper--caret-indent.gf-form-select-wrapper::after {

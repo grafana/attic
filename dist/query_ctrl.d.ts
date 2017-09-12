@@ -30,4 +30,6 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     onMetricNameChange(): any;
     getAppInsightsMetricNames(): any;
     onAppInsightsMetricNameChange(): any;
+    getAppInsightsGroupBySegments(query: any): any;
+    resetAppInsightsGroupBy(): void;
 }

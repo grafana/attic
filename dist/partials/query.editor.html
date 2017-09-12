@@ -86,9 +86,11 @@
           css-class="min-width-20">
         </gf-form-dropdown>
       </div>
-      <div class="gf-form max-width-20">
+      <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Aggregation</label>
-        <select class="gf-form-input" ng-model="ctrl.target.appInsights.aggregation" ng-options="f as f for f in ctrl.target.appInsights.aggOptions" ng-change="ctrl.refresh()"></select>
+        <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+          <select class="gf-form-input" ng-model="ctrl.target.appInsights.aggregation" ng-options="f as f for f in ctrl.target.appInsights.aggOptions" ng-change="ctrl.refresh()"></select>
+        </div>
       </div>
       <div class="gf-form gf-form--grow">
         <div class="gf-form-label gf-form-label--grow"></div>
@@ -97,7 +99,15 @@
     <div class="gf-form-inline">
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Group By</label>
-        <select class="gf-form-input" ng-model="ctrl.target.appInsights.groupBy" ng-options="f as f for f in ctrl.target.appInsights.groupByOptions" ng-change="ctrl.refresh()"></select>
+        <gf-form-dropdown
+          ng-hide="ctrl.target.appInsights.groupBy !== 'none'"
+          model="ctrl.target.appInsights.groupBy"
+          lookup-text="true"
+          get-options="ctrl.getAppInsightsGroupBySegments($query)"
+          on-change="ctrl.refresh()"
+          css-class="min-width-20">
+        </gf-form-dropdown>
+        <label class="gf-form-label min-width-20 pointer" ng-hide="ctrl.target.appInsights.groupBy === 'none'" ng-click="ctrl.resetAppInsightsGroupBy()">{{ctrl.target.appInsights.groupBy}} <i class="fa fa-remove"></i></label>
       </div>
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Time Grain</label>

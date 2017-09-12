@@ -218,6 +218,20 @@ describe('AzureMonitorQueryCtrl', function() {
       });
     });
 
+    describe('when getOptions for the GroupBy segments dropdown is called', function() {
+      beforeEach(function() {
+        queryCtrl.target.appInsights.groupByOptions = ['opt1', 'opt2'];
+      });
+
+      it('should return a list of GroupBy segments', function() {
+        const result = queryCtrl.getAppInsightsGroupBySegments('');
+        expect(result[0].text).to.be('opt1');
+        expect(result[0].value).to.be('opt1');
+        expect(result[1].text).to.be('opt2');
+        expect(result[1].value).to.be('opt2');
+      });
+    });
+
     describe('when onAppInsightsMetricNameChange is triggered for the Metric Names dropdown', function() {
       const response = {
         primaryAggType: 'avg',
