@@ -13,8 +13,8 @@ describe('AzureMonitorQueryCtrl', function() {
 
   describe('init query_ctrl variables', function() {
     it('time grain variables should be initialized', function() {
-      expect(queryCtrl.target.azureMonitor.timeGrain).to.be(1);
-      expect(queryCtrl.target.azureMonitor.timeGrainUnit).to.be('hour');
+      expect(queryCtrl.target.azureMonitor.timeGrain).to.be('');
+      expect(queryCtrl.target.azureMonitor.timeGrainUnit).to.be('minute');
     });
 
     it('should set default query type to Azure Monitor', function() {
@@ -26,6 +26,7 @@ describe('AzureMonitorQueryCtrl', function() {
       expect(queryCtrl.target.azureMonitor.metricDefinition).to.be('select');
       expect(queryCtrl.target.azureMonitor.resourceName).to.be('select');
       expect(queryCtrl.target.azureMonitor.metricName).to.be('select');
+      expect(queryCtrl.target.appInsights.groupBy).to.be('none');
     });
   });
 

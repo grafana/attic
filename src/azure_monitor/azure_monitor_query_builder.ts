@@ -44,7 +44,8 @@ export default class AzureMonitorQueryBuilder {
         options.range.from,
         options.range.to,
         item.timeGrain,
-        item.timeGrainUnit
+        item.timeGrainUnit,
+        options.interval
       );
 
       if (item.aggregation) {

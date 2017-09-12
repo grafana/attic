@@ -3,10 +3,14 @@ export default class AzureMonitorFilterBuilder {
     private metricName;
     private from;
     private to;
-    private timeGrain;
-    private timeGrainUnit;
+    timeGrain: number;
+    timeGrainUnit: string;
+    grafanaInterval: string;
     aggregation: string;
-    constructor(metricName: string, from: any, to: any, timeGrain: number, timeGrainUnit: string);
+    timeGrainInterval: string;
+    constructor(metricName: string, from: any, to: any, timeGrain: number, timeGrainUnit: string, grafanaInterval: string);
     setAggregation(agg: any): void;
     generateFilter(): string;
+    createDatetimeAndTimeGrainConditions(): string;
+    calculateAutoTimeGrain(): string;
 }

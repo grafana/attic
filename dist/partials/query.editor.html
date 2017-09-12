@@ -36,7 +36,7 @@
           lookup-text="true"
           get-options="ctrl.getResourceNames($query)"
           on-change="ctrl.onResourceNameChange()"
-          css-class="min-width-10">
+          css-class="min-width-12">
         </gf-form-dropdown>
       </div>
       <div class="gf-form gf-form--grow">
@@ -62,12 +62,16 @@
       </div>
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Time Grain</label>
-        <input type="text" class="gf-form-input width-3" ng-model="ctrl.target.azureMonitor.timeGrain" spellcheck="false" placeholder="" ng-blur="ctrl.refresh()">
+        <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.azureMonitor.timeGrain" spellcheck="false" placeholder="auto" ng-blur="ctrl.refresh()">
       </div>
       <div class="gf-form">
         <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent timegrainunit-dropdown-wrapper">
           <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']" ng-change="ctrl.refresh()"></select>
         </div>
+      </div>
+      <div class="gf-form" ng-hide="ctrl.target.azureMonitor.timeGrain.trim() !== ''">
+        <label class="gf-form-label">Auto Interval</label>
+        <label class="gf-form-label">{{ctrl.getAutoInterval()}}</label>
       </div>
       <div class="gf-form gf-form--grow">
         <div class="gf-form-label gf-form-label--grow"></div>

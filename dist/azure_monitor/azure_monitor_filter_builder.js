@@ -9,22 +9,20 @@ System.register(['../time_grain_converter'], function(exports_1) {
             }],
         execute: function() {
             AzureMonitorFilterBuilder = (function () {
-                function AzureMonitorFilterBuilder(metricName, from, to, timeGrain, timeGrainUnit) {
+                function AzureMonitorFilterBuilder(metricName, from, to, timeGrain, timeGrainUnit, grafanaInterval) {
                     this.metricName = metricName;
                     this.from = from;
                     this.to = to;
                     this.timeGrain = timeGrain;
                     this.timeGrainUnit = timeGrainUnit;
+                    this.grafanaInterval = grafanaInterval;
+                    this.timeGrainInterval = '';
                 }
                 AzureMonitorFilterBuilder.prototype.setAggregation = function (agg) {
                     this.aggregation = agg;
                 };
                 AzureMonitorFilterBuilder.prototype.generateFilter = function () {
-                    var dateTimeCondition = "startTime eq " + this.from.utc().format() + " and endTime eq " + this.to.utc().format();
-                    var timeGrain = time_grain_converter_1.default.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
-                    var timeGrainCondition = " and timeGrain eq duration'" + timeGrain + "'";
-                    var timeCondition = dateTimeCondition + timeGrainCondition;
-                    var filter = timeCondition;
+                    var filter = this.createDatetimeAndTimeGrainConditions();
                     if (this.aggregation) {
                         filter += " and aggregationType eq '" + this.aggregation + "'";
                     }
@@ -32,6 +30,20 @@ System.register(['../time_grain_converter'], function(exports_1) {
                         filter += " and (name.value eq '" + this.metricName + "')";
                     }
                     return filter;
+                };
+                AzureMonitorFilterBuilder.prototype.createDatetimeAndTimeGrainConditions = function () {
+                    var dateTimeCondition = "startTime eq " + this.from.utc().format() + " and endTime eq " + this.to.utc().format();
+                    if (this.timeGrain > 0) {
+                        this.timeGrainInterval = time_grain_converter_1.default.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
+                    }
+                    else {
+                        this.timeGrainInterval = this.calculateAutoTimeGrain();
+                    }
+                    var timeGrainCondition = " and timeGrain eq duration'" + this.timeGrainInterval + "'";
+                    return dateTimeCondition + timeGrainCondition;
+                };
+                AzureMonitorFilterBuilder.prototype.calculateAutoTimeGrain = function () {
+                    return time_grain_converter_1.default.createISO8601DurationFromInterval(this.grafanaInterval);
                 };
                 return AzureMonitorFilterBuilder;
             })();

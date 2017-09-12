@@ -4,11 +4,78 @@ import moment from 'moment';
 
 describe('AzureMonitorFilterBuilder', function() {
   let builder: AzureMonitorFilterBuilder;
-  describe('with a metric name and 1 hour time grain', function() {
+
+  beforeEach(function() {
+    builder = new AzureMonitorFilterBuilder(
+      'Percentage CPU',
+      moment.utc('2017-08-22 06:00'),
+      moment.utc('2017-08-22 07:00'),
+      1,
+      'hour',
+      '3m'
+    );
+  });
+
+  describe('with a metric name and auto time grain of 3 minutes', function() {
     beforeEach(function() {
-      builder = new AzureMonitorFilterBuilder('Percentage CPU', moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'), 1, 'hour');
+      builder.timeGrain = null;
     });
 
+    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
+      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
+        `and endTime eq 2017-08-22T07:00:00Z ` +
+        `and timeGrain eq duration'PT3M' ` +
+        `and (name.value eq 'Percentage CPU')`;
+      expect(builder.generateFilter()).to.equal(filter);
+    });
+  });
+
+  describe('with a metric name and auto time grain of 30 seconds', function() {
+    beforeEach(function() {
+      builder.timeGrain = null;
+      builder.grafanaInterval = '30s';
+    });
+
+    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
+      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
+        `and endTime eq 2017-08-22T07:00:00Z ` +
+        `and timeGrain eq duration'PT1M' ` +
+        `and (name.value eq 'Percentage CPU')`;
+      expect(builder.generateFilter()).to.equal(filter);
+    });
+  });
+
+  describe('with a metric name and auto time grain of 10 minutes', function() {
+    beforeEach(function() {
+      builder.timeGrain = null;
+      builder.grafanaInterval = '10m';
+    });
+
+    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
+      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
+        `and endTime eq 2017-08-22T07:00:00Z ` +
+        `and timeGrain eq duration'PT10M' ` +
+        `and (name.value eq 'Percentage CPU')`;
+      expect(builder.generateFilter()).to.equal(filter);
+    });
+  });
+
+  describe('with a metric name and auto time grain of 1 day', function() {
+    beforeEach(function() {
+      builder.timeGrain = null;
+      builder.grafanaInterval = '1d';
+    });
+
+    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
+      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
+        `and endTime eq 2017-08-22T07:00:00Z ` +
+        `and timeGrain eq duration'P1D' ` +
+        `and (name.value eq 'Percentage CPU')`;
+      expect(builder.generateFilter()).to.equal(filter);
+    });
+  });
+
+  describe('with a metric name and 1 hour time grain', function() {
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
       const filter = `startTime eq 2017-08-22T06:00:00Z ` +
         `and endTime eq 2017-08-22T07:00:00Z ` +
@@ -20,12 +87,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and 1 minute time grain', function() {
     beforeEach(function() {
-      builder = new AzureMonitorFilterBuilder(
-        'Percentage CPU',
-        moment.utc('2017-08-22 06:00'),
-        moment.utc('2017-08-22 07:00'),
-        1,
-        'minute');
+      builder.timeGrainUnit = 'minute';
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
@@ -39,7 +101,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and 1 day time grain', function() {
     beforeEach(function() {
-      builder = new AzureMonitorFilterBuilder('Percentage CPU', moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'), 1, 'day');
+      builder.timeGrainUnit = 'day';
     });
 
     it('should add time grain to the filter in ISO_8601 format', function() {
@@ -53,7 +115,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and 1 day time grain and an aggregation', function() {
     beforeEach(function() {
-      builder = new AzureMonitorFilterBuilder('Percentage CPU', moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'), 1, 'day');
+      builder.timeGrainUnit = 'day';
       builder.setAggregation('Maximum');
     });
 

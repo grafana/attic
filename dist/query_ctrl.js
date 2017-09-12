@@ -30,12 +30,12 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                             metricDefinition: this.defaultDropdownValue,
                             resourceName: this.defaultDropdownValue,
                             metricName: this.defaultDropdownValue,
-                            timeGrain: 1,
-                            timeGrainUnit: 'hour'
+                            timeGrain: '',
+                            timeGrainUnit: 'minute'
                         },
                         appInsights: {
                             metricName: this.defaultDropdownValue,
-                            groupBy: '',
+                            groupBy: 'none',
                         }
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
@@ -93,6 +93,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         _this.target.azureMonitor.aggregation = aggData.primaryAggType;
                         return _this.refresh();
                     });
+                };
+                AzureMonitorQueryCtrl.prototype.getAutoInterval = function () {
+                    return this.panelCtrl.interval;
                 };
                 /* Application Insights Section */
                 AzureMonitorQueryCtrl.prototype.getAppInsightsMetricNames = function () {

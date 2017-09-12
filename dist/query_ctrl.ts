@@ -16,12 +16,12 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       metricDefinition: this.defaultDropdownValue,
       resourceName: this.defaultDropdownValue,
       metricName: this.defaultDropdownValue,
-      timeGrain: 1,
-      timeGrainUnit: 'hour'
+      timeGrain: '',
+      timeGrainUnit: 'minute'
     },
     appInsights: {
       metricName: this.defaultDropdownValue,
-      groupBy: '',
+      groupBy: 'none',
     }
   };
 
@@ -104,6 +104,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       this.target.azureMonitor.aggregation = aggData.primaryAggType;
       return this.refresh();
     });
+  }
+
+  getAutoInterval() {
+    return this.panelCtrl.interval;
   }
 
   /* Application Insights Section */

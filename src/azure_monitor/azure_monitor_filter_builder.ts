@@ -6,8 +6,15 @@ import TimegrainConverter from '../time_grain_converter';
 
 export default class AzureMonitorFilterBuilder {
   aggregation: string;
+  timeGrainInterval = '';
 
-  constructor(private metricName: string, private from, private to, private timeGrain: number, private timeGrainUnit: string) {
+  constructor(
+    private metricName: string,
+    private from,
+    private to,
+    public timeGrain: number,
+    public timeGrainUnit: string,
+    public grafanaInterval: string) {
   }
 
   setAggregation(agg) {
@@ -15,11 +22,7 @@ export default class AzureMonitorFilterBuilder {
   }
 
   generateFilter() {
-    const dateTimeCondition = `startTime eq ${this.from.utc().format()} and endTime eq ${this.to.utc().format()}`;
-    const timeGrain = TimegrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
-    const timeGrainCondition = ` and timeGrain eq duration'${timeGrain}'`;
-    const timeCondition = dateTimeCondition + timeGrainCondition;
-    let filter = timeCondition;
+    let filter = this.createDatetimeAndTimeGrainConditions();
 
     if (this.aggregation) {
       filter += ` and aggregationType eq '${this.aggregation}'`;
@@ -30,5 +33,22 @@ export default class AzureMonitorFilterBuilder {
     }
 
     return filter;
+  }
+
+  createDatetimeAndTimeGrainConditions() {
+    const dateTimeCondition = `startTime eq ${this.from.utc().format()} and endTime eq ${this.to.utc().format()}`;
+
+    if (this.timeGrain > 0) {
+      this.timeGrainInterval = TimegrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
+    } else {
+      this.timeGrainInterval = this.calculateAutoTimeGrain();
+    }
+    const timeGrainCondition = ` and timeGrain eq duration'${this.timeGrainInterval}'`;
+
+    return dateTimeCondition + timeGrainCondition;
+  }
+
+  calculateAutoTimeGrain() {
+    return TimegrainConverter.createISO8601DurationFromInterval(this.grafanaInterval);
   }
 }

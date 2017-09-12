@@ -5,13 +5,28 @@ import moment from 'moment';
 
 export default class TimeGrainConverter {
   static createISO8601Duration(timeGrain, timeGrainUnit) {
-    const timeGrainUnitOrDefault = timeGrainUnit || 'hour';
-    const timeGrainOrDefault = timeGrain || 1;
-
-    if (timeGrainUnitOrDefault === 'hour' || timeGrainUnitOrDefault === 'minute') {
-      return `PT${timeGrainOrDefault}${timeGrainUnitOrDefault[0].toUpperCase()}`;
+    const timeIntervals = ['hour', 'minute', 'h', 'm'];
+    if (_.includes(timeIntervals, timeGrainUnit)) {
+      return `PT${timeGrain}${timeGrainUnit[0].toUpperCase()}`;
     }
 
-    return `P${timeGrainOrDefault}${timeGrainUnitOrDefault[0].toUpperCase()}`;
+    return `P${timeGrain}${timeGrainUnit[0].toUpperCase()}`;
+  }
+
+  static createISO8601DurationFromInterval(interval: string) {
+    const timeGrain = +interval.slice(0, interval.length - 1);
+    const unit = interval[interval.length - 1];
+
+    if (interval[interval.length - 1] === 's') {
+      let toMinutes = (timeGrain * 60) % 60;
+
+      if (toMinutes < 1) {
+        toMinutes = 1;
+      }
+
+      return TimeGrainConverter.createISO8601Duration(toMinutes, 'm');
+    }
+
+    return TimeGrainConverter.createISO8601Duration(timeGrain, unit);
   }
 }
