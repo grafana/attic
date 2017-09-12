@@ -24,6 +24,32 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     this.templateSrv = templateSrv;
                     this.$q = $q;
                     this.defaultDropdownValue = 'select';
+                    this.supportedMetricNamespaces = [
+                        'Microsoft.Compute',
+                        'Microsoft.ClassicCompute',
+                        'Microsoft.Storage',
+                        'Microsoft.Sql',
+                        'Microsoft.Web',
+                        'Microsoft.EventHub',
+                        'Microsoft.ServiceBus',
+                        'Microsoft.Devices',
+                        'Microsoft.Network',
+                        'Microsoft.Cache/Redis',
+                        'Microsoft.AnalysisServices/servers',
+                        'Microsoft.ApiManagement/service',
+                        'Microsoft.Automation/automationAccounts',
+                        'Microsoft.Batch/batchAccounts',
+                        'Microsoft.CognitiveServices/accounts',
+                        'Microsoft.CustomerInsights/hubs',
+                        'Microsoft.DataLakeAnalytics/accounts',
+                        'Microsoft.DataLakeStore/accounts',
+                        'Microsoft.DBforMySQL/servers',
+                        'Microsoft.DBforPostgreSQL/servers',
+                        'Microsoft.Logic/workflows',
+                        'Microsoft.NotificationHubs/Namespaces/NotificationHubs',
+                        'Microsoft.Search/searchServices',
+                        'Microsoft.StreamAnalytics/streamingjobs'
+                    ];
                     this.id = instanceSettings.id;
                     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
                     this.baseUrl = "/azuremonitor/subscriptions/" + this.subscriptionId + "/resourceGroups";
@@ -85,9 +111,19 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.getMetricDefinitions = function (resourceGroup) {
+                    var _this = this;
                     var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'type', 'type');
+                    }).then(function (result) {
+                        return lodash_1.default.filter(result, function (t) {
+                            for (var i = 0; i < _this.supportedMetricNamespaces.length; i++) {
+                                if (lodash_1.default.startsWith(t.value, _this.supportedMetricNamespaces[i])) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        });
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.getResourceNames = function (resourceGroup, metricDefinition) {

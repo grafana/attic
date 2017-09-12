@@ -225,13 +225,22 @@ describe('AzureMonitorDatasource', function() {
       data: {
         value: [
           {
-            name: 'Failure Anomalies - nodeapp',
-            type: 'microsoft.insights/alertrules',
+            name: 'test_OsDisk_1_68102d72f11b47dc8090b770e61cb5d2',
+            type: 'Microsoft.Compute/disks',
           },
           {
-            name: 'nodesapp',
-            type: 'microsoft.insights/components',
-            kind: 'Node.JS',
+            location: 'northeurope',
+            name: 'northeur',
+            type: 'Microsoft.Compute/virtualMachines',
+          },
+          {
+            location: 'westcentralus',
+            name: 'us',
+            type: 'Microsoft.Compute/virtualMachines',
+          },
+          {
+            name: 'IHaveNoMetrics',
+            type: 'IShouldBeFilterOut',
           }
         ]
       },
@@ -247,13 +256,13 @@ describe('AzureMonitorDatasource', function() {
       };
     });
 
-    it('should return list of Metric Definitions', function() {
+    it('should return list of Metric Definitions with no duplicates and no unsupported namespaces', function() {
       return ctx.ds.getMetricDefinitions('nodesapp').then(function(results) {
         expect(results.length).to.equal(2);
-        expect(results[0].text).to.equal('microsoft.insights/alertrules');
-        expect(results[0].value).to.equal('microsoft.insights/alertrules');
-        expect(results[1].text).to.equal('microsoft.insights/components');
-        expect(results[1].value).to.equal('microsoft.insights/components');
+        expect(results[0].text).to.equal('Microsoft.Compute/disks');
+        expect(results[0].value).to.equal('Microsoft.Compute/disks');
+        expect(results[1].text).to.equal('Microsoft.Compute/virtualMachines');
+        expect(results[1].value).to.equal('Microsoft.Compute/virtualMachines');
       });
     });
   });

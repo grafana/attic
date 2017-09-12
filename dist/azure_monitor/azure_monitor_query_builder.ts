@@ -13,6 +13,32 @@ export default class AzureMonitorQueryBuilder {
   resourceName: string;
   url: string;
   defaultDropdownValue = 'select';
+  supportedMetricNamespaces = [
+    'Microsoft.Compute',
+    'Microsoft.ClassicCompute',
+    'Microsoft.Storage',
+    'Microsoft.Sql',
+    'Microsoft.Web',
+    'Microsoft.EventHub',
+    'Microsoft.ServiceBus',
+    'Microsoft.Devices',
+    'Microsoft.Network',
+    'Microsoft.Cache/Redis',
+    'Microsoft.AnalysisServices/servers',
+    'Microsoft.ApiManagement/service',
+    'Microsoft.Automation/automationAccounts',
+    'Microsoft.Batch/batchAccounts',
+    'Microsoft.CognitiveServices/accounts',
+    'Microsoft.CustomerInsights/hubs',
+    'Microsoft.DataLakeAnalytics/accounts',
+    'Microsoft.DataLakeStore/accounts',
+    'Microsoft.DBforMySQL/servers',
+    'Microsoft.DBforPostgreSQL/servers',
+    'Microsoft.Logic/workflows',
+    'Microsoft.NotificationHubs/Namespaces/NotificationHubs',
+    'Microsoft.Search/searchServices',
+    'Microsoft.StreamAnalytics/streamingjobs'
+  ];
 
   constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
@@ -104,6 +130,16 @@ export default class AzureMonitorQueryBuilder {
     const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
     return this.doRequest(url).then(result => {
       return ResponseParser.parseResponseValues(result, 'type', 'type');
+    }).then(result => {
+      return _.filter(result, t => {
+        for (let i = 0; i < this.supportedMetricNamespaces.length; i++) {
+          if (_.startsWith(t.value, this.supportedMetricNamespaces[i])) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     });
   }
 

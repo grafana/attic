@@ -11,6 +11,7 @@ export default class AzureMonitorQueryBuilder {
     resourceName: string;
     url: string;
     defaultDropdownValue: string;
+    supportedMetricNamespaces: string[];
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
     isConfigured(): boolean;
     query(options: any): any;

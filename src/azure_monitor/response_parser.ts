@@ -48,10 +48,12 @@ export default class ResponseParser {
   static parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {
     const list = [];
     for (let i = 0; i < result.data.value.length; i++) {
-      list.push({
-        text: _.get(result.data.value[i], textFieldName),
-        value: _.get(result.data.value[i], valueFieldName)
-      });
+      if (! _.find(list, ['value', _.get(result.data.value[i], valueFieldName)])) {
+        list.push({
+          text: _.get(result.data.value[i], textFieldName),
+          value: _.get(result.data.value[i], valueFieldName)
+        });
+      }
     }
     return list;
   }

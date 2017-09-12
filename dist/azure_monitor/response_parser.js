@@ -50,10 +50,12 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 ResponseParser.parseResponseValues = function (result, textFieldName, valueFieldName) {
                     var list = [];
                     for (var i = 0; i < result.data.value.length; i++) {
-                        list.push({
-                            text: lodash_1.default.get(result.data.value[i], textFieldName),
-                            value: lodash_1.default.get(result.data.value[i], valueFieldName)
-                        });
+                        if (!lodash_1.default.find(list, ['value', lodash_1.default.get(result.data.value[i], valueFieldName)])) {
+                            list.push({
+                                text: lodash_1.default.get(result.data.value[i], textFieldName),
+                                value: lodash_1.default.get(result.data.value[i], valueFieldName)
+                            });
+                        }
                     }
                     return list;
                 };
