@@ -36,6 +36,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         appInsights: {
                             metricName: this.defaultDropdownValue,
                             groupBy: 'none',
+                            timeGrainType: 'auto'
                         }
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
@@ -121,6 +122,16 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                 };
                 AzureMonitorQueryCtrl.prototype.resetAppInsightsGroupBy = function () {
                     this.target.appInsights.groupBy = 'none';
+                    this.refresh();
+                };
+                AzureMonitorQueryCtrl.prototype.updateTimeGrainType = function () {
+                    if (this.target.appInsights.timeGrainType === 'specific') {
+                        this.target.appInsights.timeGrain = 1;
+                        this.target.appInsights.timeGrainUnit = 'minute';
+                    }
+                    else {
+                        this.target.appInsights.timeGrain = '';
+                    }
                     this.refresh();
                 };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';

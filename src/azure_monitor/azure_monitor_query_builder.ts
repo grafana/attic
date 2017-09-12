@@ -64,7 +64,7 @@ export default class AzureMonitorQueryBuilder {
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
       const metricName = this.templateSrv.replace(item.metricName, options.scopedVars);
-      const apiVersion = '2016-09-01';
+      const apiVersion = '2017-05-01-preview';
       const filterBuilder = new AzureMonitorFilterBuilder(
         item.metricName,
         options.range.from,

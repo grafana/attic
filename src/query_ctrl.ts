@@ -22,6 +22,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     appInsights: {
       metricName: this.defaultDropdownValue,
       groupBy: 'none',
+      timeGrainType: 'auto'
     }
   };
 
@@ -137,6 +138,16 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   resetAppInsightsGroupBy() {
     this.target.appInsights.groupBy = 'none';
+    this.refresh();
+  }
+
+  updateTimeGrainType() {
+    if (this.target.appInsights.timeGrainType === 'specific') {
+      this.target.appInsights.timeGrain = 1;
+      this.target.appInsights.timeGrainUnit = 'minute';
+    } else {
+      this.target.appInsights.timeGrain = '';
+    }
     this.refresh();
   }
 }

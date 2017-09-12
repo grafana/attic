@@ -16,6 +16,7 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
         appInsights: {
             metricName: string;
             groupBy: string;
+            timeGrainType: string;
         };
     };
     /** @ngInject **/
@@ -33,4 +34,5 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     onAppInsightsMetricNameChange(): any;
     getAppInsightsGroupBySegments(query: any): any;
     resetAppInsightsGroupBy(): void;
+    updateTimeGrainType(): void;
 }
