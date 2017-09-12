@@ -7,10 +7,11 @@ import TimeGrainConverter from '../time_grain_converter';
 export default class AppInsightsQuerystringBuilder {
   aggregation = '';
   groupBy = '';
+  timeGrainType = '';
   timeGrain = '';
   timeGrainUnit = '';
 
-  constructor(private from, private to) {
+  constructor(private from, private to, public grafanaInterval) {
   }
 
   setAggregation(aggregation) {
@@ -21,7 +22,8 @@ export default class AppInsightsQuerystringBuilder {
     this.groupBy = groupBy;
   }
 
-  setInterval(timeGrain, timeGrainUnit) {
+  setInterval(timeGrainType, timeGrain, timeGrainUnit) {
+    this.timeGrainType = timeGrainType;
     this.timeGrain = timeGrain;
     this.timeGrainUnit = timeGrainUnit;
   }
@@ -37,9 +39,14 @@ export default class AppInsightsQuerystringBuilder {
       querystring += `&segment=${this.groupBy}`;
     }
 
-    if (this.timeGrain && this.timeGrainUnit) {
+    if (this.timeGrainType === 'specific' && this.timeGrain && this.timeGrainUnit) {
       querystring += `&interval=${TimeGrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit)}`;
     }
+
+    if (this.timeGrainType === 'auto') {
+      querystring += `&interval=${TimeGrainConverter.createISO8601DurationFromInterval(this.grafanaInterval)}`;
+    }
+
     return querystring;
   }
 }

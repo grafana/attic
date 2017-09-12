@@ -108,6 +108,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAutoInterval() {
+    if (this.panelCtrl.interval[this.panelCtrl.interval.length - 1] === 's') {
+      return '1m';
+    }
     return this.panelCtrl.interval;
   }
 

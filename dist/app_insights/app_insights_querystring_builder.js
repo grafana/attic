@@ -9,11 +9,13 @@ System.register(['../time_grain_converter'], function(exports_1) {
             }],
         execute: function() {
             AppInsightsQuerystringBuilder = (function () {
-                function AppInsightsQuerystringBuilder(from, to) {
+                function AppInsightsQuerystringBuilder(from, to, grafanaInterval) {
                     this.from = from;
                     this.to = to;
+                    this.grafanaInterval = grafanaInterval;
                     this.aggregation = '';
                     this.groupBy = '';
+                    this.timeGrainType = '';
                     this.timeGrain = '';
                     this.timeGrainUnit = '';
                 }
@@ -23,7 +25,8 @@ System.register(['../time_grain_converter'], function(exports_1) {
                 AppInsightsQuerystringBuilder.prototype.setGroupBy = function (groupBy) {
                     this.groupBy = groupBy;
                 };
-                AppInsightsQuerystringBuilder.prototype.setInterval = function (timeGrain, timeGrainUnit) {
+                AppInsightsQuerystringBuilder.prototype.setInterval = function (timeGrainType, timeGrain, timeGrainUnit) {
+                    this.timeGrainType = timeGrainType;
                     this.timeGrain = timeGrain;
                     this.timeGrainUnit = timeGrainUnit;
                 };
@@ -35,8 +38,11 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     if (this.groupBy && this.groupBy.length > 0) {
                         querystring += "&segment=" + this.groupBy;
                     }
-                    if (this.timeGrain && this.timeGrainUnit) {
+                    if (this.timeGrainType === 'specific' && this.timeGrain && this.timeGrainUnit) {
                         querystring += "&interval=" + time_grain_converter_1.default.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
+                    }
+                    if (this.timeGrainType === 'auto') {
+                        querystring += "&interval=" + time_grain_converter_1.default.createISO8601DurationFromInterval(this.grafanaInterval);
                     }
                     return querystring;
                 };

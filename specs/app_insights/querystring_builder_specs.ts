@@ -6,7 +6,7 @@ describe('AppInsightsQuerystringBuilder', function() {
   let builder: AppInsightsQuerystringBuilder;
 
   beforeEach(function() {
-    builder = new AppInsightsQuerystringBuilder(moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'));
+    builder = new AppInsightsQuerystringBuilder(moment.utc('2017-08-22 06:00'), moment.utc('2017-08-22 07:00'), '1h');
   });
 
   describe('with only from/to date range', function() {
@@ -38,9 +38,20 @@ describe('AppInsightsQuerystringBuilder', function() {
     });
   });
 
-  describe('with from/to date range and group by interval', function() {
+  describe('with from/to date range and specific group by interval', function() {
     beforeEach(function() {
-      builder.setInterval(1, 'hour');
+      builder.setInterval('specific', 1, 'hour');
+    });
+
+    it('should add datetime filtering and interval to the querystring', function() {
+      const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&interval=PT1H`;
+      expect(builder.generate()).to.equal(querystring);
+    });
+  });
+
+  describe('with from/to date range and auto group by interval', function() {
+    beforeEach(function() {
+      builder.setInterval('auto', '', '');
     });
 
     it('should add datetime filtering and interval to the querystring', function() {

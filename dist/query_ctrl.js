@@ -96,6 +96,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     });
                 };
                 AzureMonitorQueryCtrl.prototype.getAutoInterval = function () {
+                    if (this.panelCtrl.interval[this.panelCtrl.interval.length - 1] === 's') {
+                        return '1m';
+                    }
                     return this.panelCtrl.interval;
                 };
                 /* Application Insights Section */

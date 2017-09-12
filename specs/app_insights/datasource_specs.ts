@@ -120,6 +120,7 @@ describe('AppInsightsDatasource', function() {
           appInsights: {
             metricName: 'exceptions/server',
             groupBy: '',
+            timeGrainType: 'none',
             timeGrain: '',
             timeGrainUnit: ''
           }
@@ -182,6 +183,7 @@ describe('AppInsightsDatasource', function() {
       };
 
       beforeEach(function() {
+        options.targets[0].appInsights.timeGrainType = 'specific';
         options.targets[0].appInsights.timeGrain = '30';
         options.targets[0].appInsights.timeGrainUnit = 'minute';
         ctx.backendSrv.datasourceRequest = function(options) {

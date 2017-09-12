@@ -34,12 +34,12 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         return item.hide !== true;
                     }).map(function (target) {
                         var item = target.appInsights;
-                        var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to);
+                        var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to, options.interval);
                         if (item.groupBy !== 'none') {
                             querystringBuilder.setGroupBy(item.groupBy);
                         }
                         querystringBuilder.setAggregation(item.aggregation);
-                        querystringBuilder.setInterval(item.timeGrain, item.timeGrainUnit);
+                        querystringBuilder.setInterval(item.timeGrainType, item.timeGrain, item.timeGrainUnit);
                         var url = _this.baseUrl + "/" + item.metricName + "?" + querystringBuilder.generate();
                         return {
                             refId: target.refId,

@@ -29,14 +29,15 @@ export default class AppInsightsQueryBuilder {
       const item = target.appInsights;
       const querystringBuilder = new AppInsightsQuerystringBuilder(
         options.range.from,
-        options.range.to
+        options.range.to,
+        options.interval
       );
 
       if (item.groupBy !== 'none') {
         querystringBuilder.setGroupBy(item.groupBy);
       }
       querystringBuilder.setAggregation(item.aggregation);
-      querystringBuilder.setInterval(item.timeGrain, item.timeGrainUnit);
+      querystringBuilder.setInterval(item.timeGrainType, item.timeGrain, item.timeGrainUnit);
 
       const url = `${this.baseUrl}/${item.metricName}?${querystringBuilder.generate()}`;
 
