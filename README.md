@@ -2,6 +2,70 @@
 
 The Azure Monitor Data Source plugin supports Azure Monitor and Application Insights metrics in Grafana.
 
+## Installation
+
+This plugin requires Grafana 4.5 (as this is not released yet, the latest nightly build has to be used.)
+
+### Docker
+
+1. Fetch the nightly build of grafana from Docker Hub:  
+    `docker pull grafana/grafana:master`
+2. Run Grafana and install the Azure Monitor plugin with this command: 
+    `docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:master`
+3. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
+4. Login in with username: admin and password: admin
+5. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
+Alternative command if you want to run Grafana on a different port than the default 3000 port:
+
+`docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:master`
+
+
+### Existing Grafana with CLI
+
+Grafana comes with a command line tool that can be used to install plugins.
+
+1. Upgrade Grafana to the latest nightly build. Get that [here](https://grafana.com/grafana/download/4.5.0-8944beta1). 
+2. Run this command: `grafana-cli plugins install grafana-azure-monitor-datasource`
+3. Restart the Grafana server.
+4. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
+5. Login in with a user that has admin rights. This is needed to create data sources.
+6. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
+
+
+### Manual Installation
+
+If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
+
+1. Get the zip file from Grafana.com: https://grafana.com/plugins/grafana-azure-monitor-datasource/installation and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
+2. Extract the zip file into the data/plugins subdirectory for Grafana.
+3. Restart the Grafana server
+4. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
+
+
+## Configure the data source
+
+The plugin can access metrics from both the Azure Monitor service and the Application Insights API. You can configure access to one service or both services.
+
+1. Accessed from the Grafana main menu, newly installed data sources can be added immediately within the Data Sources section. Next, click the  "Add data source" button in the upper right. The data source will be available for selection in the Type select box.
+2. Select Azure Monitor from the Type dropdown:
+![Data Source Type](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_1_select_type.png)
+3. In the name field, fill in a name for the data source. It can be anything. Some suggestions are Azure Monitor or App Insights.
+4. If you are using Azure Monitor, then you need 4 pieces of information from the Azure portal:
+    - Subscription Id (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
+    - Tenant Id (Azure Active Directory -> Properties -> Directory ID)
+    - Client Id 
+    - Client Secret
+5. Paste these four items into the fields in the Azure Monitor API Details section:
+    ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_2_azure_monitor_api_details.png)
+6. If you are are using  Application Insights, then you need two pieces of information from the Azure Portal:
+    - Application ID
+    - Application Key
+7. Paste these two items into the appropriate fields in the Application Insights API Details section:
+    ![Application Insights API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_3_app_insights_api_details.png)
+
+
+------
+
 ### Development
 
 To install and build the plugin:
