@@ -29,6 +29,13 @@ module.exports = function(grunt) {
         src: ['*.css'],
         dest: 'dist/css/'
       },
+      dist_img: {
+        expand: true,
+        flatten: true,
+        cwd: 'src/img',
+        src: ['*.*'],
+        dest: 'dist/img/'
+      },
       dist_statics: {
         expand: true,
         flatten: true,
@@ -55,7 +62,7 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      files: ['src/**/*.ts', 'src/**/*.html', 'src/**/*.css', 'src/plugin.json', 'README.md'],
+      files: ['src/**/*.ts', 'src/**/*.html', 'src/**/*.css', 'src/img/*.*', 'src/plugin.json', 'README.md'],
       tasks: ['default'],
       options: {
         debounceDelay: 250,
@@ -69,6 +76,7 @@ module.exports = function(grunt) {
     'typescript:build',
     'copy:dist_html',
     'copy:dist_css',
+    'copy:dist_img',
     'copy:dist_statics'
   ]);
 };

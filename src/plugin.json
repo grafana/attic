@@ -10,8 +10,16 @@
       "url": "https://grafana.com"
     },
     "keywords": ["azure", "monitor", "Application Insights"],
+    "logos": {
+      "small": "img/microsoftazure_480.png",
+      "large": "img/microsoftazure_480.png"
+    },
+    "links": [
+      {"name": "Project site", "url": "https://github.com/grafana/azure-monitor-datasource"},
+      {"name": "Apache License", "url": "https://github.com/grafana/azure-monitor-datasource/blob/master/LICENSE"}
+    ],
     "version": "0.0.1",
-    "updated": "2017-08-22"
+    "updated": "2017-09-13"
   },
 
   "routes": [
@@ -40,7 +48,7 @@
   ],
 
   "dependencies": {
-    "grafanaVersion": "4.x.x",
+    "grafanaVersion": "4.5.x",
     "plugins": [ ]
   },
 
