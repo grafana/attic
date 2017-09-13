@@ -40,11 +40,11 @@ export default class AzureMonitorDatasource {
   }
 
   annotationQuery(options) {
-    return this.azureMonitorQueryBuilder.annotationQuery(options);
+    throw new Error("Annotation Support not implemented yet.");
   }
 
   metricFindQuery(query: string) {
-    return this.azureMonitorQueryBuilder.metricFindQuery(query);
+    throw new Error("Template Variable Support not implemented yet.");
   }
 
   testDatasource() {
@@ -86,6 +86,10 @@ export default class AzureMonitorDatasource {
   }
 
   /* Azure Monitor REST API methods */
+  getResourceGroups() {
+    return this.azureMonitorQueryBuilder.metricFindQuery('?api-version=2017-06-01');
+  }
+
   getMetricDefinitions(resourceGroup: string) {
     return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
   }

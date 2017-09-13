@@ -13,8 +13,9 @@ export default class AzureMonitorDatasource {
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
     query(options: any): any;
     annotationQuery(options: any): void;
-    metricFindQuery(query: string): any;
+    metricFindQuery(query: string): void;
     testDatasource(): any;
+    getResourceGroups(): any;
     getMetricDefinitions(resourceGroup: string): any;
     getResourceNames(resourceGroup: string, metricDefinition: string): any;
     getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;

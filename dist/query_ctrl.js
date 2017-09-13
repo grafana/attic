@@ -46,7 +46,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorQueryBuilder.isConfigured()) {
                         return;
                     }
-                    return this.datasource.metricFindQuery('?api-version=2017-06-01');
+                    return this.datasource.getResourceGroups();
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup

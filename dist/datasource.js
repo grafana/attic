@@ -42,10 +42,10 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                     });
                 };
                 AzureMonitorDatasource.prototype.annotationQuery = function (options) {
-                    return this.azureMonitorQueryBuilder.annotationQuery(options);
+                    throw new Error("Annotation Support not implemented yet.");
                 };
                 AzureMonitorDatasource.prototype.metricFindQuery = function (query) {
-                    return this.azureMonitorQueryBuilder.metricFindQuery(query);
+                    throw new Error("Template Variable Support not implemented yet.");
                 };
                 AzureMonitorDatasource.prototype.testDatasource = function () {
                     var promises = [];
@@ -79,6 +79,9 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                     });
                 };
                 /* Azure Monitor REST API methods */
+                AzureMonitorDatasource.prototype.getResourceGroups = function () {
+                    return this.azureMonitorQueryBuilder.metricFindQuery('?api-version=2017-06-01');
+                };
                 AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
                     return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
                 };

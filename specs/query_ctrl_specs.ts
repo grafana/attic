@@ -39,8 +39,7 @@ describe('AzureMonitorQueryCtrl', function() {
       ];
 
       beforeEach(function() {
-        queryCtrl.datasource.metricFindQuery = function(query) {
-          expect(query).to.be('?api-version=2017-06-01');
+        queryCtrl.datasource.getResourceGroups = function() {
           return this.$q.when(response);
         };
         queryCtrl.datasource.azureMonitorQueryBuilder = {

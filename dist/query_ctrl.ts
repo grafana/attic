@@ -39,7 +39,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       return;
     }
 
-    return this.datasource.metricFindQuery('?api-version=2017-06-01');
+    return this.datasource.getResourceGroups();
   }
 
   getMetricDefinitions(query) {

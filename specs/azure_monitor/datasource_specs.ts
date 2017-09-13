@@ -191,7 +191,7 @@ describe('AzureMonitorDatasource', function() {
     });
   });
 
-  describe('When performing metricFindQuery', function() {
+  describe('When performing getResourceGroups', function() {
     const response = {
       data: {
         value: [
@@ -210,7 +210,7 @@ describe('AzureMonitorDatasource', function() {
     });
 
     it('should return list of Resource Groups', function() {
-      return ctx.ds.metricFindQuery('?api-version=2017-06-01').then(function(results) {
+      return ctx.ds.getResourceGroups().then(function(results) {
         expect(results.length).to.equal(2);
         expect(results[0].text).to.equal('grp1');
         expect(results[0].value).to.equal('grp1');
