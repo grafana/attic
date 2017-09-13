@@ -1,6 +1,6 @@
 {
   "type": "datasource",
-  "name": "Azure Monitor Data Source",
+  "name": "Azure Monitor",
   "id": "grafana-azure-monitor-datasource",
 
   "info": {
