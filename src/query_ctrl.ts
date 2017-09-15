@@ -16,7 +16,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       metricDefinition: this.defaultDropdownValue,
       resourceName: this.defaultDropdownValue,
       metricName: this.defaultDropdownValue,
-      timeGrain: '',
+      timeGrain: 1,
       timeGrainUnit: 'minute'
     },
     appInsights: {

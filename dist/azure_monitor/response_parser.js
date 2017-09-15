@@ -19,12 +19,18 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     for (var i = 0; i < result.data.length; i++) {
                         for (var j = 0; j < result.data[i].data.value.length; j++) {
                             data.push({
-                                target: result.data[i].data.value[j].name.value,
+                                target: ResponseParser.createTarget(result.data[i].data.value[j]),
                                 datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].data)
                             });
                         }
                     }
                     return data;
+                };
+                ResponseParser.createTarget = function (data) {
+                    var endIndex = data.id.lastIndexOf('/providers');
+                    var startIndex = data.id.slice(0, endIndex).lastIndexOf('/') + 1;
+                    var resourceName = data.id.substring(startIndex, endIndex);
+                    return resourceName + "." + data.name.value;
                 };
                 ResponseParser.convertDataToPoints = function (timeSeriesData) {
                     var dataPoints = [];

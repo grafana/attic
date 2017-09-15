@@ -6,7 +6,7 @@
 			<span class="gf-form-label width-9">Subscription Id</span>
 			<input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.subscriptionId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
-          Text on where to find it.
+          <p>In the Azure Portal, navigate to Subscriptions -> Choose subscription -> Overview -> Subscription ID.</p><a target="_blank" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal">**Click here for detailed instructions on setting up an Azure Active Directory (AD) application.**</a>
       </info-popover>
     </div>
   </div>
@@ -15,7 +15,7 @@
       <span class="gf-form-label width-9">Tenant Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.tenantId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
-          Text on where to find it.
+          <p>In the Azure Portal, navigate to Azure Active Directory -> Properties -> Directory ID.</p><a target="_blank" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal">**Click here for detailed instructions on setting up an Azure Active Directory (AD) application.**</a>
       </info-popover>
     </div>
   </div>
@@ -24,7 +24,7 @@
       <span class="gf-form-label width-9">Client Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.clientId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
-          Text on where to find it.
+        <p>In the Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose your app -> Application ID.</p><a target="_blank" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal">**Click here for detailed instructions on setting up an Azure Active Directory (AD) application.**</a>
       </info-popover>
     </div>
   </div>
@@ -33,7 +33,7 @@
       <span class="gf-form-label width-9">Client Secret</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.clientSecret' placeholder=""></input>
       <info-popover mode="right-absolute">
-          Text on where to find it.
+        <p>To create a new key, log in to Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose your app -> Keys.</p><a target="_blank" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal">**Click here for detailed instructions on setting up an Azure Active Directory (AD) application.**</a>
       </info-popover>
     </div>
   </div>
@@ -52,7 +52,7 @@
       <span class="gf-form-label width-9">API Key</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.appInsightsApiKey' placeholder=""></input>
       <info-popover mode="right-absolute">
-        Section 2 of the quickstart show where to find the key: <a href="https://dev.applicationinsights.io/quickstart/">https://dev.applicationinsights.io/quickstart/</a>
+        <p>Section 2 of the Quickstart guide shows where to find/create the API Key:</p> <a target="_blank" href="https://dev.applicationinsights.io/quickstart/">**Click here to open the Application Insights Quickstart.**</a>
       </info-popover>
     </div>
   </div>
@@ -66,7 +66,7 @@
       <span class="gf-form-label width-9">Application Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.appInsightsAppId' placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></input>
       <info-popover mode="right-absolute">
-        Text on where to find it.
+        <p>Section 2 of the Quickstart guide shows where to find the Application ID:</p> <a target="_blank" href="https://dev.applicationinsights.io/quickstart/">**Click here to open the Application Insights Quickstart.**</a>
       </info-popover>
     </div>
   </div>

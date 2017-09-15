@@ -13,7 +13,7 @@ describe('AzureMonitorQueryCtrl', function() {
 
   describe('init query_ctrl variables', function() {
     it('time grain variables should be initialized', function() {
-      expect(queryCtrl.target.azureMonitor.timeGrain).to.be('');
+      expect(queryCtrl.target.azureMonitor.timeGrain).to.be(1);
       expect(queryCtrl.target.azureMonitor.timeGrainUnit).to.be('minute');
     });
 

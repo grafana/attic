@@ -9,12 +9,19 @@ export default class ResponseParser {
     for (let i = 0; i < result.data.length; i++) {
       for (let j = 0; j < result.data[i].data.value.length; j++) {
         data.push({
-          target: result.data[i].data.value[j].name.value,
+          target: ResponseParser.createTarget(result.data[i].data.value[j]),
           datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].data)
         });
       }
     }
     return data;
+  }
+
+  static createTarget(data) {
+    const endIndex = data.id.lastIndexOf('/providers');
+    const startIndex = data.id.slice(0, endIndex).lastIndexOf('/') + 1;
+    const resourceName = data.id.substring(startIndex, endIndex);
+    return `${resourceName}.${data.name.value}`;
   }
 
   static convertDataToPoints(timeSeriesData) {

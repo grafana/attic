@@ -18,8 +18,8 @@
       {"name": "Project site", "url": "https://github.com/grafana/azure-monitor-datasource"},
       {"name": "Apache License", "url": "https://github.com/grafana/azure-monitor-datasource/blob/master/LICENSE"}
     ],
-    "version": "0.0.1",
-    "updated": "2017-09-13"
+    "version": "0.0.2",
+    "updated": "2017-09-15"
   },
 
   "routes": [

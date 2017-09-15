@@ -85,8 +85,8 @@ describe('AzureMonitorDatasource', function() {
           refId: 'A',
           queryType: 'Azure Monitor',
           azureMonitor: {
-            resourceGroup: 'test',
-            resourceName: 'test',
+            resourceGroup: 'testRG',
+            resourceName: 'testRN',
             metricDefinition: 'Microsoft.Compute/virtualMachines',
             metricName: 'Percentage CPU',
             timeGrain: 1,
@@ -114,6 +114,8 @@ describe('AzureMonitorDatasource', function() {
                   average: 1.0457499999999995
                 }
               ],
+              id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
+                + '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
               name: {
                 value: 'Percentage CPU',
                 localizedValue: 'Percentage CPU'
@@ -126,7 +128,7 @@ describe('AzureMonitorDatasource', function() {
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).to.contain('/test/providers/Microsoft.Compute/virtualMachines/test/providers/microsoft.insights/metrics');
+          expect(options.url).to.contain('/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics');
           return ctx.$q.when({data: response, status: 200});
         };
       });
@@ -134,7 +136,7 @@ describe('AzureMonitorDatasource', function() {
       it('should return a list of datapoints', function() {
         return ctx.ds.query(options).then(function(results) {
           expect(results.data.length).to.be(1);
-          expect(results.data[0].target).to.equal('Percentage CPU');
+          expect(results.data[0].target).to.equal('testRN.Percentage CPU');
           expect(results.data[0].datapoints[0][1]).to.equal(1503435600000);
           expect(results.data[0].datapoints[0][0]).to.equal(1.0503333333333331);
           expect(results.data[0].datapoints[2][1]).to.equal(1503442800000);
@@ -161,6 +163,8 @@ describe('AzureMonitorDatasource', function() {
                   total: 1.0457499999999995
                 }
               ],
+              id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
+              + '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
               name: {
                 value: 'Percentage CPU',
                 localizedValue: 'Percentage CPU'
@@ -173,7 +177,7 @@ describe('AzureMonitorDatasource', function() {
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).to.contain('/test/providers/Microsoft.Compute/virtualMachines/test/providers/microsoft.insights/metrics');
+          expect(options.url).to.contain('/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics');
           return ctx.$q.when({data: response, status: 200});
         };
       });
@@ -181,7 +185,7 @@ describe('AzureMonitorDatasource', function() {
       it('should return a list of datapoints', function() {
         return ctx.ds.query(options).then(function(results) {
           expect(results.data.length).to.be(1);
-          expect(results.data[0].target).to.equal('Percentage CPU');
+          expect(results.data[0].target).to.equal('testRN.Percentage CPU');
           expect(results.data[0].datapoints[0][1]).to.equal(1503435600000);
           expect(results.data[0].datapoints[0][0]).to.equal(1.0503333333333331);
           expect(results.data[0].datapoints[2][1]).to.equal(1503442800000);

@@ -30,7 +30,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                             metricDefinition: this.defaultDropdownValue,
                             resourceName: this.defaultDropdownValue,
                             metricName: this.defaultDropdownValue,
-                            timeGrain: '',
+                            timeGrain: 1,
                             timeGrainUnit: 'minute'
                         },
                         appInsights: {

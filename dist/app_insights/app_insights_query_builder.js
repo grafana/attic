@@ -35,6 +35,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     }).map(function (target) {
                         var item = target.appInsights;
                         var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to, options.interval);
+                        debugger;
                         if (item.groupBy !== 'none') {
                             querystringBuilder.setGroupBy(item.groupBy);
                         }
