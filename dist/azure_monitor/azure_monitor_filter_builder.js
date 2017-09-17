@@ -24,22 +24,22 @@ System.register(['../time_grain_converter'], function(exports_1) {
                 AzureMonitorFilterBuilder.prototype.generateFilter = function () {
                     var filter = this.createDatetimeAndTimeGrainConditions();
                     if (this.aggregation) {
-                        filter += " and aggregationType eq '" + this.aggregation + "'";
+                        filter += "&aggregation=" + this.aggregation;
                     }
                     if (this.metricName && this.metricName.trim().length > 0) {
-                        filter += " and (name.value eq '" + this.metricName + "')";
+                        filter += "&metric=" + this.metricName;
                     }
                     return filter;
                 };
                 AzureMonitorFilterBuilder.prototype.createDatetimeAndTimeGrainConditions = function () {
-                    var dateTimeCondition = "startTime eq " + this.from.utc().format() + " and endTime eq " + this.to.utc().format();
+                    var dateTimeCondition = "timespan=" + this.from.utc().format() + "/" + this.to.utc().format();
                     if (this.timeGrain > 0) {
                         this.timeGrainInterval = time_grain_converter_1.default.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
                     }
                     else {
                         this.timeGrainInterval = this.calculateAutoTimeGrain();
                     }
-                    var timeGrainCondition = " and timeGrain eq duration'" + this.timeGrainInterval + "'";
+                    var timeGrainCondition = "&interval=" + this.timeGrainInterval;
                     return dateTimeCondition + timeGrainCondition;
                 };
                 AzureMonitorFilterBuilder.prototype.calculateAutoTimeGrain = function () {

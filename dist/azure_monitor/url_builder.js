@@ -9,7 +9,7 @@ System.register([], function(exports_1) {
                 }
                 UrlBuilder.buildAzureMonitorQueryUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter) {
                     return (baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
-                        ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&$filter=" + filter);
+                        ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
                 };
                 UrlBuilder.buildAzureMonitorGetMetricNamesUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName) {
                     return (baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +

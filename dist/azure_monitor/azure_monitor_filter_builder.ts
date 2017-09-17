@@ -25,25 +25,25 @@ export default class AzureMonitorFilterBuilder {
     let filter = this.createDatetimeAndTimeGrainConditions();
 
     if (this.aggregation) {
-      filter += ` and aggregationType eq '${this.aggregation}'`;
+      filter += `&aggregation=${this.aggregation}`;
     }
 
     if (this.metricName && this.metricName.trim().length > 0) {
-      filter += ` and (name.value eq '${this.metricName}')`;
+      filter += `&metric=${this.metricName}`;
     }
 
     return filter;
   }
 
   createDatetimeAndTimeGrainConditions() {
-    const dateTimeCondition = `startTime eq ${this.from.utc().format()} and endTime eq ${this.to.utc().format()}`;
+    const dateTimeCondition = `timespan=${this.from.utc().format()}/${this.to.utc().format()}`;
 
     if (this.timeGrain > 0) {
       this.timeGrainInterval = TimegrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
     } else {
       this.timeGrainInterval = this.calculateAutoTimeGrain();
     }
-    const timeGrainCondition = ` and timeGrain eq duration'${this.timeGrainInterval}'`;
+    const timeGrainCondition = `&interval=${this.timeGrainInterval}`;
 
     return dateTimeCondition + timeGrainCondition;
   }

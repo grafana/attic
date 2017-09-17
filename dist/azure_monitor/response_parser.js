@@ -18,10 +18,12 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     var data = [];
                     for (var i = 0; i < result.data.length; i++) {
                         for (var j = 0; j < result.data[i].data.value.length; j++) {
-                            data.push({
-                                target: ResponseParser.createTarget(result.data[i].data.value[j]),
-                                datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].data)
-                            });
+                            for (var k = 0; k < result.data[i].data.value[j].timeseries.length; k++) {
+                                data.push({
+                                    target: ResponseParser.createTarget(result.data[i].data.value[j]),
+                                    datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].timeseries[k].data)
+                                });
+                            }
                         }
                     }
                     return data;

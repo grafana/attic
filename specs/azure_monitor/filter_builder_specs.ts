@@ -5,6 +5,9 @@ import moment from 'moment';
 describe('AzureMonitorFilterBuilder', function() {
   let builder: AzureMonitorFilterBuilder;
 
+  const timefilter = 'timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z';
+  const metricFilter = 'metric=Percentage CPU';
+
   beforeEach(function() {
     builder = new AzureMonitorFilterBuilder(
       'Percentage CPU',
@@ -22,10 +25,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'PT3M' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=PT3M&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -37,10 +37,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'PT1M' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=PT1M&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -52,10 +49,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'PT10M' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=PT10M&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -67,20 +61,14 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'P1D' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=P1D&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
 
   describe('with a metric name and 1 hour time grain', function() {
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'PT1H' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=PT1H&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -91,10 +79,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z ` +
-        `and endTime eq 2017-08-22T07:00:00Z `+
-        `and timeGrain eq duration'PT1M' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=PT1M&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -105,10 +90,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should add time grain to the filter in ISO_8601 format', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z `+
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'P1D' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=P1D&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -120,11 +102,7 @@ describe('AzureMonitorFilterBuilder', function() {
     });
 
     it('should add time grain to the filter in ISO_8601 format', function() {
-      const filter = `startTime eq 2017-08-22T06:00:00Z `+
-        `and endTime eq 2017-08-22T07:00:00Z ` +
-        `and timeGrain eq duration'P1D' ` +
-        `and aggregationType eq 'Maximum' ` +
-        `and (name.value eq 'Percentage CPU')`;
+      const filter = timefilter + '&interval=P1D&aggregation=Maximum&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });

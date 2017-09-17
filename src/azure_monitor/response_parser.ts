@@ -8,10 +8,12 @@ export default class ResponseParser {
     const data = [];
     for (let i = 0; i < result.data.length; i++) {
       for (let j = 0; j < result.data[i].data.value.length; j++) {
-        data.push({
-          target: ResponseParser.createTarget(result.data[i].data.value[j]),
-          datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].data)
-        });
+        for (let k = 0; k < result.data[i].data.value[j].timeseries.length; k++) {
+          data.push({
+            target: ResponseParser.createTarget(result.data[i].data.value[j]),
+            datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].timeseries[k].data)
+          });
+        }
       }
     }
     return data;

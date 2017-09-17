@@ -100,18 +100,22 @@ describe('AzureMonitorDatasource', function() {
       const response = {
           value: [
             {
-              data: [
+              timeseries: [
                 {
-                  timeStamp: '2017-08-22T21:00:00Z',
-                  average: 1.0503333333333331
-                },
-                {
-                  timeStamp: '2017-08-22T22:00:00Z',
-                  average: 1.045083333333333
-                },
-                {
-                  timeStamp: '2017-08-22T23:00:00Z',
-                  average: 1.0457499999999995
+                  data: [
+                    {
+                      timeStamp: '2017-08-22T21:00:00Z',
+                      average: 1.0503333333333331
+                    },
+                    {
+                      timeStamp: '2017-08-22T22:00:00Z',
+                      average: 1.045083333333333
+                    },
+                    {
+                      timeStamp: '2017-08-22T23:00:00Z',
+                      average: 1.0457499999999995
+                    }
+                  ],
                 }
               ],
               id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
@@ -149,18 +153,22 @@ describe('AzureMonitorDatasource', function() {
       const response = {
           value: [
             {
-              data: [
+              timeseries: [
                 {
-                  timeStamp: '2017-08-22T21:00:00Z',
-                  total: 1.0503333333333331
-                },
-                {
-                  timeStamp: '2017-08-22T22:00:00Z',
-                  total: 1.045083333333333
-                },
-                {
-                  timeStamp: '2017-08-22T23:00:00Z',
-                  total: 1.0457499999999995
+                  data: [
+                    {
+                      timeStamp: '2017-08-22T21:00:00Z',
+                      total: 1.0503333333333331
+                    },
+                    {
+                      timeStamp: '2017-08-22T22:00:00Z',
+                      total: 1.045083333333333
+                    },
+                    {
+                      timeStamp: '2017-08-22T23:00:00Z',
+                      total: 1.0457499999999995
+                    }
+                  ],
                 }
               ],
               id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
