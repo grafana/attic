@@ -95,3 +95,7 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 #### v0.0.2
 
 - Changes legend format for Azure Monitor to `resourceName.metricName` instead of just `metricName`.
+
+#### v0.0.3
+
+Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does not currently change anything for the user but enables new features in the future.
