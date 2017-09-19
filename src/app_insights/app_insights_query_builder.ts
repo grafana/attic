@@ -32,7 +32,6 @@ export default class AppInsightsQueryBuilder {
         options.range.to,
         options.interval
       );
-      debugger;
 
       if (item.groupBy !== 'none') {
         querystringBuilder.setGroupBy(item.groupBy);
