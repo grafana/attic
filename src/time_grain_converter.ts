@@ -17,6 +17,10 @@ export default class TimeGrainConverter {
     const timeGrain = +interval.slice(0, interval.length - 1);
     const unit = interval[interval.length - 1];
 
+    if (interval.indexOf('ms') > -1) {
+      return TimeGrainConverter.createISO8601Duration(1, 'm');
+    }
+
     if (interval[interval.length - 1] === 's') {
       let toMinutes = (timeGrain * 60) % 60;
 

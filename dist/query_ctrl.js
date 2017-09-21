@@ -20,8 +20,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
             AzureMonitorQueryCtrl = (function (_super) {
                 __extends(AzureMonitorQueryCtrl, _super);
                 /** @ngInject **/
-                function AzureMonitorQueryCtrl($scope, $injector) {
+                function AzureMonitorQueryCtrl($scope, $injector, templateSrv) {
                     _super.call(this, $scope, $injector);
+                    this.templateSrv = templateSrv;
                     this.defaultDropdownValue = 'select';
                     this.defaults = {
                         queryType: 'Azure Monitor',
@@ -41,6 +42,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
                 }
+                AzureMonitorQueryCtrl.prototype.replace = function (variable) {
+                    return this.templateSrv.replace(variable, this.panelCtrl.panel.scopedVars);
+                };
                 /* Azure Monitor Section */
                 AzureMonitorQueryCtrl.prototype.getResourceGroups = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorQueryBuilder.isConfigured()) {
@@ -53,7 +57,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getMetricDefinitions(this.target.azureMonitor.resourceGroup);
+                    return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup));
                 };
                 AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
@@ -61,7 +65,8 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getResourceNames(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition);
+                    var rg = this.templateSrv.replace(this.target.azureMonitor.resourceGroup, this.panelCtrl.panel.scopedVars);
+                    return this.datasource.getResourceNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition));
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricNames = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
@@ -70,7 +75,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getMetricNames(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition, this.target.azureMonitor.resourceName);
+                    return this.datasource.getMetricNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName));
                 };
                 AzureMonitorQueryCtrl.prototype.onResourceGroupChange = function () {
                     this.target.azureMonitor.metricDefinition = this.defaultDropdownValue;
@@ -89,7 +94,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     if (!this.target.azureMonitor.metricName || this.target.azureMonitor.metricName === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getAggregations(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition, this.target.azureMonitor.resourceName, this.target.azureMonitor.metricName).then(function (aggData) {
+                    return this.datasource.getAggregations(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName), this.replace(this.target.azureMonitor.metricName)).then(function (aggData) {
                         _this.target.azureMonitor.aggOptions = aggData.supportedAggTypes;
                         _this.target.azureMonitor.aggregation = aggData.primaryAggType;
                         return _this.refresh();
@@ -110,7 +115,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     if (!this.target.appInsights.metricName || this.target.appInsights.metricName === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getAppInsightsMetricMetadata(this.target.appInsights.metricName)
+                    return this.datasource.getAppInsightsMetricMetadata(this.replace(this.target.appInsights.metricName))
                         .then(function (aggData) {
                         _this.target.appInsights.aggOptions = aggData.supportedAggTypes;
                         _this.target.appInsights.groupByOptions = aggData.supportedGroupBy;

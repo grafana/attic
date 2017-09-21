@@ -72,8 +72,9 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         var resourceName = _this.templateSrv.replace(item.resourceName, options.scopedVars);
                         var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
                         var metricName = _this.templateSrv.replace(item.metricName, options.scopedVars);
+                        var timeGrain = _this.templateSrv.replace(item.timeGrain, options.scopedVars);
                         var apiVersion = '2017-05-01-preview';
-                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, item.timeGrain, item.timeGrainUnit, options.interval);
+                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, timeGrain, item.timeGrainUnit, options.interval);
                         if (item.aggregation) {
                             filterBuilder.setAggregation(item.aggregation);
                         }

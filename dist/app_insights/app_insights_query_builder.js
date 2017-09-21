@@ -39,8 +39,8 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                             querystringBuilder.setGroupBy(item.groupBy);
                         }
                         querystringBuilder.setAggregation(item.aggregation);
-                        querystringBuilder.setInterval(item.timeGrainType, item.timeGrain, item.timeGrainUnit);
-                        var url = _this.baseUrl + "/" + item.metricName + "?" + querystringBuilder.generate();
+                        querystringBuilder.setInterval(item.timeGrainType, _this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
+                        var url = _this.baseUrl + "/" + _this.templateSrv.replace(item.metricName, options.scopedVars) + "?" + querystringBuilder.generate();
                         return {
                             refId: target.refId,
                             intervalMs: options.intervalMs,

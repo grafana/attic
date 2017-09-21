@@ -21,6 +21,9 @@ System.register(['lodash'], function(exports_1) {
                 TimeGrainConverter.createISO8601DurationFromInterval = function (interval) {
                     var timeGrain = +interval.slice(0, interval.length - 1);
                     var unit = interval[interval.length - 1];
+                    if (interval.indexOf('ms') > -1) {
+                        return TimeGrainConverter.createISO8601Duration(1, 'm');
+                    }
                     if (interval[interval.length - 1] === 's') {
                         var toMinutes = (timeGrain * 60) % 60;
                         if (toMinutes < 1) {

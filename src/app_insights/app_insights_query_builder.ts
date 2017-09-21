@@ -37,9 +37,9 @@ export default class AppInsightsQueryBuilder {
         querystringBuilder.setGroupBy(item.groupBy);
       }
       querystringBuilder.setAggregation(item.aggregation);
-      querystringBuilder.setInterval(item.timeGrainType, item.timeGrain, item.timeGrainUnit);
+      querystringBuilder.setInterval(item.timeGrainType, this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
 
-      const url = `${this.baseUrl}/${item.metricName}?${querystringBuilder.generate()}`;
+      const url = `${this.baseUrl}/${this.templateSrv.replace(item.metricName, options.scopedVars)}?${querystringBuilder.generate()}`;
 
       return {
         refId: target.refId,

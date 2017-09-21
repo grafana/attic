@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import { QueryCtrl } from 'app/plugins/sdk';
 export declare class AzureMonitorQueryCtrl extends QueryCtrl {
+    private templateSrv;
     static templateUrl: string;
     defaultDropdownValue: string;
     defaults: {
@@ -20,7 +21,8 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
         };
     };
     /** @ngInject **/
-    constructor($scope: any, $injector: any);
+    constructor($scope: any, $injector: any, templateSrv: any);
+    replace(variable: string): any;
     getResourceGroups(query: any): any;
     getMetricDefinitions(query: any): any;
     getResourceNames(query: any): any;

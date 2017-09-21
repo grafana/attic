@@ -15,6 +15,7 @@
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Resource Group</label>
         <gf-form-dropdown model="ctrl.target.azureMonitor.resourceGroup"
+          allow-custom="true"
           lookup-text="true"
           get-options="ctrl.getResourceGroups($query)"
           on-change="ctrl.onResourceGroupChange()"
@@ -24,6 +25,7 @@
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Namespace</label>
         <gf-form-dropdown model="ctrl.target.azureMonitor.metricDefinition"
+          allow-custom="true"
           lookup-text="true"
           get-options="ctrl.getMetricDefinitions($query)"
           on-change="ctrl.onMetricDefinitionChange()"
@@ -33,6 +35,7 @@
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Resource Name</label>
         <gf-form-dropdown model="ctrl.target.azureMonitor.resourceName"
+          allow-custom="true"
           lookup-text="true"
           get-options="ctrl.getResourceNames($query)"
           on-change="ctrl.onResourceNameChange()"
@@ -47,6 +50,7 @@
       <div class="gf-form">
           <label class="gf-form-label query-keyword width-9">Metric</label>
           <gf-form-dropdown model="ctrl.target.azureMonitor.metricName"
+            allow-custom="true"
             lookup-text="true"
             get-options="ctrl.getMetricNames($query)"
             on-change="ctrl.onMetricNameChange()"
@@ -84,6 +88,7 @@
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Metric</label>
         <gf-form-dropdown model="ctrl.target.appInsights.metricName"
+          allow-custom="true"
           lookup-text="true"
           get-options="ctrl.getAppInsightsMetricNames($query)"
           on-change="ctrl.onAppInsightsMetricNameChange()"
@@ -104,6 +109,7 @@
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Group By</label>
         <gf-form-dropdown
+          allow-custom="true"
           ng-hide="ctrl.target.appInsights.groupBy !== 'none'"
           model="ctrl.target.appInsights.groupBy"
           lookup-text="true"

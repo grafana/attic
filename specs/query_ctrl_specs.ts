@@ -1,5 +1,6 @@
 import {describe, beforeEach, it, sinon, expect} from './lib/common';
 import {AzureMonitorQueryCtrl} from '../src/query_ctrl';
+import TemplateSrvStub from './lib/template_srv_stub';
 import Q from 'q';
 import moment from 'moment';
 
@@ -7,7 +8,7 @@ describe('AzureMonitorQueryCtrl', function() {
   let queryCtrl;
 
   beforeEach(function() {
-    queryCtrl = new AzureMonitorQueryCtrl({}, {});
+    queryCtrl = new AzureMonitorQueryCtrl({}, {}, new TemplateSrvStub());
     queryCtrl.datasource = {$q: Q};
   });
 

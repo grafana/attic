@@ -27,10 +27,14 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   };
 
   /** @ngInject **/
-  constructor($scope, $injector) {
+  constructor($scope, $injector, private templateSrv) {
     super($scope, $injector);
 
     _.defaultsDeep(this.target, this.defaults);
+  }
+
+  replace(variable: string) {
+    return this.templateSrv.replace(variable, this.panelCtrl.panel.scopedVars);
   }
 
   /* Azure Monitor Section */
@@ -47,7 +51,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
       return;
     }
-    return this.datasource.getMetricDefinitions(this.target.azureMonitor.resourceGroup);
+    return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup));
   }
 
   getResourceNames(query) {
@@ -57,7 +61,12 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       return;
     }
 
-    return this.datasource.getResourceNames(this.target.azureMonitor.resourceGroup, this.target.azureMonitor.metricDefinition);
+    const rg = this.templateSrv.replace(this.target.azureMonitor.resourceGroup, this.panelCtrl.panel.scopedVars);
+
+    return this.datasource.getResourceNames(
+      this.replace(this.target.azureMonitor.resourceGroup),
+      this.replace(this.target.azureMonitor.metricDefinition)
+    );
   }
 
   getMetricNames(query) {
@@ -69,9 +78,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     }
 
     return this.datasource.getMetricNames(
-      this.target.azureMonitor.resourceGroup,
-      this.target.azureMonitor.metricDefinition,
-      this.target.azureMonitor.resourceName
+      this.replace(this.target.azureMonitor.resourceGroup),
+      this.replace(this.target.azureMonitor.metricDefinition),
+      this.replace(this.target.azureMonitor.resourceName)
     );
   }
 
@@ -96,10 +105,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     }
 
     return this.datasource.getAggregations(
-      this.target.azureMonitor.resourceGroup,
-      this.target.azureMonitor.metricDefinition,
-      this.target.azureMonitor.resourceName,
-      this.target.azureMonitor.metricName
+      this.replace(this.target.azureMonitor.resourceGroup),
+      this.replace(this.target.azureMonitor.metricDefinition),
+      this.replace(this.target.azureMonitor.resourceName),
+      this.replace(this.target.azureMonitor.metricName)
     ).then(aggData => {
       this.target.azureMonitor.aggOptions = aggData.supportedAggTypes;
       this.target.azureMonitor.aggregation = aggData.primaryAggType;
@@ -124,7 +133,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       return;
     }
 
-    return this.datasource.getAppInsightsMetricMetadata(this.target.appInsights.metricName)
+    return this.datasource.getAppInsightsMetricMetadata(this.replace(this.target.appInsights.metricName))
       .then(aggData => {
         this.target.appInsights.aggOptions = aggData.supportedAggTypes;
         this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
