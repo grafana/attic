@@ -6,6 +6,7 @@ import UrlBuilder from './url_builder';
 import ResponseParser from './response_parser';
 
 export default class AzureMonitorQueryBuilder {
+  apiVersion = '2017-05-01-preview';
   id: number;
   subscriptionId: string;
   baseUrl: string;
@@ -65,7 +66,7 @@ export default class AzureMonitorQueryBuilder {
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
       const metricName = this.templateSrv.replace(item.metricName, options.scopedVars);
       const timeGrain = this.templateSrv.replace(item.timeGrain, options.scopedVars);
-      const apiVersion = '2017-05-01-preview';
+
       const filterBuilder = new AzureMonitorFilterBuilder(
         item.metricName,
         options.range.from,
@@ -86,7 +87,7 @@ export default class AzureMonitorQueryBuilder {
         resourceGroup,
         metricDefinition,
         resourceName,
-        apiVersion,
+        this.apiVersion,
         filter
       );
 
@@ -166,7 +167,8 @@ export default class AzureMonitorQueryBuilder {
       this.baseUrl,
       resourceGroup,
       metricDefinition,
-      resourceName
+      resourceName,
+      this.apiVersion
     );
 
     return this.doRequest(url).then(result => {
@@ -179,7 +181,8 @@ export default class AzureMonitorQueryBuilder {
       this.baseUrl,
       resourceGroup,
       metricDefinition,
-      resourceName
+      resourceName,
+      this.apiVersion
     );
 
     return this.doRequest(url).then(result => {

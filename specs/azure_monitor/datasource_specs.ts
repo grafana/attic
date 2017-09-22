@@ -81,7 +81,7 @@ describe('AzureMonitorDatasource', function() {
       },
       targets: [
         {
-          apiVersion: '2016-09-01',
+          apiVersion: '2017-05-01-preview',
           refId: 'A',
           queryType: 'Azure Monitor',
           azureMonitor: {
@@ -357,7 +357,7 @@ describe('AzureMonitorDatasource', function() {
       ctx.backendSrv.datasourceRequest = function(options) {
         const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
         const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
-          '/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01';
+          '/providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview';
         expect(options.url).to.be(expected);
         return ctx.$q.when(response);
       };
@@ -416,7 +416,7 @@ describe('AzureMonitorDatasource', function() {
       ctx.backendSrv.datasourceRequest = function(options) {
         const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
         const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
-          '/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01';
+          '/providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview';
         expect(options.url).to.be(expected);
         return ctx.$q.when(response);
       };

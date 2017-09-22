@@ -4,6 +4,7 @@ export default class AzureMonitorQueryBuilder {
     private backendSrv;
     private templateSrv;
     private $q;
+    apiVersion: string;
     id: number;
     subscriptionId: string;
     baseUrl: string;

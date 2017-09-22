@@ -23,6 +23,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
                     this.$q = $q;
+                    this.apiVersion = '2017-05-01-preview';
                     this.defaultDropdownValue = 'select';
                     this.supportedMetricNamespaces = [
                         'Microsoft.Compute',
@@ -73,13 +74,12 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
                         var metricName = _this.templateSrv.replace(item.metricName, options.scopedVars);
                         var timeGrain = _this.templateSrv.replace(item.timeGrain, options.scopedVars);
-                        var apiVersion = '2017-05-01-preview';
                         var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, timeGrain, item.timeGrainUnit, options.interval);
                         if (item.aggregation) {
                             filterBuilder.setAggregation(item.aggregation);
                         }
                         var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
-                        var url = url_builder_1.default.buildAzureMonitorQueryUrl(_this.baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter);
+                        var url = url_builder_1.default.buildAzureMonitorQueryUrl(_this.baseUrl, resourceGroup, metricDefinition, resourceName, _this.apiVersion, filter);
                         return {
                             refId: target.refId,
                             intervalMs: options.intervalMs,
@@ -143,13 +143,13 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
-                    var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName);
+                    var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName, this.apiVersion);
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'name.localizedValue', 'name.value');
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.getAggregations = function (resourceGroup, metricDefinition, resourceName, metricName) {
-                    var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName);
+                    var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName, this.apiVersion);
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseAggregations(result, metricName);
                     });

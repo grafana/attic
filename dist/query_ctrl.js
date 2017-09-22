@@ -95,7 +95,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                         return;
                     }
                     return this.datasource.getAggregations(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName), this.replace(this.target.azureMonitor.metricName)).then(function (aggData) {
-                        _this.target.azureMonitor.aggOptions = aggData.supportedAggTypes;
+                        _this.target.azureMonitor.aggOptions = aggData.supportedAggTypes || [aggData.primaryAggType];
                         _this.target.azureMonitor.aggregation = aggData.primaryAggType;
                         return _this.refresh();
                     });

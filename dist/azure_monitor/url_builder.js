@@ -8,12 +8,22 @@ System.register([], function(exports_1) {
                 function UrlBuilder() {
                 }
                 UrlBuilder.buildAzureMonitorQueryUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter) {
+                    if (metricDefinition === 'Microsoft.Sql/servers/databases') {
+                        var rn = resourceName.split('/');
+                        return (baseUrl + "/" + resourceGroup + "/providers/Microsoft.Sql/servers/" + rn[0] + "/databases/" + rn[1]) +
+                            ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
+                    }
                     return (baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
                         ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
                 };
-                UrlBuilder.buildAzureMonitorGetMetricNamesUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName) {
+                UrlBuilder.buildAzureMonitorGetMetricNamesUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion) {
+                    if (metricDefinition === 'Microsoft.Sql/servers/databases') {
+                        var rn = resourceName.split('/');
+                        return (baseUrl + "/" + resourceGroup + "/providers/Microsoft.Sql/servers/" + rn[0] + "/databases/" + rn[1]) +
+                            ("/providers/microsoft.insights/metricdefinitions?api-version=" + apiVersion);
+                    }
                     return (baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
-                        "/providers/microsoft.insights/metricdefinitions?api-version=2016-03-01";
+                        ("/providers/microsoft.insights/metricdefinitions?api-version=" + apiVersion);
                 };
                 return UrlBuilder;
             })();

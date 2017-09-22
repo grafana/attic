@@ -110,7 +110,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       this.replace(this.target.azureMonitor.resourceName),
       this.replace(this.target.azureMonitor.metricName)
     ).then(aggData => {
-      this.target.azureMonitor.aggOptions = aggData.supportedAggTypes;
+      this.target.azureMonitor.aggOptions = aggData.supportedAggTypes || [aggData.primaryAggType];
       this.target.azureMonitor.aggregation = aggData.primaryAggType;
       return this.refresh();
     });
