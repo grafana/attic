@@ -173,6 +173,7 @@ describe('AzureMonitorQueryCtrl', function() {
       const response = {
         primaryAggType: 'Average',
         supportAggOptions: ['Average', 'Total'],
+        dimensions: []
       };
 
       beforeEach(function() {
@@ -180,7 +181,7 @@ describe('AzureMonitorQueryCtrl', function() {
         queryCtrl.target.azureMonitor.metricDefinition = 'Microsoft.Compute/virtualMachines';
         queryCtrl.target.azureMonitor.resourceName = 'test';
         queryCtrl.target.azureMonitor.metricName = 'Percentage CPU';
-        queryCtrl.datasource.getAggregations = function(resourceGroup, metricDefinition, resourceName, metricName) {
+        queryCtrl.datasource.getMetricMetadata = function(resourceGroup, metricDefinition, resourceName, metricName) {
           expect(resourceGroup).to.be('test');
           expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
           expect(resourceName).to.be('test');
@@ -189,7 +190,7 @@ describe('AzureMonitorQueryCtrl', function() {
         };
       });
 
-      it('should set the options and default selecteed value for the Aggregations dropdown', function() {
+      it('should set the options and default selected value for the Aggregations dropdown', function() {
         queryCtrl.onMetricNameChange().then(() => {
           expect(queryCtrl.target.azureMonitor.aggregation).to.be('Average');
           expect(queryCtrl.target.azureMonitor.aggOptions).to.be(['Average', 'Total']);

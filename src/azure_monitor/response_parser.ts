@@ -67,13 +67,34 @@ export default class ResponseParser {
     return list;
   }
 
-  static parseAggregations(result: any, metricName: string) {
+  static parseMetadata(result: any, metricName: string) {
     const metricData = _.find(result.data.value, o => {
       return _.get(o, 'name.value') === metricName;
     });
+
     return {
       primaryAggType: metricData.primaryAggregationType,
-      supportedAggTypes: metricData.supportedAggregationTypes
+      supportedAggTypes: metricData.supportedAggregationTypes,
+      dimensions: ResponseParser.parseDimensions(metricData)
     };
+  }
+
+  static parseDimensions(metricData: any) {
+    const dimensions = [];
+    if (!metricData.dimensions || metricData.dimensions.length === 0) {
+      return dimensions;
+    }
+
+    if (!metricData.isDimensionRequired) {
+      dimensions.push({text: 'None', value: 'None'});
+    }
+
+    for (let i = 0; i < metricData.dimensions.length; i++) {
+      dimensions.push({
+        text: metricData.dimensions[i].localizedValue,
+        value: metricData.dimensions[i].value
+      });
+    }
+    return dimensions;
   }
 }

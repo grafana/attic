@@ -67,14 +67,31 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     }
                     return list;
                 };
-                ResponseParser.parseAggregations = function (result, metricName) {
+                ResponseParser.parseMetadata = function (result, metricName) {
                     var metricData = lodash_1.default.find(result.data.value, function (o) {
                         return lodash_1.default.get(o, 'name.value') === metricName;
                     });
                     return {
                         primaryAggType: metricData.primaryAggregationType,
-                        supportedAggTypes: metricData.supportedAggregationTypes
+                        supportedAggTypes: metricData.supportedAggregationTypes,
+                        dimensions: ResponseParser.parseDimensions(metricData)
                     };
+                };
+                ResponseParser.parseDimensions = function (metricData) {
+                    var dimensions = [];
+                    if (!metricData.dimensions || metricData.dimensions.length === 0) {
+                        return dimensions;
+                    }
+                    if (!metricData.isDimensionRequired) {
+                        dimensions.push({ text: 'None', value: 'None' });
+                    }
+                    for (var i = 0; i < metricData.dimensions.length; i++) {
+                        dimensions.push({
+                            text: metricData.dimensions[i].localizedValue,
+                            value: metricData.dimensions[i].value
+                        });
+                    }
+                    return dimensions;
                 };
                 return ResponseParser;
             })();

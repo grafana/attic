@@ -80,6 +80,10 @@ export default class AzureMonitorQueryBuilder {
         filterBuilder.setAggregation(item.aggregation);
       }
 
+      if (item.dimension && item.dimension !== 'None') {
+        filterBuilder.setDimensionFilter(item.dimension, item.dimensionFilter);
+      }
+
       const filter = this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
 
       const url = UrlBuilder.buildAzureMonitorQueryUrl(
@@ -176,7 +180,7 @@ export default class AzureMonitorQueryBuilder {
     });
   }
 
-  getAggregations(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
+  getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
     const url = UrlBuilder.buildAzureMonitorGetMetricNamesUrl(
       this.baseUrl,
       resourceGroup,
@@ -186,7 +190,7 @@ export default class AzureMonitorQueryBuilder {
     );
 
     return this.doRequest(url).then(result => {
-      return ResponseParser.parseAggregations(result, metricName);
+      return ResponseParser.parseMetadata(result, metricName);
     });
   }
 

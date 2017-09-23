@@ -13,6 +13,7 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
             metricName: string;
             timeGrain: number;
             timeGrainUnit: string;
+            dimensionFilter: string;
         };
         appInsights: {
             metricName: string;

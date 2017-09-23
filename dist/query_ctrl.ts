@@ -17,7 +17,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       resourceName: this.defaultDropdownValue,
       metricName: this.defaultDropdownValue,
       timeGrain: 1,
-      timeGrainUnit: 'minute'
+      timeGrainUnit: 'minute',
+      dimensionFilter: '*'
     },
     appInsights: {
       metricName: this.defaultDropdownValue,
@@ -104,14 +105,18 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       return;
     }
 
-    return this.datasource.getAggregations(
+    return this.datasource.getMetricMetadata(
       this.replace(this.target.azureMonitor.resourceGroup),
       this.replace(this.target.azureMonitor.metricDefinition),
       this.replace(this.target.azureMonitor.resourceName),
       this.replace(this.target.azureMonitor.metricName)
-    ).then(aggData => {
-      this.target.azureMonitor.aggOptions = aggData.supportedAggTypes || [aggData.primaryAggType];
-      this.target.azureMonitor.aggregation = aggData.primaryAggType;
+    ).then(metadata => {
+      this.target.azureMonitor.aggOptions = metadata.supportedAggTypes || [metadata.primaryAggType];
+      this.target.azureMonitor.aggregation = metadata.primaryAggType;
+      this.target.azureMonitor.dimensions = metadata.dimensions;
+      if (metadata.dimensions.length > 0) {
+        this.target.azureMonitor.dimension = metadata.dimensions[0].value;
+      }
       return this.refresh();
     });
   }

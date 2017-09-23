@@ -106,4 +106,16 @@ describe('AzureMonitorFilterBuilder', function() {
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
+
+  describe('with a metric name and 1 day time grain and an aggregation', function() {
+    beforeEach(function() {
+      builder.setDimensionFilter('aDimension', 'aFilterValue');
+    });
+
+    it('should add time grain to the filter in ISO_8601 format', function() {
+      const filter = timefilter + '&interval=PT1H&' + metricFilter
+        + `&$filter=aDimension eq 'aFilterValue'`;
+      expect(builder.generateFilter()).to.equal(filter);
+    });
+  });
 });

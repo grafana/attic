@@ -22,7 +22,7 @@ export default class AzureMonitorQueryBuilder {
     getMetricDefinitions(resourceGroup: string): any;
     getResourceNames(resourceGroup: string, metricDefinition: string): any;
     getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
-    getAggregations(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
+    getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
     testDatasource(): any;
     doRequest(url: any, maxRetries?: number): any;
 }

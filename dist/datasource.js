@@ -91,8 +91,8 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                 AzureMonitorDatasource.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
                     return this.azureMonitorQueryBuilder.getMetricNames(resourceGroup, metricDefinition, resourceName);
                 };
-                AzureMonitorDatasource.prototype.getAggregations = function (resourceGroup, metricDefinition, resourceName, metricName) {
-                    return this.azureMonitorQueryBuilder.getAggregations(resourceGroup, metricDefinition, resourceName, metricName);
+                AzureMonitorDatasource.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
+                    return this.azureMonitorQueryBuilder.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
                 };
                 /* Application Insights API method */
                 AzureMonitorDatasource.prototype.getAppInsightsMetricNames = function () {

@@ -7,6 +7,8 @@ import TimegrainConverter from '../time_grain_converter';
 export default class AzureMonitorFilterBuilder {
   aggregation: string;
   timeGrainInterval = '';
+  dimension: string;
+  dimensionFilter: string;
 
   constructor(
     private metricName: string,
@@ -21,6 +23,11 @@ export default class AzureMonitorFilterBuilder {
     this.aggregation = agg;
   }
 
+  setDimensionFilter(dimension, dimensionFilter) {
+    this.dimension = dimension;
+    this.dimensionFilter = dimensionFilter;
+  }
+
   generateFilter() {
     let filter = this.createDatetimeAndTimeGrainConditions();
 
@@ -30,6 +37,10 @@ export default class AzureMonitorFilterBuilder {
 
     if (this.metricName && this.metricName.trim().length > 0) {
       filter += `&metric=${this.metricName}`;
+    }
+
+    if (this.dimension && this.dimensionFilter && this.dimensionFilter.trim().length > 0) {
+      filter += `&$filter=${this.dimension} eq '${this.dimensionFilter}'`;
     }
 
     return filter;

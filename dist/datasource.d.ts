@@ -19,7 +19,7 @@ export default class AzureMonitorDatasource {
     getMetricDefinitions(resourceGroup: string): any;
     getResourceNames(resourceGroup: string, metricDefinition: string): any;
     getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
-    getAggregations(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
+    getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
     getAppInsightsMetricNames(): any;
     getAppInsightsMetricMetadata(metricName: any): any;
 }

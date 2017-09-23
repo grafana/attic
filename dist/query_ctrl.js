@@ -32,7 +32,8 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                             resourceName: this.defaultDropdownValue,
                             metricName: this.defaultDropdownValue,
                             timeGrain: 1,
-                            timeGrainUnit: 'minute'
+                            timeGrainUnit: 'minute',
+                            dimensionFilter: '*'
                         },
                         appInsights: {
                             metricName: this.defaultDropdownValue,
@@ -94,9 +95,13 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     if (!this.target.azureMonitor.metricName || this.target.azureMonitor.metricName === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getAggregations(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName), this.replace(this.target.azureMonitor.metricName)).then(function (aggData) {
-                        _this.target.azureMonitor.aggOptions = aggData.supportedAggTypes || [aggData.primaryAggType];
-                        _this.target.azureMonitor.aggregation = aggData.primaryAggType;
+                    return this.datasource.getMetricMetadata(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName), this.replace(this.target.azureMonitor.metricName)).then(function (metadata) {
+                        _this.target.azureMonitor.aggOptions = metadata.supportedAggTypes || [metadata.primaryAggType];
+                        _this.target.azureMonitor.aggregation = metadata.primaryAggType;
+                        _this.target.azureMonitor.dimensions = metadata.dimensions;
+                        if (metadata.dimensions.length > 0) {
+                            _this.target.azureMonitor.dimension = metadata.dimensions[0].value;
+                        }
                         return _this.refresh();
                     });
                 };

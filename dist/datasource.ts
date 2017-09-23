@@ -102,8 +102,8 @@ export default class AzureMonitorDatasource {
     return this.azureMonitorQueryBuilder.getMetricNames(resourceGroup, metricDefinition, resourceName);
   }
 
-  getAggregations(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
-    return this.azureMonitorQueryBuilder.getAggregations(resourceGroup, metricDefinition, resourceName, metricName);
+  getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
+    return this.azureMonitorQueryBuilder.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
   }
 
   /* Application Insights API method */

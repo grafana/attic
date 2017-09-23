@@ -374,7 +374,7 @@ describe('AzureMonitorDatasource', function() {
     });
   });
 
-  describe('When performing getAggregations', function() {
+  describe('When performing getMetricMetadata', function() {
     const response = {
       data: {
         value: [
@@ -423,9 +423,89 @@ describe('AzureMonitorDatasource', function() {
     });
 
     it('should return Aggregation metadata for a Metric', function() {
-      return ctx.ds.getAggregations('nodeapp', 'microsoft.insights/components', 'resource1', 'UsedCapacity').then(function(results) {
+      return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'UsedCapacity').then(function(results) {
         expect(results.primaryAggType).to.equal('Total');
         expect(results.supportedAggTypes.length).to.equal(6);
+      });
+    });
+  });
+
+  describe('When performing getMetricMetadata on metrics with dimensions', function() {
+    const response = {
+      data: {
+        value: [
+          {
+            name: {
+              value: 'Transactions',
+              localizedValue: 'Transactions'
+            },
+            unit: 'Count',
+            primaryAggregationType: 'Total',
+            supportedAggregationTypes: [
+              'None',
+              'Average',
+              'Minimum',
+              'Maximum',
+              'Total',
+              'Count'
+            ],
+            isDimensionRequired: false,
+            dimensions: [
+              {
+                  value: 'ResponseType',
+                  localizedValue: 'Response type'
+              },
+              {
+                  value: 'GeoType',
+                  localizedValue: 'Geo type'
+              },
+              {
+                  value: 'ApiName',
+                  localizedValue: 'API name'
+              }
+            ]
+          },
+          {
+            name: {
+              value: 'FreeCapacity',
+              localizedValue: 'Free capacity'
+            },
+            unit: 'CountPerSecond',
+            primaryAggregationType: 'Average',
+            supportedAggregationTypes: [
+              'None',
+              'Average',
+            ]
+          },
+        ]
+      },
+      status: 200,
+      statusText: 'OK'
+    };
+
+    beforeEach(function() {
+      ctx.backendSrv.datasourceRequest = function(options) {
+        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
+        const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
+          '/providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview';
+        expect(options.url).to.be(expected);
+        return ctx.$q.when(response);
+      };
+    });
+
+    it('should return dimensions for a Metric that has dimensions', function() {
+      return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'Transactions').then(function(results) {
+        expect(results.dimensions.length).to.equal(4);
+        expect(results.dimensions[0].text).to.equal('None');
+        expect(results.dimensions[0].value).to.equal('None');
+        expect(results.dimensions[1].text).to.equal('Response type');
+        expect(results.dimensions[1].value).to.equal('ResponseType');
+      });
+    });
+
+    it('should return an empty array for a Metric that does not have dimensions', function() {
+      return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'FreeCapacity').then(function(results) {
+        expect(results.dimensions.length).to.equal(0);
       });
     });
   });

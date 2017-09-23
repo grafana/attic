@@ -21,6 +21,10 @@ System.register(['../time_grain_converter'], function(exports_1) {
                 AzureMonitorFilterBuilder.prototype.setAggregation = function (agg) {
                     this.aggregation = agg;
                 };
+                AzureMonitorFilterBuilder.prototype.setDimensionFilter = function (dimension, dimensionFilter) {
+                    this.dimension = dimension;
+                    this.dimensionFilter = dimensionFilter;
+                };
                 AzureMonitorFilterBuilder.prototype.generateFilter = function () {
                     var filter = this.createDatetimeAndTimeGrainConditions();
                     if (this.aggregation) {
@@ -28,6 +32,9 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     }
                     if (this.metricName && this.metricName.trim().length > 0) {
                         filter += "&metric=" + this.metricName;
+                    }
+                    if (this.dimension && this.dimensionFilter && this.dimensionFilter.trim().length > 0) {
+                        filter += "&$filter=" + this.dimension + " eq '" + this.dimensionFilter + "'";
                     }
                     return filter;
                 };

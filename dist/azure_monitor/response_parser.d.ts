@@ -6,8 +6,10 @@ export default class ResponseParser {
     static dateTimeToEpoch(dateTime: any): any;
     static getKeyForAggregationField(dataObj: any): any;
     static parseResponseValues(result: any, textFieldName: string, valueFieldName: string): any[];
-    static parseAggregations(result: any, metricName: string): {
+    static parseMetadata(result: any, metricName: string): {
         primaryAggType: any;
         supportedAggTypes: any;
+        dimensions: any[];
     };
+    static parseDimensions(metricData: any): any[];
 }
