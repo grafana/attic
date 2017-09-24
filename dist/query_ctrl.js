@@ -82,13 +82,19 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!'], functi
                     this.target.azureMonitor.metricDefinition = this.defaultDropdownValue;
                     this.target.azureMonitor.resourceName = this.defaultDropdownValue;
                     this.target.azureMonitor.metricName = this.defaultDropdownValue;
+                    this.target.azureMonitor.dimensions = [];
+                    this.target.azureMonitor.dimension = '';
                 };
                 AzureMonitorQueryCtrl.prototype.onMetricDefinitionChange = function () {
                     this.target.azureMonitor.resourceName = this.defaultDropdownValue;
                     this.target.azureMonitor.metricName = this.defaultDropdownValue;
+                    this.target.azureMonitor.dimensions = [];
+                    this.target.azureMonitor.dimension = '';
                 };
                 AzureMonitorQueryCtrl.prototype.onResourceNameChange = function () {
                     this.target.azureMonitor.metricName = this.defaultDropdownValue;
+                    this.target.azureMonitor.dimensions = [];
+                    this.target.azureMonitor.dimension = '';
                 };
                 AzureMonitorQueryCtrl.prototype.onMetricNameChange = function () {
                     var _this = this;

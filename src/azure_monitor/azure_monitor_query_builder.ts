@@ -146,22 +146,52 @@ export default class AzureMonitorQueryBuilder {
 
         return false;
       });
+    }).then(result => {
+      let shouldHardcodeBlobStorage = false;
+      for (let i = 0; i < result.length; i++){
+        if (result[i].value === 'Microsoft.Storage/storageAccounts') {
+          shouldHardcodeBlobStorage = true;
+          break;
+        }
+      }
+
+      if (shouldHardcodeBlobStorage) {
+        result.push({
+          text: 'Microsoft.Storage/storageAccounts/blobServices',
+          value: 'Microsoft.Storage/storageAccounts/blobServices'
+        });
+        result.push({
+          text: 'Microsoft.Storage/storageAccounts/fileServices',
+          value: 'Microsoft.Storage/storageAccounts/fileServices'
+        });
+        result.push({
+          text: 'Microsoft.Storage/storageAccounts/tableServices',
+          value: 'Microsoft.Storage/storageAccounts/tableServices'
+        });
+        result.push({
+          text: 'Microsoft.Storage/storageAccounts/queueServices',
+          value: 'Microsoft.Storage/storageAccounts/queueServices'
+        });
+      }
+
+      return result;
     });
   }
 
   getResourceNames(resourceGroup: string, metricDefinition: string) {
     const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
-    const list = [];
 
     return this.doRequest(url).then(result => {
-      for (let i = 0; i < result.data.value.length; i++) {
-        if (result.data.value[i].type === metricDefinition) {
-          list.push({
-            text: result.data.value[i].name,
-            value: result.data.value[i].name
-          });
-        }
+      if (!_.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
+        return ResponseParser.parseResourceNames(result, metricDefinition);
       }
+
+      const list = ResponseParser.parseResourceNames(result, 'Microsoft.Storage/storageAccounts');
+      for (let i = 0; i < list.length; i++) {
+        list[i].text += '/default';
+        list[i].value += '/default';
+      }
+
       return list;
     });
   }

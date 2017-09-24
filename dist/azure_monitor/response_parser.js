@@ -20,7 +20,7 @@ System.register(['moment', 'lodash'], function(exports_1) {
                         for (var j = 0; j < result.data[i].data.value.length; j++) {
                             for (var k = 0; k < result.data[i].data.value[j].timeseries.length; k++) {
                                 data.push({
-                                    target: ResponseParser.createTarget(result.data[i].data.value[j]),
+                                    target: ResponseParser.createTarget(result.data[i].data.value[j], result.data[i].data.value[j].timeseries[k].metadatavalues),
                                     datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].timeseries[k].data)
                                 });
                             }
@@ -28,10 +28,13 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     }
                     return data;
                 };
-                ResponseParser.createTarget = function (data) {
+                ResponseParser.createTarget = function (data, metadatavalues) {
                     var endIndex = data.id.lastIndexOf('/providers');
                     var startIndex = data.id.slice(0, endIndex).lastIndexOf('/') + 1;
                     var resourceName = data.id.substring(startIndex, endIndex);
+                    if (metadatavalues && metadatavalues.length > 0) {
+                        return resourceName + "{" + metadatavalues[0].name.value + "=" + metadatavalues[0].value + "}." + data.name.value;
+                    }
                     return resourceName + "." + data.name.value;
                 };
                 ResponseParser.convertDataToPoints = function (timeSeriesData) {
@@ -62,6 +65,18 @@ System.register(['moment', 'lodash'], function(exports_1) {
                             list.push({
                                 text: lodash_1.default.get(result.data.value[i], textFieldName),
                                 value: lodash_1.default.get(result.data.value[i], valueFieldName)
+                            });
+                        }
+                    }
+                    return list;
+                };
+                ResponseParser.parseResourceNames = function (result, metricDefinition) {
+                    var list = [];
+                    for (var i = 0; i < result.data.value.length; i++) {
+                        if (result.data.value[i].type === metricDefinition) {
+                            list.push({
+                                text: result.data.value[i].name,
+                                value: result.data.value[i].name
                             });
                         }
                     }

@@ -128,19 +128,45 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             }
                             return false;
                         });
+                    }).then(function (result) {
+                        var shouldHardcodeBlobStorage = false;
+                        for (var i = 0; i < result.length; i++) {
+                            if (result[i].value === 'Microsoft.Storage/storageAccounts') {
+                                shouldHardcodeBlobStorage = true;
+                                break;
+                            }
+                        }
+                        if (shouldHardcodeBlobStorage) {
+                            result.push({
+                                text: 'Microsoft.Storage/storageAccounts/blobServices',
+                                value: 'Microsoft.Storage/storageAccounts/blobServices'
+                            });
+                            result.push({
+                                text: 'Microsoft.Storage/storageAccounts/fileServices',
+                                value: 'Microsoft.Storage/storageAccounts/fileServices'
+                            });
+                            result.push({
+                                text: 'Microsoft.Storage/storageAccounts/tableServices',
+                                value: 'Microsoft.Storage/storageAccounts/tableServices'
+                            });
+                            result.push({
+                                text: 'Microsoft.Storage/storageAccounts/queueServices',
+                                value: 'Microsoft.Storage/storageAccounts/queueServices'
+                            });
+                        }
+                        return result;
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
                     var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
-                    var list = [];
                     return this.doRequest(url).then(function (result) {
-                        for (var i = 0; i < result.data.value.length; i++) {
-                            if (result.data.value[i].type === metricDefinition) {
-                                list.push({
-                                    text: result.data.value[i].name,
-                                    value: result.data.value[i].name
-                                });
-                            }
+                        if (!lodash_1.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
+                            return response_parser_1.default.parseResourceNames(result, metricDefinition);
+                        }
+                        var list = response_parser_1.default.parseResourceNames(result, 'Microsoft.Storage/storageAccounts');
+                        for (var i = 0; i < list.length; i++) {
+                            list[i].text += '/default';
+                            list[i].value += '/default';
                         }
                         return list;
                     });

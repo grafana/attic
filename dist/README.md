@@ -6,11 +6,15 @@ The Azure Monitor Data Source plugin supports Azure Monitor and Application Insi
 
 This plugin requires Grafana 4.5 (as this is not released yet, the latest nightly build has to be used.)
 
+## Grafana Cloud
+
+Click on the `Install Plugin` button on the [Azure Monitor page on Grafana.com](https://grafana.com/plugins/grafana-azure-monitor-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take a up to a minute to install. If you do not have a Grafana Cloud account, you can sign up for one here.
+
 ### Docker
 
-1. Fetch the latest version of grafana from Docker Hub:  
+1. Fetch the latest version of grafana from Docker Hub:
     `docker pull grafana/grafana:latest`
-2. Run Grafana and install the Azure Monitor plugin with this command: 
+2. Run Grafana and install the Azure Monitor plugin with this command:
     ```
     docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:latest
     ```
@@ -23,6 +27,8 @@ This ia an alternative command if you want to run Grafana on a different port th
 ```
 docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:master
 ```
+
+It is recommended that you use a volume to save the Grafana data in. Otherwise if you remove the docker container, you will lose all your Grafana data (dashboards, users etc.). You can create a volume on Azure File Storage ...
 
 ### Existing Grafana with CLI
 

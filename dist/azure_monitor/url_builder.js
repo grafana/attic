@@ -1,25 +1,32 @@
-///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register([], function(exports_1) {
+System.register(['lodash'], function(exports_1) {
+    var lodash_1;
     var UrlBuilder;
     return {
-        setters:[],
+        setters:[
+            function (lodash_1_1) {
+                lodash_1 = lodash_1_1;
+            }],
         execute: function() {
             UrlBuilder = (function () {
                 function UrlBuilder() {
                 }
                 UrlBuilder.buildAzureMonitorQueryUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter) {
-                    if (metricDefinition === 'Microsoft.Sql/servers/databases') {
+                    if (lodash_1.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/') || metricDefinition === 'Microsoft.Sql/servers/databases') {
                         var rn = resourceName.split('/');
-                        return (baseUrl + "/" + resourceGroup + "/providers/Microsoft.Sql/servers/" + rn[0] + "/databases/" + rn[1]) +
+                        var service = metricDefinition.substring(metricDefinition.lastIndexOf('/') + 1);
+                        var md = metricDefinition.substring(0, metricDefinition.lastIndexOf('/'));
+                        return (baseUrl + "/" + resourceGroup + "/providers/" + md + "/" + rn[0] + "/" + service + "/" + rn[1]) +
                             ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
                     }
                     return (baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +
                         ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
                 };
                 UrlBuilder.buildAzureMonitorGetMetricNamesUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion) {
-                    if (metricDefinition === 'Microsoft.Sql/servers/databases') {
+                    if (lodash_1.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/') || metricDefinition === 'Microsoft.Sql/servers/databases') {
                         var rn = resourceName.split('/');
-                        return (baseUrl + "/" + resourceGroup + "/providers/Microsoft.Sql/servers/" + rn[0] + "/databases/" + rn[1]) +
+                        var service = metricDefinition.substring(metricDefinition.lastIndexOf('/') + 1);
+                        var md = metricDefinition.substring(0, metricDefinition.lastIndexOf('/'));
+                        return (baseUrl + "/" + resourceGroup + "/providers/" + md + "/" + rn[0] + "/" + service + "/" + rn[1]) +
                             ("/providers/microsoft.insights/metricdefinitions?api-version=" + apiVersion);
                     }
                     return (baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName) +

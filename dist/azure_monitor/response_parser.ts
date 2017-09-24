@@ -10,7 +10,7 @@ export default class ResponseParser {
       for (let j = 0; j < result.data[i].data.value.length; j++) {
         for (let k = 0; k < result.data[i].data.value[j].timeseries.length; k++) {
           data.push({
-            target: ResponseParser.createTarget(result.data[i].data.value[j]),
+            target: ResponseParser.createTarget(result.data[i].data.value[j], result.data[i].data.value[j].timeseries[k].metadatavalues),
             datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].timeseries[k].data)
           });
         }
@@ -19,10 +19,15 @@ export default class ResponseParser {
     return data;
   }
 
-  static createTarget(data) {
+  static createTarget(data, metadatavalues) {
     const endIndex = data.id.lastIndexOf('/providers');
     const startIndex = data.id.slice(0, endIndex).lastIndexOf('/') + 1;
     const resourceName = data.id.substring(startIndex, endIndex);
+
+    if (metadatavalues && metadatavalues.length > 0) {
+      return `${resourceName}{${metadatavalues[0].name.value}=${metadatavalues[0].value}}.${data.name.value}`;
+    }
+
     return `${resourceName}.${data.name.value}`;
   }
 
@@ -64,6 +69,20 @@ export default class ResponseParser {
         });
       }
     }
+    return list;
+  }
+
+  static parseResourceNames(result: any, metricDefinition: string) {
+    const list = [];
+    for (let i = 0; i < result.data.value.length; i++) {
+      if (result.data.value[i].type === metricDefinition) {
+        list.push({
+          text: result.data.value[i].name,
+          value: result.data.value[i].name
+        });
+      }
+    }
+
     return list;
   }
 
