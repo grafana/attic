@@ -86,9 +86,10 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     var metricData = lodash_1.default.find(result.data.value, function (o) {
                         return lodash_1.default.get(o, 'name.value') === metricName;
                     });
+                    var defaultAggTypes = ['None', 'Average', 'Minimum', 'Maximum', 'Total', 'Count'];
                     return {
                         primaryAggType: metricData.primaryAggregationType,
-                        supportedAggTypes: metricData.supportedAggregationTypes,
+                        supportedAggTypes: metricData.supportedAggregationTypes || defaultAggTypes,
                         dimensions: ResponseParser.parseDimensions(metricData)
                     };
                 };

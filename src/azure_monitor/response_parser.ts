@@ -91,9 +91,11 @@ export default class ResponseParser {
       return _.get(o, 'name.value') === metricName;
     });
 
+    const defaultAggTypes = ['None', 'Average', 'Minimum', 'Maximum', 'Total', 'Count'];
+
     return {
       primaryAggType: metricData.primaryAggregationType,
-      supportedAggTypes: metricData.supportedAggregationTypes,
+      supportedAggTypes: metricData.supportedAggregationTypes || defaultAggTypes,
       dimensions: ResponseParser.parseDimensions(metricData)
     };
   }
