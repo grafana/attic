@@ -16,7 +16,14 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 }
                 ResponseParser.parseQueryResult = function (result) {
                     var data = [];
-                    var value = result.data[0].data.value;
+                    for (var i = 0; i < result.data.length; i++) {
+                        var value = result.data[i].data.value;
+                        data = lodash_1.default.concat(data, ResponseParser.parseQueryResultRow(value));
+                    }
+                    return data;
+                };
+                ResponseParser.parseQueryResultRow = function (value) {
+                    var data = [];
                     if (ResponseParser.isSingleValue(value)) {
                         var metricName = ResponseParser.getMetricFieldKey(value);
                         var aggField = ResponseParser.getKeyForAggregationField(value[metricName]);

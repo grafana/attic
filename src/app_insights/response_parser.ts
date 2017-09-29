@@ -5,8 +5,18 @@ import _ from 'lodash';
 
 export default class ResponseParser {
   static parseQueryResult(result) {
+    let data = [];
+
+    for (let i = 0; i < result.data.length; i++) {
+      const value = result.data[i].data.value;
+      data = _.concat(data, ResponseParser.parseQueryResultRow(value));
+    }
+
+    return data;
+  }
+
+  static parseQueryResultRow(value) {
     const data = [];
-    const value = result.data[0].data.value;
 
     if (ResponseParser.isSingleValue(value)) {
       const metricName = ResponseParser.getMetricFieldKey(value);
