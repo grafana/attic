@@ -34,6 +34,8 @@ describe('AzureMonitorDatasource', function() {
       };
 
       beforeEach(function() {
+        ctx.instanceSettings.jsonData.tenantId = 'xxx';
+        ctx.instanceSettings.jsonData.clientId = 'xxx';
         ctx.backendSrv.datasourceRequest = function(options) {
           return ctx.$q.reject(error);
         };
@@ -60,6 +62,8 @@ describe('AzureMonitorDatasource', function() {
       };
 
       beforeEach(function() {
+        ctx.instanceSettings.jsonData.tenantId = 'xxx';
+        ctx.instanceSettings.jsonData.clientId = 'xxx';
         ctx.backendSrv.datasourceRequest = function(options) {
           return ctx.$q.when({data: response, status: 200});
         };

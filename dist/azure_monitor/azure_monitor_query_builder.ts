@@ -225,6 +225,20 @@ export default class AzureMonitorQueryBuilder {
   }
 
   testDatasource() {
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.tenantId)) {
+      return {
+        status: 'error',
+        message: 'The Tenant Id field is required.'
+      };
+    }
+
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.clientId)) {
+      return {
+        status: 'error',
+        message: 'The Client Id field is required.'
+      };
+    }
+
     const url = `${this.baseUrl}?api-version=2017-06-01`;
     return this.doRequest(url).then(response => {
       if (response.status === 200) {
@@ -253,6 +267,10 @@ export default class AzureMonitorQueryBuilder {
         message: message
       };
     });
+  }
+
+  isValidConfigField(field: string) {
+    return field && field.length > 0;
   }
 
   doRequest(url, maxRetries = 1) {

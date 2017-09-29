@@ -24,5 +24,6 @@ export default class AzureMonitorQueryBuilder {
     getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
     getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
     testDatasource(): any;
+    isValidConfigField(field: string): boolean;
     doRequest(url: any, maxRetries?: number): any;
 }

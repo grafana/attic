@@ -184,6 +184,18 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.testDatasource = function () {
+                    if (!this.isValidConfigField(this.instanceSettings.jsonData.tenantId)) {
+                        return {
+                            status: 'error',
+                            message: 'The Tenant Id field is required.'
+                        };
+                    }
+                    if (!this.isValidConfigField(this.instanceSettings.jsonData.clientId)) {
+                        return {
+                            status: 'error',
+                            message: 'The Client Id field is required.'
+                        };
+                    }
                     var url = this.baseUrl + "?api-version=2017-06-01";
                     return this.doRequest(url).then(function (response) {
                         if (response.status === 200) {
@@ -214,6 +226,9 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             message: message
                         };
                     });
+                };
+                AzureMonitorQueryBuilder.prototype.isValidConfigField = function (field) {
+                    return field && field.length > 0;
                 };
                 AzureMonitorQueryBuilder.prototype.doRequest = function (url, maxRetries) {
                     var _this = this;
