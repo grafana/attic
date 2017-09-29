@@ -9,6 +9,7 @@ export default class AzureMonitorFilterBuilder {
   timeGrainInterval = '';
   dimension: string;
   dimensionFilter: string;
+  allowedTimeGrains = ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d'];
 
   constructor(
     private metricName: string,
@@ -60,6 +61,8 @@ export default class AzureMonitorFilterBuilder {
   }
 
   calculateAutoTimeGrain() {
-    return TimegrainConverter.createISO8601DurationFromInterval(this.grafanaInterval);
+    const roundedInterval = TimegrainConverter.findClosestTimeGrain(this.grafanaInterval, this.allowedTimeGrains);
+
+    return TimegrainConverter.createISO8601DurationFromInterval(roundedInterval);
   }
 }

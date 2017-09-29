@@ -24,8 +24,8 @@ describe('AzureMonitorFilterBuilder', function() {
       builder.timeGrain = null;
     });
 
-    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = timefilter + '&interval=PT3M&' + metricFilter;
+    it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
+      const filter = timefilter + '&interval=PT5M&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
@@ -48,19 +48,19 @@ describe('AzureMonitorFilterBuilder', function() {
       builder.grafanaInterval = '10m';
     });
 
-    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
-      const filter = timefilter + '&interval=PT10M&' + metricFilter;
+    it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
+      const filter = timefilter + '&interval=PT15M&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });
   });
 
-  describe('with a metric name and auto time grain of 1 day', function() {
+  describe('with a metric name and auto time grain of 2 day', function() {
     beforeEach(function() {
       builder.timeGrain = null;
-      builder.grafanaInterval = '1d';
+      builder.grafanaInterval = '2d';
     });
 
-    it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
+    it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
       const filter = timefilter + '&interval=P1D&' + metricFilter;
       expect(builder.generateFilter()).to.equal(filter);
     });

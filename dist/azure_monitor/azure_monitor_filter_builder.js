@@ -17,6 +17,7 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     this.timeGrainUnit = timeGrainUnit;
                     this.grafanaInterval = grafanaInterval;
                     this.timeGrainInterval = '';
+                    this.allowedTimeGrains = ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d'];
                 }
                 AzureMonitorFilterBuilder.prototype.setAggregation = function (agg) {
                     this.aggregation = agg;
@@ -50,7 +51,8 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     return dateTimeCondition + timeGrainCondition;
                 };
                 AzureMonitorFilterBuilder.prototype.calculateAutoTimeGrain = function () {
-                    return time_grain_converter_1.default.createISO8601DurationFromInterval(this.grafanaInterval);
+                    var roundedInterval = time_grain_converter_1.default.findClosestTimeGrain(this.grafanaInterval, this.allowedTimeGrains);
+                    return time_grain_converter_1.default.createISO8601DurationFromInterval(roundedInterval);
                 };
                 return AzureMonitorFilterBuilder;
             })();

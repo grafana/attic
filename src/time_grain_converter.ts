@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import moment from 'moment';
+import * as kbn from 'app/core/utils/kbn';
 
 export default class TimeGrainConverter {
   static createISO8601Duration(timeGrain, timeGrainUnit) {
@@ -32,5 +33,23 @@ export default class TimeGrainConverter {
     }
 
     return TimeGrainConverter.createISO8601Duration(timeGrain, unit);
+  }
+
+  static findClosestTimeGrain(interval, allowedTimeGrains) {
+    let closest = allowedTimeGrains[0];
+    const intervalMs = kbn.interval_to_ms(interval);
+
+    for (let i = 0; i < allowedTimeGrains.length; i++) {
+      // abs (num - val) < abs (num - curr):
+      if (intervalMs > kbn.interval_to_ms(allowedTimeGrains[i])) {
+        if ((i + 1) < allowedTimeGrains.length) {
+          closest = allowedTimeGrains[i + 1];
+        } else {
+          closest = allowedTimeGrains[i];
+        }
+      }
+    }
+
+    return closest;
   }
 }

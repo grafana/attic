@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query_editor.css!';
+import TimegrainConverter from './time_grain_converter';
 
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
@@ -128,10 +129,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAutoInterval() {
-    if (this.panelCtrl.interval[this.panelCtrl.interval.length - 1] === 's') {
-      return '1m';
-    }
-    return this.panelCtrl.interval;
+    return TimegrainConverter.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
   }
 
   /* Application Insights Section */
