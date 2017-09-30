@@ -1,14 +1,37 @@
 ## Azure Monitor Data Source For Grafana
 
-The Azure Monitor Data Source plugin supports Azure Monitor and Application Insights metrics in Grafana.
+Azure Monitor is the platform service that provides a single source for monitoring Azure resources. Application Insights is an extensible Application Performance Management (APM) service for web developers on multiple platforms and can be used to monitor your live web application - it will automatically detect performance anomalies.
+
+The Azure Monitor Data Source plugin supports both Azure Monitor and Application Insights metrics in Grafana.
+
+## Features
+
+- Support for all the Azure APIAzure Monitor metrics
+  - includes support for the latest API version that allows multi-dimensional filtering for the Storage and SQL metrics.
+  - Automatic time grain mode which will group the metrics by the most appropriate time grain value depending on whether you have zoomed in to look at fine-grained metrics or zoomed out to look at an overview.
+- Application Insights metrics
+  - Automatic time grain support
+- You can combine metrics from both services in the same graph.
 
 ## Installation
 
-This plugin requires Grafana 4.5 (as this is not released yet, the latest nightly build has to be used.)
+This plugin requires Grafana 4.5.0 or newer.
 
 ## Grafana Cloud
 
-Click on the `Install Plugin` button on the [Azure Monitor page on Grafana.com](https://grafana.com/plugins/grafana-azure-monitor-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take a up to a minute to install. If you do not have a Grafana Cloud account, you can sign up for one here.
+If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
+
+1. Click on the `Install Now` button on the [Azure Monitor page on Grafana.com](https://grafana.com/plugins/grafana-azure-monitor-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
+    ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/dist/img/grafana_cloud_install.png)
+
+2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Monitor data source will be installed.
+
+### Installion Instructions on the Grafana Docs Site
+
+- [Installing on Debian/Ubuntu](http://docs.grafana.org/installation/debian/)
+- [Installing on RPM-based Linux (CentOS, Fedora, OpenSuse, RedHat)](http://docs.grafana.org/installation/rpm/)
+- [Installing on Windows](http://docs.grafana.org/installation/windows/)
+- [Installing on Mac](http://docs.grafana.org/installation/mac/)
 
 ### Docker
 
@@ -28,9 +51,9 @@ This ia an alternative command if you want to run Grafana on a different port th
 docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:master
 ```
 
-It is recommended that you use a volume to save the Grafana data in. Otherwise if you remove the docker container, you will lose all your Grafana data (dashboards, users etc.). You can create a volume on Azure File Storage ...
+It is recommended that you use a volume to save the Grafana data in. Otherwise if you remove the docker container, you will lose all your Grafana data (dashboards, users etc.). You can create a volume with the [Docker Volume Driver for Azure File Storage](https://github.com/Azure/azurefile-dockervolumedriver).
 
-### Existing Grafana with CLI
+### Installing the Plugin on an Existing Grafana with the CLI
 
 Grafana comes with a command line tool that can be used to install plugins.
 
@@ -41,8 +64,7 @@ Grafana comes with a command line tool that can be used to install plugins.
 5. Login in with a user that has admin rights. This is needed to create data sources.
 6. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
 
-
-### Manual Installation
+### Installing the Plugin Manually on an Existing Grafana
 
 If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
 
@@ -105,3 +127,8 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 #### v0.0.3
 
 Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does not currently change anything for the user but enables new features in the future.
+
+#### v0.0.4
+
+- Multi-dimensional filtering
+- Support for the Microsoft.Sql API and for the Storage API.

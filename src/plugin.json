@@ -18,8 +18,12 @@
       {"name": "Project site", "url": "https://github.com/grafana/azure-monitor-datasource"},
       {"name": "Apache License", "url": "https://github.com/grafana/azure-monitor-datasource/blob/master/LICENSE"}
     ],
-    "version": "0.0.3",
-    "updated": "2017-09-17"
+    "screenshots": [
+      {"name": "Azure Monitor Network", "path": "img/azure_monitor_network.png"},
+      {"name": "Azure Monitor CPU", "path": "img/azure_monitor_cpu.png"}
+    ],
+    "version": "0.0.4",
+    "updated": "2017-09-28"
   },
 
   "routes": [
