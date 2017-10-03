@@ -115,9 +115,18 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     });
                 };
                 AzureMonitorQueryCtrl.prototype.getAutoInterval = function () {
-                    return time_grain_converter_1.default.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+                    if (this.target.azureMonitor.timeGrain.trim() === '') {
+                        return time_grain_converter_1.default.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+                    }
+                    return '';
                 };
                 /* Application Insights Section */
+                AzureMonitorQueryCtrl.prototype.getAppInsightsAutoInterval = function () {
+                    if (this.panelCtrl.interval[this.panelCtrl.interval.length - 1] === 's') {
+                        return '1m';
+                    }
+                    return this.panelCtrl.interval;
+                };
                 AzureMonitorQueryCtrl.prototype.getAppInsightsMetricNames = function () {
                     return this.datasource.getAppInsightsMetricNames();
                 };

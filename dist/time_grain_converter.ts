@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import moment from 'moment';
-import * as kbn from 'app/core/utils/kbn';
+import kbn from 'app/core/utils/kbn';
 
 export default class TimeGrainConverter {
   static createISO8601Duration(timeGrain, timeGrainUnit) {

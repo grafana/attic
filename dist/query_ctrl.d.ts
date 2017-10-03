@@ -33,6 +33,7 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     onResourceNameChange(): void;
     onMetricNameChange(): any;
     getAutoInterval(): any;
+    getAppInsightsAutoInterval(): any;
     getAppInsightsMetricNames(): any;
     onAppInsightsMetricNameChange(): any;
     getAppInsightsGroupBySegments(query: any): any;

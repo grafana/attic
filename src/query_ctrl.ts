@@ -129,10 +129,21 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAutoInterval() {
-    return TimegrainConverter.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+    if (this.target.azureMonitor.timeGrain.trim() === '') {
+      return TimegrainConverter.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+    }
+
+    return '';
   }
 
   /* Application Insights Section */
+
+  getAppInsightsAutoInterval() {
+    if (this.panelCtrl.interval[this.panelCtrl.interval.length - 1] === 's') {
+      return '1m';
+    }
+    return this.panelCtrl.interval;
+  }
   getAppInsightsMetricNames() {
     return this.datasource.getAppInsightsMetricNames();
   }

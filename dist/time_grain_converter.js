@@ -1,14 +1,14 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register(['lodash', 'app/core/utils/kbn'], function(exports_1) {
-    var lodash_1, kbn;
+    var lodash_1, kbn_1;
     var TimeGrainConverter;
     return {
         setters:[
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
             },
-            function (kbn_1) {
-                kbn = kbn_1;
+            function (kbn_1_1) {
+                kbn_1 = kbn_1_1;
             }],
         execute: function() {
             TimeGrainConverter = (function () {
@@ -38,10 +38,10 @@ System.register(['lodash', 'app/core/utils/kbn'], function(exports_1) {
                 };
                 TimeGrainConverter.findClosestTimeGrain = function (interval, allowedTimeGrains) {
                     var closest = allowedTimeGrains[0];
-                    var intervalMs = kbn.interval_to_ms(interval);
+                    var intervalMs = kbn_1.default.interval_to_ms(interval);
                     for (var i = 0; i < allowedTimeGrains.length; i++) {
                         // abs (num - val) < abs (num - curr):
-                        if (intervalMs > kbn.interval_to_ms(allowedTimeGrains[i])) {
+                        if (intervalMs > kbn_1.default.interval_to_ms(allowedTimeGrains[i])) {
                             if ((i + 1) < allowedTimeGrains.length) {
                                 closest = allowedTimeGrains[i + 1];
                             }
