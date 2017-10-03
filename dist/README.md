@@ -132,3 +132,7 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 
 - Multi-dimensional filtering
 - Support for the Microsoft.Sql API and for the Storage API.
+
+#### v0.0.5
+
+- Fix for breaking change in Grafana master to prevent problems in future.
