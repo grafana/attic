@@ -17,7 +17,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       metricDefinition: this.defaultDropdownValue,
       resourceName: this.defaultDropdownValue,
       metricName: this.defaultDropdownValue,
-      timeGrain: 1,
+      timeGrain: '1',
       timeGrainUnit: 'minute',
       dimensionFilter: '*'
     },
@@ -129,7 +129,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAutoInterval() {
-    if (this.target.azureMonitor.timeGrain.trim() === '') {
+    if (!this.target.azureMonitor.timeGrain) {
       return TimegrainConverter.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
     }
 
@@ -175,7 +175,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   updateTimeGrainType() {
     if (this.target.appInsights.timeGrainType === 'specific') {
-      this.target.appInsights.timeGrain = 1;
+      this.target.appInsights.timeGrain = '1';
       this.target.appInsights.timeGrainUnit = 'minute';
     } else {
       this.target.appInsights.timeGrain = '';

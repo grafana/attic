@@ -65,7 +65,7 @@ export default class AzureMonitorQueryBuilder {
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
       const metricName = this.templateSrv.replace(item.metricName, options.scopedVars);
-      const timeGrain = this.templateSrv.replace(item.timeGrain, options.scopedVars);
+      const timeGrain = this.templateSrv.replace(item.timeGrain.toString(), options.scopedVars);
 
       const filterBuilder = new AzureMonitorFilterBuilder(
         item.metricName,
