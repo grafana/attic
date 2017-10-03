@@ -136,3 +136,7 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 #### v0.0.5
 
 - Fix for breaking change in Grafana master to prevent problems in future.
+
+#### v0.0.6
+
+- Auto time grain fix.
