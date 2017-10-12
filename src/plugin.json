@@ -19,6 +19,7 @@
       {"name": "Apache License", "url": "https://github.com/grafana/azure-monitor-datasource/blob/master/LICENSE"}
     ],
     "screenshots": [
+      {"name": "Azure Contoso Loans", "path": "img/contoso_loans_grafana_dashboard.png"},
       {"name": "Azure Monitor Network", "path": "img/azure_monitor_network.png"},
       {"name": "Azure Monitor CPU", "path": "img/azure_monitor_cpu.png"}
     ],
