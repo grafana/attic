@@ -140,3 +140,7 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 #### v0.0.6
 
 - Auto time grain fix.
+
+#### v0.0.7
+
+- Adds support for the CosmoDB API.
