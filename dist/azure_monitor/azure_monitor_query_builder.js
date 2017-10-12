@@ -34,6 +34,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         'Microsoft.EventHub',
                         'Microsoft.ServiceBus',
                         'Microsoft.Devices',
+                        'Microsoft.DocumentDb',
                         'Microsoft.Network',
                         'Microsoft.Cache/Redis',
                         'Microsoft.AnalysisServices/servers',
