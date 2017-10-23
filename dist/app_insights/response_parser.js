@@ -12,17 +12,19 @@ System.register(['moment', 'lodash'], function(exports_1) {
             }],
         execute: function() {
             ResponseParser = (function () {
-                function ResponseParser() {
+                function ResponseParser(results) {
+                    this.results = results;
                 }
-                ResponseParser.parseQueryResult = function (result) {
+                ResponseParser.prototype.parseQueryResult = function () {
                     var data = [];
-                    for (var i = 0; i < result.data.length; i++) {
-                        var value = result.data[i].data.value;
-                        data = lodash_1.default.concat(data, ResponseParser.parseQueryResultRow(value));
+                    for (var i = 0; i < this.results.length; i++) {
+                        var value = this.results[i].result.data.value;
+                        var alias = this.results[i].query.alias;
+                        data = lodash_1.default.concat(data, this.parseQueryResultRow(value, alias));
                     }
                     return data;
                 };
-                ResponseParser.parseQueryResultRow = function (value) {
+                ResponseParser.prototype.parseQueryResultRow = function (value, alias) {
                     var data = [];
                     if (ResponseParser.isSingleValue(value)) {
                         var metricName = ResponseParser.getMetricFieldKey(value);
@@ -45,15 +47,49 @@ System.register(['moment', 'lodash'], function(exports_1) {
                         for (var i = 0; i < value.segments.length; i++) {
                             var epoch = ResponseParser.dateTimeToEpoch(value.segments[i].end);
                             for (var j = 0; j < value.segments[i].segments.length; j++) {
-                                var target = ResponseParser.getTargetName(value.segments[i].segments[j]);
                                 var metricName = ResponseParser.getMetricFieldKey(value.segments[i].segments[j]);
                                 var aggField = ResponseParser.getKeyForAggregationField(value.segments[i].segments[j][metricName]);
+                                var target = this.getTargetName(value.segments[i].segments[j], alias, aggField);
                                 var bucket = ResponseParser.findOrCreateBucket(data, target);
                                 bucket.datapoints.push([value.segments[i].segments[j][metricName][aggField], epoch]);
                             }
                         }
                     }
                     return data;
+                };
+                ResponseParser.prototype.getTargetName = function (segment, alias, aggField) {
+                    var metric = '';
+                    var segmentName = '';
+                    var segmentValue = '';
+                    for (var prop in segment) {
+                        if (lodash_1.default.isObject(segment[prop])) {
+                            metric = prop;
+                        }
+                        else {
+                            segmentName = prop;
+                            segmentValue = segment[prop];
+                        }
+                    }
+                    if (alias) {
+                        var regex = /\{\{([\s\S]+?)\}\}/g;
+                        return alias.replace(regex, function (match, g1, g2) {
+                            var group = g1 || g2;
+                            if (group === 'metric') {
+                                return metric;
+                            }
+                            else if (group === 'groupbyname') {
+                                return segmentName;
+                            }
+                            else if (group === 'groupbyvalue') {
+                                return segmentValue;
+                            }
+                            else if (group === 'aggregation') {
+                                return aggField;
+                            }
+                            return match;
+                        });
+                    }
+                    return metric + ("{" + segmentName + "=\"" + segmentValue + "\"}");
                 };
                 ResponseParser.isSingleValue = function (value) {
                     return !ResponseParser.hasSegmentsField(value);
@@ -65,19 +101,6 @@ System.register(['moment', 'lodash'], function(exports_1) {
                         data.push(dataTarget);
                     }
                     return dataTarget;
-                };
-                ResponseParser.getTargetName = function (segment) {
-                    var metric = '';
-                    var groupBy = '';
-                    for (var prop in segment) {
-                        if (lodash_1.default.isObject(segment[prop])) {
-                            metric = prop;
-                        }
-                        else {
-                            groupBy = "{" + prop + "=\"" + segment[prop] + "\"}";
-                        }
-                    }
-                    return metric + groupBy;
                 };
                 ResponseParser.hasSegmentsField = function (obj) {
                     var keys = lodash_1.default.keys(obj);

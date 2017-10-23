@@ -4,18 +4,20 @@ import moment from 'moment';
 import _ from 'lodash';
 
 export default class ResponseParser {
-  static parseQueryResult(result) {
-    let data = [];
+  constructor(private results) {}
 
-    for (let i = 0; i < result.data.length; i++) {
-      const value = result.data[i].data.value;
-      data = _.concat(data, ResponseParser.parseQueryResultRow(value));
+  parseQueryResult() {
+    let data = [];
+    for (let i = 0; i < this.results.length; i++) {
+      const value = this.results[i].result.data.value;
+      const alias = this.results[i].query.alias;
+      data = _.concat(data, this.parseQueryResultRow(value, alias));
     }
 
     return data;
   }
 
-  static parseQueryResultRow(value) {
+  parseQueryResultRow(value, alias: string) {
     const data = [];
 
     if (ResponseParser.isSingleValue(value)) {
@@ -42,9 +44,9 @@ export default class ResponseParser {
         const epoch = ResponseParser.dateTimeToEpoch(value.segments[i].end);
 
         for (let j = 0; j < value.segments[i].segments.length; j++) {
-          const target = ResponseParser.getTargetName(value.segments[i].segments[j]);
           const metricName = ResponseParser.getMetricFieldKey(value.segments[i].segments[j]);
           const aggField = ResponseParser.getKeyForAggregationField(value.segments[i].segments[j][metricName]);
+          const target = this.getTargetName(value.segments[i].segments[j], alias, aggField);
 
           const bucket = ResponseParser.findOrCreateBucket(data, target);
           bucket.datapoints.push([value.segments[i].segments[j][metricName][aggField], epoch]);
@@ -53,6 +55,40 @@ export default class ResponseParser {
     }
 
     return data;
+  }
+
+  getTargetName(segment, alias: string, aggField: string) {
+    let metric = '';
+    let segmentName = '';
+    let segmentValue = '';
+    for (let prop in segment) {
+      if (_.isObject(segment[prop])) {
+        metric = prop;
+      } else {
+        segmentName = prop;
+        segmentValue = segment[prop];
+      }
+    }
+
+    if (alias) {
+      const regex = /\{\{([\s\S]+?)\}\}/g;
+      return alias.replace(regex, (match, g1, g2) => {
+        const group = g1 || g2;
+
+        if (group === 'metric') {
+          return metric;
+        } else if (group === 'groupbyname') {
+          return segmentName;
+        } else if (group === 'groupbyvalue') {
+          return segmentValue;
+        } else if (group === 'aggregation') {
+          return aggField;
+        }
+        return match;
+      });
+    }
+
+    return metric + `{${segmentName}="${segmentValue}"}`;
   }
 
   static isSingleValue(value) {
@@ -67,19 +103,6 @@ export default class ResponseParser {
     }
 
     return dataTarget;
-  }
-
-  static getTargetName(segment) {
-    let metric = '';
-    let groupBy = '';
-    for (let prop in segment) {
-      if (_.isObject(segment[prop])) {
-        metric = prop;
-      } else {
-        groupBy = `{${prop}="${segment[prop]}"}`;
-      }
-    }
-    return metric + groupBy;
   }
 
   static hasSegmentsField(obj) {
