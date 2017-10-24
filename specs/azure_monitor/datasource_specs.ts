@@ -95,6 +95,7 @@ describe('AzureMonitorDatasource', function() {
             metricName: 'Percentage CPU',
             timeGrain: 1,
             timeGrainUnit: 'hour',
+            alias: ''
           }
         }
       ]
@@ -202,6 +203,96 @@ describe('AzureMonitorDatasource', function() {
           expect(results.data[0].datapoints[0][0]).to.equal(1.0503333333333331);
           expect(results.data[0].datapoints[2][1]).to.equal(1503442800000);
           expect(results.data[0].datapoints[2][0]).to.equal(1.0457499999999995);
+        });
+      });
+    });
+
+    describe('and data has a dimension filter', function() {
+      const response = {
+        value: [
+          {
+            timeseries: [
+              {
+                data: [
+                  {
+                    timeStamp: '2017-08-22T21:00:00Z',
+                    total: 1.0503333333333331
+                  },
+                  {
+                    timeStamp: '2017-08-22T22:00:00Z',
+                    total: 1.045083333333333
+                  },
+                  {
+                    timeStamp: '2017-08-22T23:00:00Z',
+                    total: 1.0457499999999995
+                  }
+                ],
+                metadatavalues: [
+                  {
+                    "name": {
+                      "value": "blobtype",
+                      "localizedValue": "blobtype"
+                    },
+                    "value": "BlockBlob"
+                  }
+                ]
+              }
+            ],
+            id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
+            + '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
+            name: {
+              value: 'Percentage CPU',
+              localizedValue: 'Percentage CPU'
+            },
+            type: 'Microsoft.Insights/metrics',
+            unit: 'Percent'
+          }
+        ]
+      };
+
+      describe('and with no alias specified', () => {
+        beforeEach(function() {
+          ctx.backendSrv.datasourceRequest = function(options) {
+            const expected = '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics';
+            expect(options.url).to.contain(expected);
+            return ctx.$q.when({data: response, status: 200});
+          };
+        });
+
+        it('should return a list of datapoints', function() {
+          return ctx.ds.query(options).then(function(results) {
+            expect(results.data.length).to.be(1);
+            expect(results.data[0].target).to.equal('testRN{blobtype=BlockBlob}.Percentage CPU');
+            expect(results.data[0].datapoints[0][1]).to.equal(1503435600000);
+            expect(results.data[0].datapoints[0][0]).to.equal(1.0503333333333331);
+            expect(results.data[0].datapoints[2][1]).to.equal(1503442800000);
+            expect(results.data[0].datapoints[2][0]).to.equal(1.0457499999999995);
+          });
+        });
+      });
+
+      describe('and with an alias specified', () => {
+        beforeEach(function() {
+          options.targets[0].azureMonitor.alias = '{{resourcegroup}} + {{namespace}} + {{resourcename}} + ' +
+            '{{metric}} + {{dimensionname}} + {{dimensionvalue}}';
+
+          ctx.backendSrv.datasourceRequest = function(options) {
+            const expected = '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics';
+            expect(options.url).to.contain(expected);
+            return ctx.$q.when({data: response, status: 200});
+          };
+        });
+
+        it('should return a list of datapoints', function() {
+          return ctx.ds.query(options).then(function(results) {
+            expect(results.data.length).to.be(1);
+            const expected = 'testRG + Microsoft.Compute/virtualMachines + testRN + Percentage CPU + blobtype + BlockBlob';
+            expect(results.data[0].target).to.equal(expected);
+            expect(results.data[0].datapoints[0][1]).to.equal(1503435600000);
+            expect(results.data[0].datapoints[0][0]).to.equal(1.0503333333333331);
+            expect(results.data[0].datapoints[2][1]).to.equal(1503442800000);
+            expect(results.data[0].datapoints[2][0]).to.equal(1.0457499999999995);
+          });
         });
       });
     });

@@ -49,7 +49,7 @@ System.register(['moment', 'lodash'], function(exports_1) {
                             for (var j = 0; j < value.segments[i].segments.length; j++) {
                                 var metricName = ResponseParser.getMetricFieldKey(value.segments[i].segments[j]);
                                 var aggField = ResponseParser.getKeyForAggregationField(value.segments[i].segments[j][metricName]);
-                                var target = this.getTargetName(value.segments[i].segments[j], alias, aggField);
+                                var target = this.getTargetName(value.segments[i].segments[j], alias);
                                 var bucket = ResponseParser.findOrCreateBucket(data, target);
                                 bucket.datapoints.push([value.segments[i].segments[j][metricName][aggField], epoch]);
                             }
@@ -57,7 +57,7 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     }
                     return data;
                 };
-                ResponseParser.prototype.getTargetName = function (segment, alias, aggField) {
+                ResponseParser.prototype.getTargetName = function (segment, alias) {
                     var metric = '';
                     var segmentName = '';
                     var segmentValue = '';
@@ -82,9 +82,6 @@ System.register(['moment', 'lodash'], function(exports_1) {
                             }
                             else if (group === 'groupbyvalue') {
                                 return segmentValue;
-                            }
-                            else if (group === 'aggregation') {
-                                return aggField;
                             }
                             return match;
                         });

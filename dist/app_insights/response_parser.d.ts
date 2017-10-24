@@ -4,7 +4,7 @@ export default class ResponseParser {
     constructor(results: any);
     parseQueryResult(): any[];
     parseQueryResultRow(value: any, alias: string): any[];
-    getTargetName(segment: any, alias: string, aggField: string): string;
+    getTargetName(segment: any, alias: string): string;
     static isSingleValue(value: any): boolean;
     static findOrCreateBucket(data: any, target: any): any;
     static hasSegmentsField(obj: any): boolean;

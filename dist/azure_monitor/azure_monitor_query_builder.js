@@ -91,6 +91,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             datasourceId: _this.id,
                             url: url,
                             format: options.format,
+                            alias: item.alias
                         };
                     });
                     if (queries.length === 0) {
@@ -98,13 +99,18 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     }
                     var promises = this.doQueries(queries);
                     return this.$q.all(promises).then(function (results) {
-                        return { data: lodash_1.default.flatten(results) };
-                    }).then(response_parser_1.default.parseQueryResult);
+                        return new response_parser_1.default(results).parseQueryResult();
+                    });
                 };
                 AzureMonitorQueryBuilder.prototype.doQueries = function (queries) {
                     var _this = this;
                     return lodash_1.default.map(queries, function (query) {
-                        return _this.doRequest(query.url);
+                        return _this.doRequest(query.url).then(function (result) {
+                            return {
+                                result: result,
+                                query: query
+                            };
+                        });
                     });
                 };
                 AzureMonitorQueryBuilder.prototype.annotationQuery = function (options) {

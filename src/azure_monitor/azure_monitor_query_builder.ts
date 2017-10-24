@@ -103,6 +103,7 @@ export default class AzureMonitorQueryBuilder {
         datasourceId: this.id,
         url: url,
         format: options.format,
+        alias: item.alias
       };
     });
 
@@ -113,13 +114,18 @@ export default class AzureMonitorQueryBuilder {
     const promises = this.doQueries(queries);
 
     return this.$q.all(promises).then(results => {
-      return { data: _.flatten(results) };
-    }).then(ResponseParser.parseQueryResult);
+      return new ResponseParser(results).parseQueryResult();
+    });
   }
 
   doQueries(queries) {
     return _.map(queries, query => {
-      return this.doRequest(query.url);
+      return this.doRequest(query.url).then(result => {
+        return {
+          result: result,
+          query: query
+        };
+      });
     });
   }
 

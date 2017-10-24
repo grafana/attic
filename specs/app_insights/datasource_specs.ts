@@ -278,10 +278,10 @@ describe('AppInsightsDatasource', function() {
         });
       });
 
-      describe('and with a alias specified', () => {
+      describe('and with an alias specified', () => {
         beforeEach(function() {
           options.targets[0].appInsights.groupBy = 'client/city';
-          options.targets[0].appInsights.alias = '{{metric}} + {{groupbyname}} + {{groupbyvalue}} + {{aggregation}}';
+          options.targets[0].appInsights.alias = '{{metric}} + {{groupbyname}} + {{groupbyvalue}}';
 
           ctx.backendSrv.datasourceRequest = function(options) {
             expect(options.url).to.contain('/metrics/exceptions/server');
@@ -294,7 +294,7 @@ describe('AppInsightsDatasource', function() {
           return ctx.ds.query(options).then(function(results) {
             expect(results.data.length).to.be(3);
             expect(results.data[0].datapoints.length).to.be(2);
-            expect(results.data[0].target).to.equal('exceptions/server + client/city + Miami + sum');
+            expect(results.data[0].target).to.equal('exceptions/server + client/city + Miami');
             expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
             expect(results.data[0].datapoints[0][0]).to.equal(10);
             expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);

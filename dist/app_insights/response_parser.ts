@@ -46,7 +46,7 @@ export default class ResponseParser {
         for (let j = 0; j < value.segments[i].segments.length; j++) {
           const metricName = ResponseParser.getMetricFieldKey(value.segments[i].segments[j]);
           const aggField = ResponseParser.getKeyForAggregationField(value.segments[i].segments[j][metricName]);
-          const target = this.getTargetName(value.segments[i].segments[j], alias, aggField);
+          const target = this.getTargetName(value.segments[i].segments[j], alias);
 
           const bucket = ResponseParser.findOrCreateBucket(data, target);
           bucket.datapoints.push([value.segments[i].segments[j][metricName][aggField], epoch]);
@@ -57,7 +57,7 @@ export default class ResponseParser {
     return data;
   }
 
-  getTargetName(segment, alias: string, aggField: string) {
+  getTargetName(segment, alias: string) {
     let metric = '';
     let segmentName = '';
     let segmentValue = '';
@@ -81,9 +81,8 @@ export default class ResponseParser {
           return segmentName;
         } else if (group === 'groupbyvalue') {
           return segmentValue;
-        } else if (group === 'aggregation') {
-          return aggField;
         }
+
         return match;
       });
     }

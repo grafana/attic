@@ -1,7 +1,12 @@
 /// <reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 export default class ResponseParser {
-    static parseQueryResult(result: any): any[];
-    static createTarget(data: any, metadatavalues: any): string;
+    private results;
+    constructor(results: any);
+    parseQueryResult(): any[];
+    static createTarget(data: any, metadatavalues: any, alias: string): string;
+    static parseResourceGroupFromId(id: string): string;
+    static parseNamespaceFromId(id: string, resourceName: string): string;
+    static parseResourceNameFromId(id: string): string;
     static convertDataToPoints(timeSeriesData: any): any[];
     static dateTimeToEpoch(dateTime: any): any;
     static getKeyForAggregationField(dataObj: any): any;

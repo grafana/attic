@@ -90,7 +90,20 @@
       </div>
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-3">eq</label>
-        <input type="text" class="gf-form-input width-7" ng-model="ctrl.target.azureMonitor.dimensionFilter" spellcheck="false" placeholder="auto" ng-blur="ctrl.refresh()">
+        <input type="text" class="gf-form-input width-17" ng-model="ctrl.target.azureMonitor.dimensionFilter" spellcheck="false" placeholder="auto" ng-blur="ctrl.refresh()">
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div>
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-9">Legend Format</label>
+        <input type="text" class="gf-form-input width-30" ng-model="ctrl.target.azureMonitor.alias" spellcheck="false" placeholder="alias patterns (see help for more info)" ng-blur="ctrl.refresh()">
+      </div>
+
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
   </div>
@@ -156,7 +169,7 @@
     <div class="gf-form-inline">
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Legend Format</label>
-        <input type="text" class="gf-form-input width-20" ng-model="ctrl.target.appInsights.alias" spellcheck="false" placeholder="alias patterns (see help)" ng-blur="ctrl.refresh()">
+        <input type="text" class="gf-form-input width-30" ng-model="ctrl.target.appInsights.alias" spellcheck="false" placeholder="alias patterns (see help for more info)" ng-blur="ctrl.refresh()">
       </div>
 
       <div class="gf-form gf-form--grow">

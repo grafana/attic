@@ -12,30 +12,72 @@ System.register(['moment', 'lodash'], function(exports_1) {
             }],
         execute: function() {
             ResponseParser = (function () {
-                function ResponseParser() {
+                function ResponseParser(results) {
+                    this.results = results;
                 }
-                ResponseParser.parseQueryResult = function (result) {
+                ResponseParser.prototype.parseQueryResult = function () {
                     var data = [];
-                    for (var i = 0; i < result.data.length; i++) {
-                        for (var j = 0; j < result.data[i].data.value.length; j++) {
-                            for (var k = 0; k < result.data[i].data.value[j].timeseries.length; k++) {
+                    for (var i = 0; i < this.results.length; i++) {
+                        for (var j = 0; j < this.results[i].result.data.value.length; j++) {
+                            for (var k = 0; k < this.results[i].result.data.value[j].timeseries.length; k++) {
+                                var alias = this.results[i].query.alias;
                                 data.push({
-                                    target: ResponseParser.createTarget(result.data[i].data.value[j], result.data[i].data.value[j].timeseries[k].metadatavalues),
-                                    datapoints: ResponseParser.convertDataToPoints(result.data[i].data.value[j].timeseries[k].data)
+                                    target: ResponseParser.createTarget(this.results[i].result.data.value[j], this.results[i].result.data.value[j].timeseries[k].metadatavalues, alias),
+                                    datapoints: ResponseParser.convertDataToPoints(this.results[i].result.data.value[j].timeseries[k].data)
                                 });
                             }
                         }
                     }
                     return data;
                 };
-                ResponseParser.createTarget = function (data, metadatavalues) {
-                    var endIndex = data.id.lastIndexOf('/providers');
-                    var startIndex = data.id.slice(0, endIndex).lastIndexOf('/') + 1;
-                    var resourceName = data.id.substring(startIndex, endIndex);
+                ResponseParser.createTarget = function (data, metadatavalues, alias) {
+                    var resourceGroup = ResponseParser.parseResourceGroupFromId(data.id);
+                    var resourceName = ResponseParser.parseResourceNameFromId(data.id);
+                    var namespace = ResponseParser.parseNamespaceFromId(data.id, resourceName);
+                    if (alias) {
+                        var regex = /\{\{([\s\S]+?)\}\}/g;
+                        return alias.replace(regex, function (match, g1, g2) {
+                            var group = g1 || g2;
+                            if (group === 'resourcegroup') {
+                                return resourceGroup;
+                            }
+                            else if (group === 'namespace') {
+                                return namespace;
+                            }
+                            else if (group === 'resourcename') {
+                                return resourceName;
+                            }
+                            else if (group === 'metric') {
+                                return data.name.value;
+                            }
+                            else if (group === 'dimensionname') {
+                                return metadatavalues && metadatavalues.length > 0 ? metadatavalues[0].name.value : '';
+                            }
+                            else if (group === 'dimensionvalue') {
+                                return metadatavalues && metadatavalues.length > 0 ? metadatavalues[0].value : '';
+                            }
+                            return match;
+                        });
+                    }
                     if (metadatavalues && metadatavalues.length > 0) {
                         return resourceName + "{" + metadatavalues[0].name.value + "=" + metadatavalues[0].value + "}." + data.name.value;
                     }
                     return resourceName + "." + data.name.value;
+                };
+                ResponseParser.parseResourceGroupFromId = function (id) {
+                    var startIndex = id.indexOf('/resourceGroups/') + 16;
+                    var endIndex = id.indexOf('/providers');
+                    return id.substring(startIndex, endIndex);
+                };
+                ResponseParser.parseNamespaceFromId = function (id, resourceName) {
+                    var startIndex = id.indexOf('/providers/') + 11;
+                    var endIndex = id.indexOf('/' + resourceName);
+                    return id.substring(startIndex, endIndex);
+                };
+                ResponseParser.parseResourceNameFromId = function (id) {
+                    var endIndex = id.lastIndexOf('/providers');
+                    var startIndex = id.slice(0, endIndex).lastIndexOf('/') + 1;
+                    return id.substring(startIndex, endIndex);
                 };
                 ResponseParser.convertDataToPoints = function (timeSeriesData) {
                     var dataPoints = [];
