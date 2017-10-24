@@ -100,6 +100,44 @@ The plugin can access metrics from both the Azure Monitor service and the Applic
 8. Test that the configuration details are correct by clicking on the "Save & Test" button:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_4_save_and_test.png)
 
+### Formatting Legend Keys with Aliases
+
+The default legend formatting for the Azure Monitor API is:
+
+`resourceName{dimensionValue=dimensionName}.metricName`
+
+and for the Application Insights API is:
+
+`metric/name{group/by="groupbyvalue"}`
+
+These can be quite long but this formatting can be changed using aliases. In the Legend Format field, the aliases which are defined below can be combined any way you want.
+
+Azure Monitor Examples:
+
+- `dimension: {{dimensionvalue}}`
+- `{{resourcegroup}} - {{resourcename}}`
+
+Application Insights Examples:
+
+- `server: {{groupbyvalue}}`
+- `city: {{groupbyvalue}}`
+- `{{groupbyname}}: {{groupbyvalue}}`
+
+#### Alias Patterns for Application Insights
+
+- `{{groupbyvalue}}` = replaced with the value of the group by
+- `{{groupbyname}}` = replaced with the name/label of the group by
+- `{{metric}}` = replaced with metric name (e.g. requests/count)
+
+#### Alias Patterns for Azure Monitor
+
+- `{{resourcegroup}}` = replaced with the value of the Resource Group
+- `{{namespace}}` = replaced with the value of the Namespace (e.g. Microsoft.Compute/virtualMachines)
+- `{{resourcename}}` = replaced with the value of the Resource Name
+- `{{metric}}` = replaced with metric name (e.g. Percentage CPU)
+- `{{dimensionname}}` = replaced with dimension key/label (e.g. blobtype)
+- `{{dimensionvalue}}` = replaced with dimension value (e.g. BlockBlob)
+
 ### Development
 
 To install and build the plugin:
@@ -144,3 +182,7 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 #### v0.0.7
 
 - Adds support for the CosmoDB API.
+
+#### v0.0.8
+
+- Adds support for legend formatting with aliases.
