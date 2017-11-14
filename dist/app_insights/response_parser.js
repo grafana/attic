@@ -111,7 +111,7 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 };
                 ResponseParser.getKeyForAggregationField = function (dataObj) {
                     var keys = lodash_1.default.keys(dataObj);
-                    return lodash_1.default.intersection(keys, ['sum', 'avg', 'min', 'max', 'count']);
+                    return lodash_1.default.intersection(keys, ['sum', 'avg', 'min', 'max', 'count', 'unique']);
                 };
                 ResponseParser.dateTimeToEpoch = function (dateTime) {
                     return moment_1.default(dateTime).valueOf();

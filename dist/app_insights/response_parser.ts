@@ -119,7 +119,7 @@ export default class ResponseParser {
 
   static getKeyForAggregationField(dataObj) {
     const keys = _.keys(dataObj);
-    return _.intersection(keys, ['sum', 'avg', 'min', 'max', 'count']);
+    return _.intersection(keys, ['sum', 'avg', 'min', 'max', 'count', 'unique']);
   }
 
   static dateTimeToEpoch(dateTime) {
