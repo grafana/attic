@@ -186,3 +186,7 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 #### v0.0.8
 
 - Adds support for legend formatting with aliases.
+
+#### v0.0.9
+
+- Adds support for the `unique` aggregation for Application Insights.
