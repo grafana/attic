@@ -4,6 +4,7 @@
   "description": "Grafana data source for Azure Monitor/Application Insights",
   "scripts": {
     "build": "grunt",
+    "watch": "grunt watch",
     "test": "./node_modules/karma/bin/karma start"
   },
   "author": "Grafana Labs",

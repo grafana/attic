@@ -1,5 +1,3 @@
-///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-
 import _ from 'lodash';
 import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
 import UrlBuilder from './url_builder';

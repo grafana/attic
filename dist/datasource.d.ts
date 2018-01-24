@@ -1,4 +1,3 @@
-/// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import AzureMonitorQueryBuilder from './azure_monitor/azure_monitor_query_builder';
 import AppInsightsQueryBuilder from './app_insights/app_insights_query_builder';
 export default class AzureMonitorDatasource {

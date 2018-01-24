@@ -1,4 +1,3 @@
-///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register(['moment', 'lodash'], function(exports_1) {
     var moment_1, lodash_1;
     var ResponseParser;

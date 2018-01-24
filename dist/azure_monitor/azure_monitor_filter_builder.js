@@ -1,4 +1,3 @@
-///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register(['../time_grain_converter'], function(exports_1) {
     var time_grain_converter_1;
     var AzureMonitorFilterBuilder;

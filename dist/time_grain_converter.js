@@ -1,4 +1,3 @@
-///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register(['lodash', 'app/core/utils/kbn'], function(exports_1) {
     var lodash_1, kbn_1;
     var TimeGrainConverter;

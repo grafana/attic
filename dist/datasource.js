@@ -1,4 +1,3 @@
-///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app_insights/app_insights_query_builder'], function(exports_1) {
     var lodash_1, azure_monitor_query_builder_1, app_insights_query_builder_1;
     var AzureMonitorDatasource;
