@@ -1,19 +1,29 @@
 import _ from 'lodash';
-import AzureMonitorQueryBuilder from './azure_monitor/azure_monitor_query_builder';
-import AppInsightsQueryBuilder from './app_insights/app_insights_query_builder';
+import AzureMonitorDatasource from './azure_monitor/azure_monitor_datasource';
+import AppInsightsDatasource from './app_insights/app_insights_datasource';
 
-export default class AzureMonitorDatasource {
+export default class Datasource {
   id: number;
   name: string;
-  azureMonitorQueryBuilder: AzureMonitorQueryBuilder;
-  appInsightsQueryBuilder: AppInsightsQueryBuilder;
+  azureMonitorDatasource: AzureMonitorDatasource;
+  appInsightsDatasource: AppInsightsDatasource;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
-    this.azureMonitorQueryBuilder = new AzureMonitorQueryBuilder(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
-    this.appInsightsQueryBuilder = new AppInsightsQueryBuilder(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
+    this.azureMonitorDatasource = new AzureMonitorDatasource(
+      instanceSettings,
+      this.backendSrv,
+      this.templateSrv,
+      this.$q
+    );
+    this.appInsightsDatasource = new AppInsightsDatasource(
+      instanceSettings,
+      this.backendSrv,
+      this.templateSrv,
+      this.$q
+    );
   }
 
   query(options) {
@@ -25,11 +35,11 @@ export default class AzureMonitorDatasource {
     appInsightsTargets.targets = _.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
 
     if (azureMonitorOptions.targets.length > 0) {
-      promises.push(this.azureMonitorQueryBuilder.query(azureMonitorOptions));
+      promises.push(this.azureMonitorDatasource.query(azureMonitorOptions));
     }
 
     if (appInsightsTargets.targets.length > 0) {
-      promises.push(this.appInsightsQueryBuilder.query(appInsightsTargets));
+      promises.push(this.appInsightsDatasource.query(appInsightsTargets));
     }
 
     return this.$q.all(promises).then(results => {
@@ -38,29 +48,38 @@ export default class AzureMonitorDatasource {
   }
 
   annotationQuery(options) {
-    throw new Error("Annotation Support not implemented yet.");
+    throw new Error('Annotation Support not implemented yet.');
   }
 
   metricFindQuery(query: string) {
-    throw new Error("Template Variable Support not implemented yet.");
+    if (!query) {
+      return Promise.resolve([]);
+    }
+
+    const result = this.appInsightsDatasource.metricFindQuery(query);
+    if (result) {
+      return result;
+    }
+
+    return Promise.resolve([]);
   }
 
   testDatasource() {
     const promises = [];
 
-    if (this.azureMonitorQueryBuilder.isConfigured()) {
-      promises.push(this.azureMonitorQueryBuilder.testDatasource());
+    if (this.azureMonitorDatasource.isConfigured()) {
+      promises.push(this.azureMonitorDatasource.testDatasource());
     }
 
-    if (this.appInsightsQueryBuilder.isConfigured()) {
-      promises.push(this.appInsightsQueryBuilder.testDatasource());
+    if (this.appInsightsDatasource.isConfigured()) {
+      promises.push(this.appInsightsDatasource.testDatasource());
     }
 
     if (promises.length === 0) {
       return {
         status: 'error',
         message: `Nothing configured. At least one of the API's must be configured.`,
-        title: 'Error'
+        title: 'Error',
       };
     }
 
@@ -72,44 +91,44 @@ export default class AzureMonitorDatasource {
         if (results[i].status !== 'success') {
           status = results[i].status;
         }
-        message += `${i+1}. ${results[i].message} `;
+        message += `${i + 1}. ${results[i].message} `;
       }
 
       return {
         status: status,
         message: message,
-        title: _.upperFirst(status)
+        title: _.upperFirst(status),
       };
     });
   }
 
   /* Azure Monitor REST API methods */
   getResourceGroups() {
-    return this.azureMonitorQueryBuilder.metricFindQuery('?api-version=2017-06-01');
+    return this.azureMonitorDatasource.metricFindQuery('?api-version=2017-06-01');
   }
 
   getMetricDefinitions(resourceGroup: string) {
-    return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
+    return this.azureMonitorDatasource.getMetricDefinitions(resourceGroup);
   }
 
   getResourceNames(resourceGroup: string, metricDefinition: string) {
-    return this.azureMonitorQueryBuilder.getResourceNames(resourceGroup, metricDefinition);
+    return this.azureMonitorDatasource.getResourceNames(resourceGroup, metricDefinition);
   }
 
   getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string) {
-    return this.azureMonitorQueryBuilder.getMetricNames(resourceGroup, metricDefinition, resourceName);
+    return this.azureMonitorDatasource.getMetricNames(resourceGroup, metricDefinition, resourceName);
   }
 
   getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string) {
-    return this.azureMonitorQueryBuilder.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
+    return this.azureMonitorDatasource.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
   }
 
   /* Application Insights API method */
   getAppInsightsMetricNames() {
-    return this.appInsightsQueryBuilder.getMetricNames();
+    return this.appInsightsDatasource.getMetricNames();
   }
 
   getAppInsightsMetricMetadata(metricName) {
-    return this.appInsightsQueryBuilder.getMetricMetadata(metricName);
+    return this.appInsightsDatasource.getMetricMetadata(metricName);
   }
 }

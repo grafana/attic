@@ -1,18 +1,18 @@
-import AzureMonitorQueryBuilder from './azure_monitor/azure_monitor_query_builder';
-import AppInsightsQueryBuilder from './app_insights/app_insights_query_builder';
-export default class AzureMonitorDatasource {
+import AzureMonitorDatasource from './azure_monitor/azure_monitor_datasource';
+import AppInsightsDatasource from './app_insights/app_insights_datasource';
+export default class Datasource {
     private backendSrv;
     private templateSrv;
     private $q;
     id: number;
     name: string;
-    azureMonitorQueryBuilder: AzureMonitorQueryBuilder;
-    appInsightsQueryBuilder: AppInsightsQueryBuilder;
+    azureMonitorDatasource: AzureMonitorDatasource;
+    appInsightsDatasource: AppInsightsDatasource;
     /** @ngInject */
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
     query(options: any): any;
     annotationQuery(options: any): void;
-    metricFindQuery(query: string): void;
+    metricFindQuery(query: string): any;
     testDatasource(): any;
     getResourceGroups(): any;
     getMetricDefinitions(resourceGroup: string): any;

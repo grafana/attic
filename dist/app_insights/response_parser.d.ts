@@ -12,9 +12,11 @@ export default class ResponseParser {
     static getKeyForAggregationField(dataObj: any): any;
     static dateTimeToEpoch(dateTime: any): any;
     static parseMetricNames(result: any): any[];
-    static parseMetadata(result: any, metricName: string): {
+    parseMetadata(metricName: string): {
         primaryAggType: any;
         supportedAggTypes: any;
         supportedGroupBy: any;
     };
+    parseGroupBys(): any[];
+    static toTextValueList(values: any): any[];
 }

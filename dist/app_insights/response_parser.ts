@@ -24,7 +24,7 @@ export default class ResponseParser {
       const metricName = ResponseParser.getMetricFieldKey(value);
       const aggField = ResponseParser.getKeyForAggregationField(value[metricName]);
       const epoch = ResponseParser.dateTimeToEpoch(value.end);
-      data.push({target: metricName, datapoints: [[value[metricName][aggField], epoch]]});
+      data.push({ target: metricName, datapoints: [[value[metricName][aggField], epoch]] });
       return data;
     }
 
@@ -97,7 +97,7 @@ export default class ResponseParser {
   static findOrCreateBucket(data, target) {
     let dataTarget = _.find(data, ['target', target]);
     if (!dataTarget) {
-      dataTarget = {target: target, datapoints: []};
+      dataTarget = { target: target, datapoints: [] };
       data.push(dataTarget);
     }
 
@@ -129,23 +129,31 @@ export default class ResponseParser {
   static parseMetricNames(result) {
     const keys = _.keys(result.data.metrics);
 
-    const list = [];
-    for (let i = 0; i < keys.length; i++) {
-      list.push({
-        text: keys[i],
-        value: keys[i]
-      });
-    }
-    return list;
+    return ResponseParser.toTextValueList(keys);
   }
 
-  static parseMetadata(result: any, metricName: string) {
-    const metric = result.data.metrics[metricName];
+  parseMetadata(metricName: string) {
+    const metric = this.results.data.metrics[metricName];
 
     return {
       primaryAggType: metric.defaultAggregation,
       supportedAggTypes: metric.supportedAggregations,
-      supportedGroupBy: metric.supportedGroupBy.all
+      supportedGroupBy: metric.supportedGroupBy.all,
     };
+  }
+
+  parseGroupBys() {
+    return ResponseParser.toTextValueList(this.results.supportedGroupBy);
+  }
+
+  static toTextValueList(values) {
+    const list = [];
+    for (let i = 0; i < values.length; i++) {
+      list.push({
+        text: values[i],
+        value: values[i],
+      });
+    }
+    return list;
   }
 }

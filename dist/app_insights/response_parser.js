@@ -118,22 +118,28 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 };
                 ResponseParser.parseMetricNames = function (result) {
                     var keys = lodash_1.default.keys(result.data.metrics);
-                    var list = [];
-                    for (var i = 0; i < keys.length; i++) {
-                        list.push({
-                            text: keys[i],
-                            value: keys[i]
-                        });
-                    }
-                    return list;
+                    return ResponseParser.toTextValueList(keys);
                 };
-                ResponseParser.parseMetadata = function (result, metricName) {
-                    var metric = result.data.metrics[metricName];
+                ResponseParser.prototype.parseMetadata = function (metricName) {
+                    var metric = this.results.data.metrics[metricName];
                     return {
                         primaryAggType: metric.defaultAggregation,
                         supportedAggTypes: metric.supportedAggregations,
-                        supportedGroupBy: metric.supportedGroupBy.all
+                        supportedGroupBy: metric.supportedGroupBy.all,
                     };
+                };
+                ResponseParser.prototype.parseGroupBys = function () {
+                    return ResponseParser.toTextValueList(this.results.supportedGroupBy);
+                };
+                ResponseParser.toTextValueList = function (values) {
+                    var list = [];
+                    for (var i = 0; i < values.length; i++) {
+                        list.push({
+                            text: values[i],
+                            value: values[i],
+                        });
+                    }
+                    return list;
                 };
                 return ResponseParser;
             })();

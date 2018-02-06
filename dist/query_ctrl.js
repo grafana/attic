@@ -50,7 +50,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                 };
                 /* Azure Monitor Section */
                 AzureMonitorQueryCtrl.prototype.getResourceGroups = function (query) {
-                    if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorQueryBuilder.isConfigured()) {
+                    if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorDatasource.isConfigured()) {
                         return;
                     }
                     return this.datasource.getResourceGroups();

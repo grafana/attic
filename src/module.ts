@@ -1,6 +1,6 @@
-import AzureMonitorDatasource from './datasource';
-import {AzureMonitorQueryCtrl} from './query_ctrl';
-import {AzureMonitorConfigCtrl} from './config_ctrl';
+import Datasource from './datasource';
+import { AzureMonitorQueryCtrl } from './query_ctrl';
+import { AzureMonitorConfigCtrl } from './config_ctrl';
 
 class AzureMonitorQueryOptionsCtrl {
   static templateUrl = 'partials/query.options.html';
@@ -11,7 +11,7 @@ class AzureMonitorAnnotationsQueryCtrl {
 }
 
 export {
-  AzureMonitorDatasource as Datasource,
+  Datasource,
   AzureMonitorQueryCtrl as QueryCtrl,
   AzureMonitorConfigCtrl as ConfigCtrl,
   AzureMonitorQueryOptionsCtrl as QueryOptionsCtrl,

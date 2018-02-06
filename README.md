@@ -138,6 +138,25 @@ Application Insights Examples:
 - `{{dimensionname}}` = replaced with dimension key/label (e.g. blobtype)
 - `{{dimensionvalue}}` = replaced with dimension value (e.g. BlockBlob)
 
+### Templating with Variables
+
+Instead of hard-coding things like server, application and sensor name in you metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns makes it easy to change the data being displayed in your dashboard.
+
+The Azure Monitor Datasource Plugin provides the following queries you can specify in the `Query` field in the Variable edit view. They allow you to fill a variable's options list.
+
+Application Insights:
+
+Name | Description
+------- | --------
+*AppInsightsMetricNames()* | Returns a list of metric names.
+*AppInsightsGroupBys(aMetricName)* | Returns a list of group bys for the specified metric name.
+
+Examples:
+
+- Metric Names query: `AppInsightsMetricNames()`
+- Passing in metric name variable: `AppInsightsGroupBys(requests/count)`
+- Chaining template variables: `AppInsightsGroupBys($metricnames)`
+
 ### Development
 
 To install and build the plugin:

@@ -1,64 +1,71 @@
-System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app_insights/app_insights_query_builder'], function(exports_1) {
-    var lodash_1, azure_monitor_query_builder_1, app_insights_query_builder_1;
-    var AzureMonitorDatasource;
+System.register(['lodash', './azure_monitor/azure_monitor_datasource', './app_insights/app_insights_datasource'], function(exports_1) {
+    var lodash_1, azure_monitor_datasource_1, app_insights_datasource_1;
+    var Datasource;
     return {
         setters:[
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
             },
-            function (azure_monitor_query_builder_1_1) {
-                azure_monitor_query_builder_1 = azure_monitor_query_builder_1_1;
+            function (azure_monitor_datasource_1_1) {
+                azure_monitor_datasource_1 = azure_monitor_datasource_1_1;
             },
-            function (app_insights_query_builder_1_1) {
-                app_insights_query_builder_1 = app_insights_query_builder_1_1;
+            function (app_insights_datasource_1_1) {
+                app_insights_datasource_1 = app_insights_datasource_1_1;
             }],
         execute: function() {
-            AzureMonitorDatasource = (function () {
+            Datasource = (function () {
                 /** @ngInject */
-                function AzureMonitorDatasource(instanceSettings, backendSrv, templateSrv, $q) {
+                function Datasource(instanceSettings, backendSrv, templateSrv, $q) {
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
                     this.$q = $q;
                     this.name = instanceSettings.name;
                     this.id = instanceSettings.id;
-                    this.azureMonitorQueryBuilder = new azure_monitor_query_builder_1.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
-                    this.appInsightsQueryBuilder = new app_insights_query_builder_1.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
+                    this.azureMonitorDatasource = new azure_monitor_datasource_1.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
+                    this.appInsightsDatasource = new app_insights_datasource_1.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
                 }
-                AzureMonitorDatasource.prototype.query = function (options) {
+                Datasource.prototype.query = function (options) {
                     var promises = [];
                     var azureMonitorOptions = lodash_1.default.cloneDeep(options);
                     var appInsightsTargets = lodash_1.default.cloneDeep(options);
                     azureMonitorOptions.targets = lodash_1.default.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
                     appInsightsTargets.targets = lodash_1.default.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
                     if (azureMonitorOptions.targets.length > 0) {
-                        promises.push(this.azureMonitorQueryBuilder.query(azureMonitorOptions));
+                        promises.push(this.azureMonitorDatasource.query(azureMonitorOptions));
                     }
                     if (appInsightsTargets.targets.length > 0) {
-                        promises.push(this.appInsightsQueryBuilder.query(appInsightsTargets));
+                        promises.push(this.appInsightsDatasource.query(appInsightsTargets));
                     }
                     return this.$q.all(promises).then(function (results) {
                         return { data: lodash_1.default.flatten(results) };
                     });
                 };
-                AzureMonitorDatasource.prototype.annotationQuery = function (options) {
-                    throw new Error("Annotation Support not implemented yet.");
+                Datasource.prototype.annotationQuery = function (options) {
+                    throw new Error('Annotation Support not implemented yet.');
                 };
-                AzureMonitorDatasource.prototype.metricFindQuery = function (query) {
-                    throw new Error("Template Variable Support not implemented yet.");
-                };
-                AzureMonitorDatasource.prototype.testDatasource = function () {
-                    var promises = [];
-                    if (this.azureMonitorQueryBuilder.isConfigured()) {
-                        promises.push(this.azureMonitorQueryBuilder.testDatasource());
+                Datasource.prototype.metricFindQuery = function (query) {
+                    if (!query) {
+                        return Promise.resolve([]);
                     }
-                    if (this.appInsightsQueryBuilder.isConfigured()) {
-                        promises.push(this.appInsightsQueryBuilder.testDatasource());
+                    var result = this.appInsightsDatasource.metricFindQuery(query);
+                    if (result) {
+                        return result;
+                    }
+                    return Promise.resolve([]);
+                };
+                Datasource.prototype.testDatasource = function () {
+                    var promises = [];
+                    if (this.azureMonitorDatasource.isConfigured()) {
+                        promises.push(this.azureMonitorDatasource.testDatasource());
+                    }
+                    if (this.appInsightsDatasource.isConfigured()) {
+                        promises.push(this.appInsightsDatasource.testDatasource());
                     }
                     if (promises.length === 0) {
                         return {
                             status: 'error',
                             message: "Nothing configured. At least one of the API's must be configured.",
-                            title: 'Error'
+                            title: 'Error',
                         };
                     }
                     return this.$q.all(promises).then(function (results) {
@@ -73,36 +80,36 @@ System.register(['lodash', './azure_monitor/azure_monitor_query_builder', './app
                         return {
                             status: status,
                             message: message,
-                            title: lodash_1.default.upperFirst(status)
+                            title: lodash_1.default.upperFirst(status),
                         };
                     });
                 };
                 /* Azure Monitor REST API methods */
-                AzureMonitorDatasource.prototype.getResourceGroups = function () {
-                    return this.azureMonitorQueryBuilder.metricFindQuery('?api-version=2017-06-01');
+                Datasource.prototype.getResourceGroups = function () {
+                    return this.azureMonitorDatasource.metricFindQuery('?api-version=2017-06-01');
                 };
-                AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
-                    return this.azureMonitorQueryBuilder.getMetricDefinitions(resourceGroup);
+                Datasource.prototype.getMetricDefinitions = function (resourceGroup) {
+                    return this.azureMonitorDatasource.getMetricDefinitions(resourceGroup);
                 };
-                AzureMonitorDatasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
-                    return this.azureMonitorQueryBuilder.getResourceNames(resourceGroup, metricDefinition);
+                Datasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
+                    return this.azureMonitorDatasource.getResourceNames(resourceGroup, metricDefinition);
                 };
-                AzureMonitorDatasource.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
-                    return this.azureMonitorQueryBuilder.getMetricNames(resourceGroup, metricDefinition, resourceName);
+                Datasource.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
+                    return this.azureMonitorDatasource.getMetricNames(resourceGroup, metricDefinition, resourceName);
                 };
-                AzureMonitorDatasource.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
-                    return this.azureMonitorQueryBuilder.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
+                Datasource.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
+                    return this.azureMonitorDatasource.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
                 };
                 /* Application Insights API method */
-                AzureMonitorDatasource.prototype.getAppInsightsMetricNames = function () {
-                    return this.appInsightsQueryBuilder.getMetricNames();
+                Datasource.prototype.getAppInsightsMetricNames = function () {
+                    return this.appInsightsDatasource.getMetricNames();
                 };
-                AzureMonitorDatasource.prototype.getAppInsightsMetricMetadata = function (metricName) {
-                    return this.appInsightsQueryBuilder.getMetricMetadata(metricName);
+                Datasource.prototype.getAppInsightsMetricMetadata = function (metricName) {
+                    return this.appInsightsDatasource.getMetricMetadata(metricName);
                 };
-                return AzureMonitorDatasource;
+                return Datasource;
             })();
-            exports_1("default", AzureMonitorDatasource);
+            exports_1("default", Datasource);
         }
     }
 });

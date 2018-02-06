@@ -1,6 +1,6 @@
 System.register(['lodash', './azure_monitor_filter_builder', './url_builder', './response_parser'], function(exports_1) {
     var lodash_1, azure_monitor_filter_builder_1, url_builder_1, response_parser_1;
-    var AzureMonitorQueryBuilder;
+    var AzureMonitorDatasource;
     return {
         setters:[
             function (lodash_1_1) {
@@ -16,8 +16,8 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                 response_parser_1 = response_parser_1_1;
             }],
         execute: function() {
-            AzureMonitorQueryBuilder = (function () {
-                function AzureMonitorQueryBuilder(instanceSettings, backendSrv, templateSrv, $q) {
+            AzureMonitorDatasource = (function () {
+                function AzureMonitorDatasource(instanceSettings, backendSrv, templateSrv, $q) {
                     this.instanceSettings = instanceSettings;
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
@@ -49,24 +49,28 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         'Microsoft.Logic/workflows',
                         'Microsoft.NotificationHubs/Namespaces/NotificationHubs',
                         'Microsoft.Search/searchServices',
-                        'Microsoft.StreamAnalytics/streamingjobs'
+                        'Microsoft.StreamAnalytics/streamingjobs',
                     ];
                     this.id = instanceSettings.id;
                     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
                     this.baseUrl = "/azuremonitor/subscriptions/" + this.subscriptionId + "/resourceGroups";
                     this.url = instanceSettings.url;
                 }
-                AzureMonitorQueryBuilder.prototype.isConfigured = function () {
+                AzureMonitorDatasource.prototype.isConfigured = function () {
                     return this.subscriptionId && this.subscriptionId.length > 0;
                 };
-                AzureMonitorQueryBuilder.prototype.query = function (options) {
+                AzureMonitorDatasource.prototype.query = function (options) {
                     var _this = this;
                     var queries = lodash_1.default.filter(options.targets, function (item) {
-                        return item.hide !== true
-                            && item.azureMonitor.resourceGroup && item.azureMonitor.resourceGroup !== _this.defaultDropdownValue
-                            && item.azureMonitor.resourceName && item.azureMonitor.resourceName !== _this.defaultDropdownValue
-                            && item.azureMonitor.metricDefinition && item.azureMonitor.metricDefinition !== _this.defaultDropdownValue
-                            && item.azureMonitor.metricName && item.azureMonitor.metricName !== _this.defaultDropdownValue;
+                        return (item.hide !== true &&
+                            item.azureMonitor.resourceGroup &&
+                            item.azureMonitor.resourceGroup !== _this.defaultDropdownValue &&
+                            item.azureMonitor.resourceName &&
+                            item.azureMonitor.resourceName !== _this.defaultDropdownValue &&
+                            item.azureMonitor.metricDefinition &&
+                            item.azureMonitor.metricDefinition !== _this.defaultDropdownValue &&
+                            item.azureMonitor.metricName &&
+                            item.azureMonitor.metricName !== _this.defaultDropdownValue);
                     }).map(function (target) {
                         var item = target.azureMonitor;
                         var resourceGroup = _this.templateSrv.replace(item.resourceGroup, options.scopedVars);
@@ -90,7 +94,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             datasourceId: _this.id,
                             url: url,
                             format: options.format,
-                            alias: item.alias
+                            alias: item.alias,
                         };
                     });
                     if (queries.length === 0) {
@@ -101,31 +105,32 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         return new response_parser_1.default(results).parseQueryResult();
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.doQueries = function (queries) {
+                AzureMonitorDatasource.prototype.doQueries = function (queries) {
                     var _this = this;
                     return lodash_1.default.map(queries, function (query) {
                         return _this.doRequest(query.url).then(function (result) {
                             return {
                                 result: result,
-                                query: query
+                                query: query,
                             };
                         });
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.annotationQuery = function (options) {
-                };
-                AzureMonitorQueryBuilder.prototype.metricFindQuery = function (query) {
+                AzureMonitorDatasource.prototype.annotationQuery = function (options) { };
+                AzureMonitorDatasource.prototype.metricFindQuery = function (query) {
                     var url = "" + this.baseUrl + query;
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'name', 'name');
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.getMetricDefinitions = function (resourceGroup) {
+                AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
                     var _this = this;
                     var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
-                    return this.doRequest(url).then(function (result) {
+                    return this.doRequest(url)
+                        .then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'type', 'type');
-                    }).then(function (result) {
+                    })
+                        .then(function (result) {
                         return lodash_1.default.filter(result, function (t) {
                             for (var i = 0; i < _this.supportedMetricNamespaces.length; i++) {
                                 if (lodash_1.default.startsWith(t.value, _this.supportedMetricNamespaces[i])) {
@@ -134,7 +139,8 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             }
                             return false;
                         });
-                    }).then(function (result) {
+                    })
+                        .then(function (result) {
                         var shouldHardcodeBlobStorage = false;
                         for (var i = 0; i < result.length; i++) {
                             if (result[i].value === 'Microsoft.Storage/storageAccounts') {
@@ -145,25 +151,25 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         if (shouldHardcodeBlobStorage) {
                             result.push({
                                 text: 'Microsoft.Storage/storageAccounts/blobServices',
-                                value: 'Microsoft.Storage/storageAccounts/blobServices'
+                                value: 'Microsoft.Storage/storageAccounts/blobServices',
                             });
                             result.push({
                                 text: 'Microsoft.Storage/storageAccounts/fileServices',
-                                value: 'Microsoft.Storage/storageAccounts/fileServices'
+                                value: 'Microsoft.Storage/storageAccounts/fileServices',
                             });
                             result.push({
                                 text: 'Microsoft.Storage/storageAccounts/tableServices',
-                                value: 'Microsoft.Storage/storageAccounts/tableServices'
+                                value: 'Microsoft.Storage/storageAccounts/tableServices',
                             });
                             result.push({
                                 text: 'Microsoft.Storage/storageAccounts/queueServices',
-                                value: 'Microsoft.Storage/storageAccounts/queueServices'
+                                value: 'Microsoft.Storage/storageAccounts/queueServices',
                             });
                         }
                         return result;
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
+                AzureMonitorDatasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
                     var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
                     return this.doRequest(url).then(function (result) {
                         if (!lodash_1.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
@@ -177,38 +183,39 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         return list;
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
+                AzureMonitorDatasource.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
                     var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName, this.apiVersion);
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'name.localizedValue', 'name.value');
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
+                AzureMonitorDatasource.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
                     var url = url_builder_1.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName, this.apiVersion);
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseMetadata(result, metricName);
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.testDatasource = function () {
+                AzureMonitorDatasource.prototype.testDatasource = function () {
                     if (!this.isValidConfigField(this.instanceSettings.jsonData.tenantId)) {
                         return {
                             status: 'error',
-                            message: 'The Tenant Id field is required.'
+                            message: 'The Tenant Id field is required.',
                         };
                     }
                     if (!this.isValidConfigField(this.instanceSettings.jsonData.clientId)) {
                         return {
                             status: 'error',
-                            message: 'The Client Id field is required.'
+                            message: 'The Client Id field is required.',
                         };
                     }
                     var url = this.baseUrl + "?api-version=2017-06-01";
-                    return this.doRequest(url).then(function (response) {
+                    return this.doRequest(url)
+                        .then(function (response) {
                         if (response.status === 200) {
                             return {
                                 status: 'success',
                                 message: 'Successfully queried the Azure Monitor service.',
-                                title: 'Success'
+                                title: 'Success',
                             };
                         }
                     })
@@ -229,30 +236,32 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         }
                         return {
                             status: 'error',
-                            message: message
+                            message: message,
                         };
                     });
                 };
-                AzureMonitorQueryBuilder.prototype.isValidConfigField = function (field) {
+                AzureMonitorDatasource.prototype.isValidConfigField = function (field) {
                     return field && field.length > 0;
                 };
-                AzureMonitorQueryBuilder.prototype.doRequest = function (url, maxRetries) {
+                AzureMonitorDatasource.prototype.doRequest = function (url, maxRetries) {
                     var _this = this;
                     if (maxRetries === void 0) { maxRetries = 1; }
-                    return this.backendSrv.datasourceRequest({
+                    return this.backendSrv
+                        .datasourceRequest({
                         url: this.url + url,
-                        method: 'GET'
-                    }).catch(function (error) {
+                        method: 'GET',
+                    })
+                        .catch(function (error) {
                         if (maxRetries > 0) {
                             return _this.doRequest(url, maxRetries - 1);
                         }
                         throw error;
                     });
                 };
-                return AzureMonitorQueryBuilder;
+                return AzureMonitorDatasource;
             })();
-            exports_1("default", AzureMonitorQueryBuilder);
+            exports_1("default", AzureMonitorDatasource);
         }
     }
 });
-//# sourceMappingURL=azure_monitor_query_builder.js.map
+//# sourceMappingURL=azure_monitor_datasource.js.map

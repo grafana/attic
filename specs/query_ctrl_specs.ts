@@ -43,7 +43,7 @@ describe('AzureMonitorQueryCtrl', function() {
         queryCtrl.datasource.getResourceGroups = function() {
           return this.$q.when(response);
         };
-        queryCtrl.datasource.azureMonitorQueryBuilder = {
+        queryCtrl.datasource.azureMonitorDatasource = {
           isConfigured: function() {
             return true;
           }

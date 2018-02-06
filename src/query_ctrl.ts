@@ -39,7 +39,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   /* Azure Monitor Section */
   getResourceGroups(query) {
-    if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorQueryBuilder.isConfigured()) {
+    if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorDatasource.isConfigured()) {
       return;
     }
 

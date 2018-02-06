@@ -1,4 +1,4 @@
-export default class AzureMonitorQueryBuilder {
+export default class AzureMonitorDatasource {
     private instanceSettings;
     private backendSrv;
     private templateSrv;

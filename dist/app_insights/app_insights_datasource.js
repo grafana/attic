@@ -1,7 +1,7 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 System.register(['lodash', './app_insights_querystring_builder', './response_parser'], function(exports_1) {
     var lodash_1, app_insights_querystring_builder_1, response_parser_1;
-    var AppInsightsQueryBuilder;
+    var AppInsightsDatasource;
     return {
         setters:[
             function (lodash_1_1) {
@@ -14,8 +14,8 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                 response_parser_1 = response_parser_1_1;
             }],
         execute: function() {
-            AppInsightsQueryBuilder = (function () {
-                function AppInsightsQueryBuilder(instanceSettings, backendSrv, templateSrv, $q) {
+            AppInsightsDatasource = (function () {
+                function AppInsightsDatasource(instanceSettings, backendSrv, templateSrv, $q) {
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
                     this.$q = $q;
@@ -25,10 +25,10 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     this.baseUrl = "/appinsights/" + this.version + "/apps/" + this.applicationId + "/metrics";
                     this.url = instanceSettings.url;
                 }
-                AppInsightsQueryBuilder.prototype.isConfigured = function () {
+                AppInsightsDatasource.prototype.isConfigured = function () {
                     return this.applicationId && this.applicationId.length > 0;
                 };
-                AppInsightsQueryBuilder.prototype.query = function (options) {
+                AppInsightsDatasource.prototype.query = function (options) {
                     var _this = this;
                     var queries = lodash_1.default.filter(options.targets, function (item) {
                         return item.hide !== true;
@@ -36,7 +36,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         var item = target.appInsights;
                         var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to, options.interval);
                         if (item.groupBy !== 'none') {
-                            querystringBuilder.setGroupBy(item.groupBy);
+                            querystringBuilder.setGroupBy(_this.templateSrv.replace(item.groupBy, options.scopedVars));
                         }
                         querystringBuilder.setAggregation(item.aggregation);
                         querystringBuilder.setInterval(item.timeGrainType, _this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
@@ -48,7 +48,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                             datasourceId: _this.id,
                             url: url,
                             format: options.format,
-                            alias: item.alias
+                            alias: item.alias,
                         };
                     });
                     if (queries.length === 0) {
@@ -59,32 +59,42 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         return new response_parser_1.default(results).parseQueryResult();
                     });
                 };
-                AppInsightsQueryBuilder.prototype.doQueries = function (queries) {
+                AppInsightsDatasource.prototype.doQueries = function (queries) {
                     var _this = this;
                     return lodash_1.default.map(queries, function (query) {
                         return _this.doRequest(query.url).then(function (result) {
                             return {
                                 result: result,
-                                query: query
+                                query: query,
                             };
                         });
                     });
                 };
-                AppInsightsQueryBuilder.prototype.annotationQuery = function (options) {
+                AppInsightsDatasource.prototype.annotationQuery = function (options) { };
+                AppInsightsDatasource.prototype.metricFindQuery = function (query) {
+                    var appInsightsMetricNameQuery = query.match(/^AppInsightsMetricNames\(\)/i);
+                    if (appInsightsMetricNameQuery) {
+                        return this.getMetricNames();
+                    }
+                    var appInsightsGroupByQuery = query.match(/^AppInsightsGroupBys\(([^\)]+?)(,\s?([^,]+?))?\)/i);
+                    if (appInsightsGroupByQuery) {
+                        var metricName = appInsightsGroupByQuery[1];
+                        return this.getGroupBys(this.templateSrv.replace(metricName));
+                    }
                 };
-                AppInsightsQueryBuilder.prototype.metricFindQuery = function (query) {
-                };
-                AppInsightsQueryBuilder.prototype.testDatasource = function () {
+                AppInsightsDatasource.prototype.testDatasource = function () {
                     var url = this.baseUrl + "/metadata";
-                    return this.doRequest(url).then(function (response) {
+                    return this.doRequest(url)
+                        .then(function (response) {
                         if (response.status === 200) {
                             return {
                                 status: 'success',
                                 message: 'Successfully queried the Application Insights service.',
-                                title: 'Success'
+                                title: 'Success',
                             };
                         }
-                    }).catch(function (error) {
+                    })
+                        .catch(function (error) {
                         var message = 'Application Insights: ';
                         message += error.statusText ? error.statusText + ': ' : '';
                         if (error.data && error.data.error && error.data.error.code === 'PathNotFoundError') {
@@ -98,37 +108,44 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         }
                         return {
                             status: 'error',
-                            message: message
+                            message: message,
                         };
                     });
                 };
-                AppInsightsQueryBuilder.prototype.doRequest = function (url, maxRetries) {
+                AppInsightsDatasource.prototype.doRequest = function (url, maxRetries) {
                     var _this = this;
                     if (maxRetries === void 0) { maxRetries = 1; }
-                    return this.backendSrv.datasourceRequest({
+                    return this.backendSrv
+                        .datasourceRequest({
                         url: this.url + url,
-                        method: 'GET'
-                    }).catch(function (error) {
+                        method: 'GET',
+                    })
+                        .catch(function (error) {
                         if (maxRetries > 0) {
                             return _this.doRequest(url, maxRetries - 1);
                         }
                         throw error;
                     });
                 };
-                AppInsightsQueryBuilder.prototype.getMetricNames = function () {
+                AppInsightsDatasource.prototype.getMetricNames = function () {
                     var url = this.baseUrl + "/metadata";
                     return this.doRequest(url).then(response_parser_1.default.parseMetricNames);
                 };
-                AppInsightsQueryBuilder.prototype.getMetricMetadata = function (metricName) {
+                AppInsightsDatasource.prototype.getMetricMetadata = function (metricName) {
                     var url = this.baseUrl + "/metadata";
                     return this.doRequest(url).then(function (result) {
-                        return response_parser_1.default.parseMetadata(result, metricName);
+                        return new response_parser_1.default(result).parseMetadata(metricName);
                     });
                 };
-                return AppInsightsQueryBuilder;
+                AppInsightsDatasource.prototype.getGroupBys = function (metricName) {
+                    return this.getMetricMetadata(metricName).then(function (result) {
+                        return new response_parser_1.default(result).parseGroupBys();
+                    });
+                };
+                return AppInsightsDatasource;
             })();
-            exports_1("default", AppInsightsQueryBuilder);
+            exports_1("default", AppInsightsDatasource);
         }
     }
 });
-//# sourceMappingURL=app_insights_query_builder.js.map
+//# sourceMappingURL=app_insights_datasource.js.map

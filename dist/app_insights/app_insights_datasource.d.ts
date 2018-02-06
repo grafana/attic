@@ -1,5 +1,5 @@
 /// <reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-export default class AppInsightsQueryBuilder {
+export default class AppInsightsDatasource {
     private backendSrv;
     private templateSrv;
     private $q;
@@ -13,9 +13,10 @@ export default class AppInsightsQueryBuilder {
     query(options: any): any;
     doQueries(queries: any): any;
     annotationQuery(options: any): void;
-    metricFindQuery(query: string): void;
+    metricFindQuery(query: string): any;
     testDatasource(): any;
     doRequest(url: any, maxRetries?: number): any;
     getMetricNames(): any;
     getMetricMetadata(metricName: string): any;
+    getGroupBys(metricName: string): any;
 }
