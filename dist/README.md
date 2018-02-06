@@ -144,7 +144,7 @@ Instead of hard-coding things like server, application and sensor name in you me
 
 The Azure Monitor Datasource Plugin provides the following queries you can specify in the `Query` field in the Variable edit view. They allow you to fill a variable's options list.
 
-Application Insights:
+#### Application Insights
 
 Name | Description
 ------- | --------
@@ -156,6 +156,20 @@ Examples:
 - Metric Names query: `AppInsightsMetricNames()`
 - Passing in metric name variable: `AppInsightsGroupBys(requests/count)`
 - Chaining template variables: `AppInsightsGroupBys($metricnames)`
+
+#### Azure Monitor
+
+Name | Description
+------- | --------
+*AzureMonitorResourceGroups()* | Returns a list of resource groups.
+*AzureMonitorNamespaces(aResourceGroup)* | Returns a list of namespaces for the specified resource group.
+*AzureMonitorResourceNames(aResourceGroup, aNamespace)* | Returns a list of resource names.
+
+Examples:
+
+- Resource Groups query: `AzureMonitorResourceGroups()`
+- Passing in metric name variable: `AzureMonitorNamespaces(cosmo)`
+- Chaining template variables: `AzureMonitorResourceNames($rg, $ns)`
 
 ### Development
 

@@ -47,9 +47,13 @@ System.register(['lodash', './azure_monitor/azure_monitor_datasource', './app_in
                     if (!query) {
                         return Promise.resolve([]);
                     }
-                    var result = this.appInsightsDatasource.metricFindQuery(query);
-                    if (result) {
-                        return result;
+                    var aiResult = this.appInsightsDatasource.metricFindQuery(query);
+                    if (aiResult) {
+                        return aiResult;
+                    }
+                    var amResult = this.azureMonitorDatasource.metricFindQuery(query);
+                    if (amResult) {
+                        return amResult;
                     }
                     return Promise.resolve([]);
                 };
@@ -86,7 +90,7 @@ System.register(['lodash', './azure_monitor/azure_monitor_datasource', './app_in
                 };
                 /* Azure Monitor REST API methods */
                 Datasource.prototype.getResourceGroups = function () {
-                    return this.azureMonitorDatasource.metricFindQuery('?api-version=2017-06-01');
+                    return this.azureMonitorDatasource.getResourceGroups();
                 };
                 Datasource.prototype.getMetricDefinitions = function (resourceGroup) {
                     return this.azureMonitorDatasource.getMetricDefinitions(resourceGroup);

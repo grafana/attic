@@ -298,6 +298,103 @@ describe('AzureMonitorDatasource', function() {
     });
   });
 
+  describe('When performing metricFindQuery', () => {
+    describe('with a metric names query', () => {
+      const response = {
+        data: {
+          value: [
+            { name: 'grp1' },
+            { name: 'grp2' },
+          ]
+        },
+        status: 200,
+        statusText: 'OK'
+      };
+
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          return ctx.$q.when(response);
+        };
+      });
+
+      it('should return a list of metric names', function() {
+        return ctx.ds.metricFindQuery('azureMonitorResourceGroups()').then(function(results) {
+          expect(results.length).to.be(2);
+          expect(results[0].text).to.be('grp1');
+          expect(results[0].value).to.be('grp1');
+          expect(results[1].text).to.be('grp2');
+          expect(results[1].value).to.be('grp2');
+        });
+      });
+    });
+
+    describe('with metric definitions query', function() {
+      const response = {
+        data: {
+          value: [
+            {
+              name: 'test_OsDisk_1_68102d72f11b47dc8090b770e61cb5d2',
+              type: 'Microsoft.Compute/disks',
+            }
+          ]
+        },
+        status: 200,
+        statusText: 'OK'
+      };
+
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          expect(options.url).to.be(baseUrl + '/nodesapp/resources?api-version=2017-06-01');
+          return ctx.$q.when(response);
+        };
+      });
+
+      it('should return a list of metric definitions', () => {
+        return ctx.ds.metricFindQuery('azureMonitorNamespaces(nodesapp)').then(results => {
+          expect(results.length).to.equal(1);
+          expect(results[0].text).to.equal('Microsoft.Compute/disks');
+          expect(results[0].value).to.equal('Microsoft.Compute/disks');
+        });
+      });
+    });
+
+    describe('with resource names query', function() {
+      const response = {
+        data: {
+          value: [
+            {
+              name: 'Failure Anomalies - nodeapp',
+              type: 'microsoft.insights/alertrules',
+            },
+            {
+              name: 'nodeapp',
+              type: 'microsoft.insights/components',
+            }
+          ]
+        },
+        status: 200,
+        statusText: 'OK'
+      };
+
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2017-06-01');
+          return ctx.$q.when(response);
+        };
+      });
+
+      it('should return a list of resource names', () => {
+        return ctx.ds.metricFindQuery('azureMonitorResourceNames(nodeapp, microsoft.insights/components )').then(results => {
+          expect(results.length).to.equal(1);
+          expect(results[0].text).to.equal('nodeapp');
+          expect(results[0].value).to.equal('nodeapp');
+        });
+      });
+    });
+  });
+
   describe('When performing getResourceGroups', function() {
     const response = {
       data: {

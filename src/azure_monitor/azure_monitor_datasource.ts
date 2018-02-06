@@ -136,7 +136,30 @@ export default class AzureMonitorDatasource {
   annotationQuery(options) {}
 
   metricFindQuery(query: string) {
-    const url = `${this.baseUrl}${query}`;
+    const resourceGroupsQuery = query.match(/^AzureMonitorResourceGroups\(\)/i);
+    if (resourceGroupsQuery) {
+      return this.getResourceGroups();
+    }
+
+    const metricDefinitionsQuery = query.match(/^AzureMonitorNamespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);
+    if (metricDefinitionsQuery) {
+      return this.getMetricDefinitions(this.toVariable(metricDefinitionsQuery[1]));
+    }
+
+    const resourceNamesQuery = query.match(/^AzureMonitorResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
+    if (resourceNamesQuery) {
+      const metricName = this.toVariable(resourceNamesQuery[1]);
+      const metricDefinition = this.toVariable(resourceNamesQuery[2]);
+      return this.getResourceNames(metricName, metricDefinition);
+    }
+  }
+
+  toVariable(metric: string) {
+    return this.templateSrv.replace((metric || '').trim());
+  }
+
+  getResourceGroups() {
+    const url = `${this.baseUrl}?api-version=2017-06-01`;
     return this.doRequest(url).then(result => {
       return ResponseParser.parseResponseValues(result, 'name', 'name');
     });

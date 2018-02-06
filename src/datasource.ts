@@ -56,9 +56,14 @@ export default class Datasource {
       return Promise.resolve([]);
     }
 
-    const result = this.appInsightsDatasource.metricFindQuery(query);
-    if (result) {
-      return result;
+    const aiResult = this.appInsightsDatasource.metricFindQuery(query);
+    if (aiResult) {
+      return aiResult;
+    }
+
+    const amResult = this.azureMonitorDatasource.metricFindQuery(query);
+    if (amResult) {
+      return amResult;
     }
 
     return Promise.resolve([]);
@@ -104,7 +109,7 @@ export default class Datasource {
 
   /* Azure Monitor REST API methods */
   getResourceGroups() {
-    return this.azureMonitorDatasource.metricFindQuery('?api-version=2017-06-01');
+    return this.azureMonitorDatasource.getResourceGroups();
   }
 
   getMetricDefinitions(resourceGroup: string) {
