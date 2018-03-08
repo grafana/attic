@@ -6,7 +6,7 @@ describe('AzureMonitorFilterBuilder', function() {
   let builder: AzureMonitorFilterBuilder;
 
   const timefilter = 'timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z';
-  const metricFilter = 'metric=Percentage CPU';
+  const metricFilter = 'metricnames=Percentage CPU';
 
   beforeEach(function() {
     builder = new AzureMonitorFilterBuilder(

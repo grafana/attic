@@ -5,7 +5,7 @@ System.register([], function(exports_1) {
         execute: function() {
             AzureMonitorConfigCtrl = (function () {
                 function AzureMonitorConfigCtrl($scope) {
-                    this.current.url = 'https://management.azure.com';
+                    this.current.jsonData.cloudName = this.current.jsonData.cloudName || 'azuremonitor';
                 }
                 AzureMonitorConfigCtrl.templateUrl = 'partials/config.html';
                 return AzureMonitorConfigCtrl;

@@ -1,6 +1,17 @@
 <h3 class="page-heading">Azure Monitor API Details</h3>
 
 <div class="gf-form-group">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-9">Azure Cloud</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.cloudName" ng-options="f.value as f.text for f in [{value: 'azuremonitor', text: 'Public Azure'}, {value: 'govazuremonitor', text: 'Gov Cloud'}, {value: 'germanyazuremonitor', text: 'Germany Cloud'}, {value: 'chinaazuremonitor', text: 'China Cloud'}]" ng-change="ctrl.refresh()"></select>
+      </div>
+      <info-popover mode="right-normal">
+          <p>Choose an Azure Cloud.</p>
+      </info-popover>
+    </div>
+  </div>
 	<div class="gf-form-inline">
 		<div class="gf-form">
 			<span class="gf-form-label width-9">Subscription Id</span>

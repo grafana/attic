@@ -14,7 +14,8 @@ describe('AzureMonitorDatasource', function() {
     ctx.$q = Q;
     ctx.instanceSettings = {
       url: 'http://azuremonitor.com',
-      jsonData: { subscriptionId: '9935389e-9122-4ef9-95f9-1513dd24753f'}
+      jsonData: { subscriptionId: '9935389e-9122-4ef9-95f9-1513dd24753f'},
+      cloudName: 'azuremonitor'
     };
 
     ctx.ds = new AzureMonitorDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.templateSrv, ctx.$q);
@@ -85,7 +86,7 @@ describe('AzureMonitorDatasource', function() {
       },
       targets: [
         {
-          apiVersion: '2017-05-01-preview',
+          apiVersion: '2018-01-01',
           refId: 'A',
           queryType: 'Azure Monitor',
           azureMonitor: {
@@ -345,7 +346,7 @@ describe('AzureMonitorDatasource', function() {
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
           const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
-          expect(options.url).to.be(baseUrl + '/nodesapp/resources?api-version=2017-06-01');
+          expect(options.url).to.be(baseUrl + '/nodesapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
       });
@@ -380,7 +381,7 @@ describe('AzureMonitorDatasource', function() {
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
           const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
-          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2017-06-01');
+          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
       });
@@ -459,7 +460,7 @@ describe('AzureMonitorDatasource', function() {
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
         const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
-        expect(options.url).to.be(baseUrl + '/nodesapp/resources?api-version=2017-06-01');
+        expect(options.url).to.be(baseUrl + '/nodesapp/resources?api-version=2018-01-01');
         return ctx.$q.when(response);
       };
     });
@@ -507,7 +508,7 @@ describe('AzureMonitorDatasource', function() {
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
           const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
-          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2017-06-01');
+          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
       });
@@ -542,7 +543,7 @@ describe('AzureMonitorDatasource', function() {
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
           const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
-          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2017-06-01');
+          expect(options.url).to.be(baseUrl + '/nodeapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
       });
@@ -600,7 +601,7 @@ describe('AzureMonitorDatasource', function() {
       ctx.backendSrv.datasourceRequest = function(options) {
         const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
         const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
-          '/providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview';
+          '/providers/microsoft.insights/metricdefinitions?api-version=2018-01-01';
         expect(options.url).to.be(expected);
         return ctx.$q.when(response);
       };
@@ -659,7 +660,7 @@ describe('AzureMonitorDatasource', function() {
       ctx.backendSrv.datasourceRequest = function(options) {
         const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
         const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
-          '/providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview';
+          '/providers/microsoft.insights/metricdefinitions?api-version=2018-01-01';
         expect(options.url).to.be(expected);
         return ctx.$q.when(response);
       };
@@ -730,7 +731,7 @@ describe('AzureMonitorDatasource', function() {
       ctx.backendSrv.datasourceRequest = function(options) {
         const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
         const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
-          '/providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview';
+          '/providers/microsoft.insights/metricdefinitions?api-version=2018-01-01';
         expect(options.url).to.be(expected);
         return ctx.$q.when(response);
       };

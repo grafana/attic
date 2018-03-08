@@ -3,6 +3,6 @@ export class AzureMonitorConfigCtrl {
   current: any;
 
   constructor($scope) {
-    this.current.url = 'https://management.azure.com';
+    this.current.jsonData.cloudName = this.current.jsonData.cloudName || 'azuremonitor';
   }
 }

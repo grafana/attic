@@ -52,10 +52,10 @@ describe('AzureMonitorUrlBuilder', function() {
         'Microsoft.Storage/storageAccounts/blobServices',
         'rn1/default',
         '2017-05-01-preview',
-        'metric=aMetric'
+        'metricnames=aMetric'
       );
       expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/blobServices/default/' +
-        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metric=aMetric');
+        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
 
@@ -81,10 +81,10 @@ describe('AzureMonitorUrlBuilder', function() {
         'Microsoft.Storage/storageAccounts/fileServices',
         'rn1/default',
         '2017-05-01-preview',
-        'metric=aMetric'
+        'metricnames=aMetric'
       );
       expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/fileServices/default/' +
-        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metric=aMetric');
+        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
 
@@ -110,10 +110,10 @@ describe('AzureMonitorUrlBuilder', function() {
         'Microsoft.Storage/storageAccounts/tableServices',
         'rn1/default',
         '2017-05-01-preview',
-        'metric=aMetric'
+        'metricnames=aMetric'
       );
       expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/tableServices/default/' +
-        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metric=aMetric');
+        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
 
@@ -139,10 +139,10 @@ describe('AzureMonitorUrlBuilder', function() {
         'Microsoft.Storage/storageAccounts/queueServices',
         'rn1/default',
         '2017-05-01-preview',
-        'metric=aMetric'
+        'metricnames=aMetric'
       );
       expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/queueServices/default/' +
-        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metric=aMetric');
+        'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
 });

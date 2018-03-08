@@ -43,6 +43,48 @@
       }
     },
     {
+      "path": "govazuremonitor",
+      "method": "GET",
+      "url": "https://management.usgovcloudapi.net",
+      "tokenAuth": {
+        "url": " https://login.microsoftonline.us/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type":  "client_credentials",
+          "client_id": "{{.JsonData.clientId}}",
+          "client_secret": "{{.SecureJsonData.clientSecret}}",
+          "resource": "https://management.usgovcloudapi.net/"
+        }
+      }
+    },
+    {
+      "path": "germanyazuremonitor",
+      "method": "GET",
+      "url": "https://management.microsoftazure.de",
+      "tokenAuth": {
+        "url": "https://login.microsoftonline.de/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type":  "client_credentials",
+          "client_id": "{{.JsonData.clientId}}",
+          "client_secret": "{{.SecureJsonData.clientSecret}}",
+          "resource": "https://management.microsoftazure.de/"
+        }
+      }
+    },
+    {
+      "path": "chinaazuremonitor",
+      "method": "GET",
+      "url": "https://management.chinacloudapi.cn",
+      "tokenAuth": {
+        "url": "https://login.chinacloudapi.cn/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type":  "client_credentials",
+          "client_id": "{{.JsonData.clientId}}",
+          "client_secret": "{{.SecureJsonData.clientSecret}}",
+          "resource": "https://management.chinacloudapi.cn/"
+        }
+      }
+    },
+    {
       "path": "appinsights",
       "method": "GET",
       "url": "https://api.applicationinsights.io",

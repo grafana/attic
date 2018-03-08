@@ -31,7 +31,7 @@ System.register(['../time_grain_converter'], function(exports_1) {
                         filter += "&aggregation=" + this.aggregation;
                     }
                     if (this.metricName && this.metricName.trim().length > 0) {
-                        filter += "&metric=" + this.metricName;
+                        filter += "&metricnames=" + this.metricName;
                     }
                     if (this.dimension && this.dimensionFilter && this.dimensionFilter.trim().length > 0) {
                         filter += "&$filter=" + this.dimension + " eq '" + this.dimensionFilter + "'";

@@ -2,9 +2,10 @@ import _ from 'lodash';
 import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
 import UrlBuilder from './url_builder';
 import ResponseParser from './response_parser';
+import SupportedNamespaces from './supported_namespaces';
 
 export default class AzureMonitorDatasource {
-  apiVersion = '2017-05-01-preview';
+  apiVersion = '2018-01-01';
   id: number;
   subscriptionId: string;
   baseUrl: string;
@@ -12,39 +13,17 @@ export default class AzureMonitorDatasource {
   resourceName: string;
   url: string;
   defaultDropdownValue = 'select';
-  supportedMetricNamespaces = [
-    'Microsoft.Compute',
-    'Microsoft.ClassicCompute',
-    'Microsoft.Storage',
-    'Microsoft.Sql',
-    'Microsoft.Web',
-    'Microsoft.EventHub',
-    'Microsoft.ServiceBus',
-    'Microsoft.Devices',
-    'Microsoft.DocumentDb',
-    'Microsoft.Network',
-    'Microsoft.Cache/Redis',
-    'Microsoft.AnalysisServices/servers',
-    'Microsoft.ApiManagement/service',
-    'Microsoft.Automation/automationAccounts',
-    'Microsoft.Batch/batchAccounts',
-    'Microsoft.CognitiveServices/accounts',
-    'Microsoft.CustomerInsights/hubs',
-    'Microsoft.DataLakeAnalytics/accounts',
-    'Microsoft.DataLakeStore/accounts',
-    'Microsoft.DBforMySQL/servers',
-    'Microsoft.DBforPostgreSQL/servers',
-    'Microsoft.Logic/workflows',
-    'Microsoft.NotificationHubs/Namespaces/NotificationHubs',
-    'Microsoft.Search/searchServices',
-    'Microsoft.StreamAnalytics/streamingjobs',
-  ];
+  cloudName: string;
+  supportedMetricNamespaces = [];
 
   constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
-    this.baseUrl = `/azuremonitor/subscriptions/${this.subscriptionId}/resourceGroups`;
+    this.cloudName = instanceSettings.jsonData.cloudName || 'azuremonitor';
+    this.baseUrl = `/${this.cloudName}/subscriptions/${this.subscriptionId}/resourceGroups`;
     this.url = instanceSettings.url;
+
+    this.supportedMetricNamespaces = new SupportedNamespaces(this.cloudName).get();
   }
 
   isConfigured() {
@@ -159,14 +138,14 @@ export default class AzureMonitorDatasource {
   }
 
   getResourceGroups() {
-    const url = `${this.baseUrl}?api-version=2017-06-01`;
+    const url = `${this.baseUrl}?api-version=2018-01-01`;
     return this.doRequest(url).then(result => {
       return ResponseParser.parseResponseValues(result, 'name', 'name');
     });
   }
 
   getMetricDefinitions(resourceGroup: string) {
-    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
+    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2018-01-01`;
     return this.doRequest(url)
       .then(result => {
         return ResponseParser.parseResponseValues(result, 'type', 'type');
@@ -215,7 +194,7 @@ export default class AzureMonitorDatasource {
   }
 
   getResourceNames(resourceGroup: string, metricDefinition: string) {
-    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2017-06-01`;
+    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2018-01-01`;
 
     return this.doRequest(url).then(result => {
       if (!_.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
@@ -275,7 +254,7 @@ export default class AzureMonitorDatasource {
       };
     }
 
-    const url = `${this.baseUrl}?api-version=2017-06-01`;
+    const url = `${this.baseUrl}?api-version=2018-01-01`;
     return this.doRequest(url)
       .then(response => {
         if (response.status === 200) {

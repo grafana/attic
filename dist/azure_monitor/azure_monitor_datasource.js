@@ -1,5 +1,5 @@
-System.register(['lodash', './azure_monitor_filter_builder', './url_builder', './response_parser'], function(exports_1) {
-    var lodash_1, azure_monitor_filter_builder_1, url_builder_1, response_parser_1;
+System.register(['lodash', './azure_monitor_filter_builder', './url_builder', './response_parser', './supported_namespaces'], function(exports_1) {
+    var lodash_1, azure_monitor_filter_builder_1, url_builder_1, response_parser_1, supported_namespaces_1;
     var AzureMonitorDatasource;
     return {
         setters:[
@@ -14,6 +14,9 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
             },
             function (response_parser_1_1) {
                 response_parser_1 = response_parser_1_1;
+            },
+            function (supported_namespaces_1_1) {
+                supported_namespaces_1 = supported_namespaces_1_1;
             }],
         execute: function() {
             AzureMonitorDatasource = (function () {
@@ -22,39 +25,15 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
                     this.$q = $q;
-                    this.apiVersion = '2017-05-01-preview';
+                    this.apiVersion = '2018-01-01';
                     this.defaultDropdownValue = 'select';
-                    this.supportedMetricNamespaces = [
-                        'Microsoft.Compute',
-                        'Microsoft.ClassicCompute',
-                        'Microsoft.Storage',
-                        'Microsoft.Sql',
-                        'Microsoft.Web',
-                        'Microsoft.EventHub',
-                        'Microsoft.ServiceBus',
-                        'Microsoft.Devices',
-                        'Microsoft.DocumentDb',
-                        'Microsoft.Network',
-                        'Microsoft.Cache/Redis',
-                        'Microsoft.AnalysisServices/servers',
-                        'Microsoft.ApiManagement/service',
-                        'Microsoft.Automation/automationAccounts',
-                        'Microsoft.Batch/batchAccounts',
-                        'Microsoft.CognitiveServices/accounts',
-                        'Microsoft.CustomerInsights/hubs',
-                        'Microsoft.DataLakeAnalytics/accounts',
-                        'Microsoft.DataLakeStore/accounts',
-                        'Microsoft.DBforMySQL/servers',
-                        'Microsoft.DBforPostgreSQL/servers',
-                        'Microsoft.Logic/workflows',
-                        'Microsoft.NotificationHubs/Namespaces/NotificationHubs',
-                        'Microsoft.Search/searchServices',
-                        'Microsoft.StreamAnalytics/streamingjobs',
-                    ];
+                    this.supportedMetricNamespaces = [];
                     this.id = instanceSettings.id;
                     this.subscriptionId = instanceSettings.jsonData.subscriptionId;
-                    this.baseUrl = "/azuremonitor/subscriptions/" + this.subscriptionId + "/resourceGroups";
+                    this.cloudName = instanceSettings.jsonData.cloudName || 'azuremonitor';
+                    this.baseUrl = "/" + this.cloudName + "/subscriptions/" + this.subscriptionId + "/resourceGroups";
                     this.url = instanceSettings.url;
+                    this.supportedMetricNamespaces = new supported_namespaces_1.default(this.cloudName).get();
                 }
                 AzureMonitorDatasource.prototype.isConfigured = function () {
                     return this.subscriptionId && this.subscriptionId.length > 0;
@@ -137,14 +116,14 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     return this.templateSrv.replace((metric || '').trim());
                 };
                 AzureMonitorDatasource.prototype.getResourceGroups = function () {
-                    var url = this.baseUrl + "?api-version=2017-06-01";
+                    var url = this.baseUrl + "?api-version=2018-01-01";
                     return this.doRequest(url).then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'name', 'name');
                     });
                 };
                 AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
                     var _this = this;
-                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
+                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2018-01-01";
                     return this.doRequest(url)
                         .then(function (result) {
                         return response_parser_1.default.parseResponseValues(result, 'type', 'type');
@@ -189,7 +168,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     });
                 };
                 AzureMonitorDatasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
-                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2017-06-01";
+                    var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2018-01-01";
                     return this.doRequest(url).then(function (result) {
                         if (!lodash_1.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
                             return response_parser_1.default.parseResourceNames(result, metricDefinition);
@@ -227,7 +206,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             message: 'The Client Id field is required.',
                         };
                     }
-                    var url = this.baseUrl + "?api-version=2017-06-01";
+                    var url = this.baseUrl + "?api-version=2018-01-01";
                     return this.doRequest(url)
                         .then(function (response) {
                         if (response.status === 200) {
