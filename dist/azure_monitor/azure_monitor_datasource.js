@@ -131,7 +131,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                         .then(function (result) {
                         return lodash_1.default.filter(result, function (t) {
                             for (var i = 0; i < _this.supportedMetricNamespaces.length; i++) {
-                                if (lodash_1.default.startsWith(t.value, _this.supportedMetricNamespaces[i])) {
+                                if (lodash_1.default.startsWith(t.value.toLowerCase(), _this.supportedMetricNamespaces[i].toLowerCase())) {
                                     return true;
                                 }
                             }
