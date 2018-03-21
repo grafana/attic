@@ -23,6 +23,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-typescript": "^0.8.0",
+    "load-grunt-tasks": "^3.5.2",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-expect": "^1.1.3",

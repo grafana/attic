@@ -153,7 +153,7 @@ export default class AzureMonitorDatasource {
       .then(result => {
         return _.filter(result, t => {
           for (let i = 0; i < this.supportedMetricNamespaces.length; i++) {
-            if (_.startsWith(t.value, this.supportedMetricNamespaces[i])) {
+            if (_.startsWith(t.value.toLowerCase(), this.supportedMetricNamespaces[i].toLowerCase())) {
               return true;
             }
           }
