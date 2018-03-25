@@ -1,5 +1,5 @@
-System.register(['lodash', './azure_monitor_filter_builder', './url_builder', './response_parser', './supported_namespaces'], function(exports_1) {
-    var lodash_1, azure_monitor_filter_builder_1, url_builder_1, response_parser_1, supported_namespaces_1;
+System.register(['lodash', './azure_monitor_filter_builder', './url_builder', './response_parser', './supported_namespaces', '../time_grain_converter'], function(exports_1) {
+    var lodash_1, azure_monitor_filter_builder_1, url_builder_1, response_parser_1, supported_namespaces_1, time_grain_converter_1;
     var AzureMonitorDatasource;
     return {
         setters:[
@@ -17,6 +17,9 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
             },
             function (supported_namespaces_1_1) {
                 supported_namespaces_1 = supported_namespaces_1_1;
+            },
+            function (time_grain_converter_1_1) {
+                time_grain_converter_1 = time_grain_converter_1_1;
             }],
         execute: function() {
             AzureMonitorDatasource = (function () {
@@ -52,12 +55,18 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             item.azureMonitor.metricName !== _this.defaultDropdownValue);
                     }).map(function (target) {
                         var item = target.azureMonitor;
+                        if (item.timeGrainUnit && item.timeGrain !== 'auto') {
+                            item.timeGrain = time_grain_converter_1.default.createISO8601Duration(item.timeGrain, item.timeGrainUnit);
+                        }
                         var resourceGroup = _this.templateSrv.replace(item.resourceGroup, options.scopedVars);
                         var resourceName = _this.templateSrv.replace(item.resourceName, options.scopedVars);
                         var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
                         var metricName = _this.templateSrv.replace(item.metricName, options.scopedVars);
-                        var timeGrain = _this.templateSrv.replace(item.timeGrain.toString(), options.scopedVars);
-                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, timeGrain, item.timeGrainUnit, options.interval);
+                        var timeGrain = _this.templateSrv.replace((item.timeGrain || '').toString(), options.scopedVars);
+                        var filterBuilder = new azure_monitor_filter_builder_1.default(item.metricName, options.range.from, options.range.to, timeGrain, options.interval);
+                        if (item.timeGrains) {
+                            filterBuilder.setAllowedTimeGrains(item.timeGrains);
+                        }
                         if (item.aggregation) {
                             filterBuilder.setAggregation(item.aggregation);
                         }

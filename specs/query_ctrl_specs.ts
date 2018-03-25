@@ -8,16 +8,15 @@ describe('AzureMonitorQueryCtrl', function() {
   let queryCtrl;
 
   beforeEach(function() {
+    AzureMonitorQueryCtrl.prototype.panelCtrl = {
+      events: {on: () => {}},
+      panel: {scopedVars: []}
+    };
     queryCtrl = new AzureMonitorQueryCtrl({}, {}, new TemplateSrvStub());
     queryCtrl.datasource = {$q: Q};
   });
 
   describe('init query_ctrl variables', function() {
-    it('time grain variables should be initialized', function() {
-      expect(queryCtrl.target.azureMonitor.timeGrain).to.be('1');
-      expect(queryCtrl.target.azureMonitor.timeGrainUnit).to.be('minute');
-    });
-
     it('should set default query type to Azure Monitor', function() {
       expect(queryCtrl.target.queryType).to.be('Azure Monitor');
     });
@@ -173,6 +172,7 @@ describe('AzureMonitorQueryCtrl', function() {
       const response = {
         primaryAggType: 'Average',
         supportAggOptions: ['Average', 'Total'],
+        supportedTimeGrains: ['PT1M', 'P1D'],
         dimensions: []
       };
 
@@ -194,6 +194,7 @@ describe('AzureMonitorQueryCtrl', function() {
         queryCtrl.onMetricNameChange().then(() => {
           expect(queryCtrl.target.azureMonitor.aggregation).to.be('Average');
           expect(queryCtrl.target.azureMonitor.aggOptions).to.be(['Average', 'Total']);
+          expect(queryCtrl.target.azureMonitor.timeGrains).to.be(['PT1M', 'P1D']);
         });
       });
     });

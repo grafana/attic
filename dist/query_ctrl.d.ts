@@ -2,6 +2,7 @@ import { QueryCtrl } from 'app/plugins/sdk';
 export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     private templateSrv;
     static templateUrl: string;
+    lastQueryError: string;
     defaultDropdownValue: string;
     defaults: {
         queryType: string;
@@ -10,9 +11,8 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
             metricDefinition: string;
             resourceName: string;
             metricName: string;
-            timeGrain: string;
-            timeGrainUnit: string;
             dimensionFilter: string;
+            timeGrain: string;
         };
         appInsights: {
             metricName: string;
@@ -22,6 +22,9 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     };
     /** @ngInject **/
     constructor($scope: any, $injector: any, templateSrv: any);
+    onDataReceived(dataList: any): void;
+    onDataError(err: any): void;
+    migrateTimeGrains(): void;
     replace(variable: string): any;
     getResourceGroups(query: any): any;
     getMetricDefinitions(query: any): any;

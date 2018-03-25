@@ -1,5 +1,6 @@
 import moment from 'moment';
 import _ from 'lodash';
+import TimeGrainConverter from '../time_grain_converter';
 
 export default class ResponseParser {
   constructor(private results) {}
@@ -144,8 +145,22 @@ export default class ResponseParser {
     return {
       primaryAggType: metricData.primaryAggregationType,
       supportedAggTypes: metricData.supportedAggregationTypes || defaultAggTypes,
+      supportedTimeGrains: ResponseParser.parseTimeGrains(metricData.metricAvailabilities || []),
       dimensions: ResponseParser.parseDimensions(metricData)
     };
+  }
+
+  static parseTimeGrains(metricAvailabilities) {
+    const timeGrains = [];
+    metricAvailabilities.forEach(avail => {
+      if (avail.timeGrain) {
+        timeGrains.push({
+          text: TimeGrainConverter.createTimeGrainFromISO8601Duration(avail.timeGrain),
+          value: avail.timeGrain}
+        );
+      }
+    });
+    return timeGrains;
   }
 
   static parseDimensions(metricData: any) {

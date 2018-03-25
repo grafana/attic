@@ -3,6 +3,7 @@ import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
 import UrlBuilder from './url_builder';
 import ResponseParser from './response_parser';
 import SupportedNamespaces from './supported_namespaces';
+import TimegrainConverter from '../time_grain_converter';
 
 export default class AzureMonitorDatasource {
   apiVersion = '2018-01-01';
@@ -45,20 +46,31 @@ export default class AzureMonitorDatasource {
       );
     }).map(target => {
       const item = target.azureMonitor;
+
+      if (item.timeGrainUnit && item.timeGrain !== 'auto') {
+        item.timeGrain = TimegrainConverter.createISO8601Duration(
+          item.timeGrain,
+          item.timeGrainUnit
+        );
+      }
+
       const resourceGroup = this.templateSrv.replace(item.resourceGroup, options.scopedVars);
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
       const metricName = this.templateSrv.replace(item.metricName, options.scopedVars);
-      const timeGrain = this.templateSrv.replace(item.timeGrain.toString(), options.scopedVars);
+      const timeGrain = this.templateSrv.replace((item.timeGrain || '').toString(), options.scopedVars);
 
       const filterBuilder = new AzureMonitorFilterBuilder(
         item.metricName,
         options.range.from,
         options.range.to,
         timeGrain,
-        item.timeGrainUnit,
         options.interval
       );
+
+      if (item.timeGrains) {
+        filterBuilder.setAllowedTimeGrains(item.timeGrains);
+      }
 
       if (item.aggregation) {
         filterBuilder.setAggregation(item.aggregation);

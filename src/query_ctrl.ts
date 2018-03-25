@@ -5,6 +5,7 @@ import TimegrainConverter from './time_grain_converter';
 
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
+  lastQueryError: string;
 
   defaultDropdownValue = 'select';
 
@@ -15,9 +16,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       metricDefinition: this.defaultDropdownValue,
       resourceName: this.defaultDropdownValue,
       metricName: this.defaultDropdownValue,
-      timeGrain: '1',
-      timeGrainUnit: 'minute',
-      dimensionFilter: '*'
+      dimensionFilter: '*',
+      timeGrain: 'auto'
     },
     appInsights: {
       metricName: this.defaultDropdownValue,
@@ -31,6 +31,33 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     super($scope, $injector);
 
     _.defaultsDeep(this.target, this.defaults);
+    this.migrateTimeGrains();
+
+    this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
+    this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
+  }
+
+  onDataReceived(dataList) {
+    this.lastQueryError = null;
+  }
+
+  onDataError(err) {
+    if (err.data) {
+      this.lastQueryError = err.data.message;
+    }
+  }
+
+  migrateTimeGrains() {
+    if (this.target.azureMonitor.timeGrainUnit) {
+
+      if (this.target.azureMonitor.timeGrain !== 'auto') {
+        this.target.azureMonitor.timeGrain =
+          TimegrainConverter.createISO8601Duration(this.target.azureMonitor.timeGrain, this.target.azureMonitor.timeGrainUnit);
+      }
+
+      delete this.target.azureMonitor.timeGrainUnit;
+      this.onMetricNameChange();
+    }
   }
 
   replace(variable: string) {
@@ -118,6 +145,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     ).then(metadata => {
       this.target.azureMonitor.aggOptions = metadata.supportedAggTypes || [metadata.primaryAggType];
       this.target.azureMonitor.aggregation = metadata.primaryAggType;
+      this.target.azureMonitor.timeGrains = [{text: 'auto', value: 'auto'}].concat(metadata.supportedTimeGrains);
+
       this.target.azureMonitor.dimensions = metadata.dimensions;
       if (metadata.dimensions.length > 0) {
         this.target.azureMonitor.dimension = metadata.dimensions[0].value;
@@ -127,8 +156,12 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAutoInterval() {
-    if (!this.target.azureMonitor.timeGrain) {
-      return TimegrainConverter.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+    if (this.target.azureMonitor.timeGrain === 'auto') {
+      return TimegrainConverter.findClosestTimeGrain(
+        this.panelCtrl.interval,
+        _.map(this.target.azureMonitor.timeGrains, o => TimegrainConverter.createKbnUnitFromISO8601Duration(o.value))
+        || ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']
+      );
     }
 
     return '';

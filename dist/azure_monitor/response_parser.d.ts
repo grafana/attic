@@ -14,7 +14,9 @@ export default class ResponseParser {
     static parseMetadata(result: any, metricName: string): {
         primaryAggType: any;
         supportedAggTypes: any;
+        supportedTimeGrains: any[];
         dimensions: any[];
     };
+    static parseTimeGrains(metricAvailabilities: any): any[];
     static parseDimensions(metricData: any): any[];
 }

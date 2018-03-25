@@ -66,14 +66,11 @@
       </div>
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Time Grain</label>
-        <input type="text" class="gf-form-input width-5" ng-model="ctrl.target.azureMonitor.timeGrain" spellcheck="false" placeholder="auto" ng-blur="ctrl.refresh()">
-      </div>
-      <div class="gf-form">
         <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent timegrainunit-dropdown-wrapper">
-          <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.timeGrainUnit" ng-options="f as f for f in ['minute', 'hour', 'day', 'month', 'year']" ng-change="ctrl.refresh()"></select>
+          <select class="gf-form-input" ng-model="ctrl.target.azureMonitor.timeGrain" ng-options="f.value as f.text for f in ctrl.target.azureMonitor.timeGrains" ng-change="ctrl.refresh()"></select>
         </div>
       </div>
-      <div class="gf-form" ng-hide="ctrl.target.azureMonitor.timeGrain.trim() !== ''">
+      <div class="gf-form" ng-show="ctrl.target.azureMonitor.timeGrain.trim() === 'auto'">
         <label class="gf-form-label">Auto Interval</label>
         <label class="gf-form-label">{{ctrl.getAutoInterval()}}</label>
       </div>
@@ -176,5 +173,9 @@
         <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
+  </div>
+
+  <div class="gf-form" ng-show="ctrl.lastQueryError">
+    <pre class="gf-form-pre alert alert-error">{{ctrl.lastQueryError}}</pre>
   </div>
 </query-editor-row>

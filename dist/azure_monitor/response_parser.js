@@ -1,5 +1,5 @@
-System.register(['moment', 'lodash'], function(exports_1) {
-    var moment_1, lodash_1;
+System.register(['moment', 'lodash', '../time_grain_converter'], function(exports_1) {
+    var moment_1, lodash_1, time_grain_converter_1;
     var ResponseParser;
     return {
         setters:[
@@ -8,6 +8,9 @@ System.register(['moment', 'lodash'], function(exports_1) {
             },
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
+            },
+            function (time_grain_converter_1_1) {
+                time_grain_converter_1 = time_grain_converter_1_1;
             }],
         execute: function() {
             ResponseParser = (function () {
@@ -131,8 +134,20 @@ System.register(['moment', 'lodash'], function(exports_1) {
                     return {
                         primaryAggType: metricData.primaryAggregationType,
                         supportedAggTypes: metricData.supportedAggregationTypes || defaultAggTypes,
+                        supportedTimeGrains: ResponseParser.parseTimeGrains(metricData.metricAvailabilities || []),
                         dimensions: ResponseParser.parseDimensions(metricData)
                     };
+                };
+                ResponseParser.parseTimeGrains = function (metricAvailabilities) {
+                    var timeGrains = [];
+                    metricAvailabilities.forEach(function (avail) {
+                        if (avail.timeGrain) {
+                            timeGrains.push({
+                                text: time_grain_converter_1.default.createTimeGrainFromISO8601Duration(avail.timeGrain),
+                                value: avail.timeGrain });
+                        }
+                    });
+                    return timeGrains;
                 };
                 ResponseParser.parseDimensions = function (metricData) {
                     var dimensions = [];

@@ -13,15 +13,14 @@ describe('AzureMonitorFilterBuilder', function() {
       'Percentage CPU',
       moment.utc('2017-08-22 06:00'),
       moment.utc('2017-08-22 07:00'),
-      1,
-      'hour',
+      'PT1H',
       '3m'
     );
   });
 
   describe('with a metric name and auto time grain of 3 minutes', function() {
     beforeEach(function() {
-      builder.timeGrain = null;
+      builder.timeGrain = 'auto';
     });
 
     it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
@@ -32,7 +31,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and auto time grain of 30 seconds', function() {
     beforeEach(function() {
-      builder.timeGrain = null;
+      builder.timeGrain = 'auto';
       builder.grafanaInterval = '30s';
     });
 
@@ -44,7 +43,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and auto time grain of 10 minutes', function() {
     beforeEach(function() {
-      builder.timeGrain = null;
+      builder.timeGrain = 'auto';
       builder.grafanaInterval = '10m';
     });
 
@@ -56,7 +55,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and auto time grain of 2 day', function() {
     beforeEach(function() {
-      builder.timeGrain = null;
+      builder.timeGrain = 'auto';
       builder.grafanaInterval = '2d';
     });
 
@@ -75,7 +74,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
   describe('with a metric name and 1 minute time grain', function() {
     beforeEach(function() {
-      builder.timeGrainUnit = 'minute';
+      builder.timeGrain = 'PT1M';
     });
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
@@ -84,20 +83,9 @@ describe('AzureMonitorFilterBuilder', function() {
     });
   });
 
-  describe('with a metric name and 1 day time grain', function() {
-    beforeEach(function() {
-      builder.timeGrainUnit = 'day';
-    });
-
-    it('should add time grain to the filter in ISO_8601 format', function() {
-      const filter = timefilter + '&interval=P1D&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
-    });
-  });
-
   describe('with a metric name and 1 day time grain and an aggregation', function() {
     beforeEach(function() {
-      builder.timeGrainUnit = 'day';
+      builder.timeGrain = 'P1D';
       builder.setAggregation('Maximum');
     });
 
@@ -107,12 +95,12 @@ describe('AzureMonitorFilterBuilder', function() {
     });
   });
 
-  describe('with a metric name and 1 day time grain and an aggregation', function() {
+  describe('with a metric name and 1 day time grain and an aggregation and a dimension', function() {
     beforeEach(function() {
       builder.setDimensionFilter('aDimension', 'aFilterValue');
     });
 
-    it('should add time grain to the filter in ISO_8601 format', function() {
+    it('should add dimension to the filter', function() {
       const filter = timefilter + '&interval=PT1H&' + metricFilter
         + `&$filter=aDimension eq 'aFilterValue'`;
       expect(builder.generateFilter()).to.equal(filter);

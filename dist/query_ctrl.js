@@ -33,9 +33,8 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                             metricDefinition: this.defaultDropdownValue,
                             resourceName: this.defaultDropdownValue,
                             metricName: this.defaultDropdownValue,
-                            timeGrain: '1',
-                            timeGrainUnit: 'minute',
-                            dimensionFilter: '*'
+                            dimensionFilter: '*',
+                            timeGrain: 'auto'
                         },
                         appInsights: {
                             metricName: this.defaultDropdownValue,
@@ -44,7 +43,28 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                         }
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
+                    this.migrateTimeGrains();
+                    this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
+                    this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
                 }
+                AzureMonitorQueryCtrl.prototype.onDataReceived = function (dataList) {
+                    this.lastQueryError = null;
+                };
+                AzureMonitorQueryCtrl.prototype.onDataError = function (err) {
+                    if (err.data) {
+                        this.lastQueryError = err.data.message;
+                    }
+                };
+                AzureMonitorQueryCtrl.prototype.migrateTimeGrains = function () {
+                    if (this.target.azureMonitor.timeGrainUnit) {
+                        if (this.target.azureMonitor.timeGrain !== 'auto') {
+                            this.target.azureMonitor.timeGrain =
+                                time_grain_converter_1.default.createISO8601Duration(this.target.azureMonitor.timeGrain, this.target.azureMonitor.timeGrainUnit);
+                        }
+                        delete this.target.azureMonitor.timeGrainUnit;
+                        this.onMetricNameChange();
+                    }
+                };
                 AzureMonitorQueryCtrl.prototype.replace = function (variable) {
                     return this.templateSrv.replace(variable, this.panelCtrl.panel.scopedVars);
                 };
@@ -106,6 +126,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     return this.datasource.getMetricMetadata(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName), this.replace(this.target.azureMonitor.metricName)).then(function (metadata) {
                         _this.target.azureMonitor.aggOptions = metadata.supportedAggTypes || [metadata.primaryAggType];
                         _this.target.azureMonitor.aggregation = metadata.primaryAggType;
+                        _this.target.azureMonitor.timeGrains = [{ text: 'auto', value: 'auto' }].concat(metadata.supportedTimeGrains);
                         _this.target.azureMonitor.dimensions = metadata.dimensions;
                         if (metadata.dimensions.length > 0) {
                             _this.target.azureMonitor.dimension = metadata.dimensions[0].value;
@@ -114,8 +135,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     });
                 };
                 AzureMonitorQueryCtrl.prototype.getAutoInterval = function () {
-                    if (!this.target.azureMonitor.timeGrain) {
-                        return time_grain_converter_1.default.findClosestTimeGrain(this.panelCtrl.interval, ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+                    if (this.target.azureMonitor.timeGrain === 'auto') {
+                        return time_grain_converter_1.default.findClosestTimeGrain(this.panelCtrl.interval, lodash_1.default.map(this.target.azureMonitor.timeGrains, function (o) { return time_grain_converter_1.default.createKbnUnitFromISO8601Duration(o.value); })
+                            || ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
                     }
                     return '';
                 };

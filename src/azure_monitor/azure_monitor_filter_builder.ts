@@ -13,9 +13,19 @@ export default class AzureMonitorFilterBuilder {
     private metricName: string,
     private from,
     private to,
-    public timeGrain: number,
-    public timeGrainUnit: string,
+    public timeGrain: string,
     public grafanaInterval: string) {
+  }
+
+  setAllowedTimeGrains(timeGrains) {
+    this.allowedTimeGrains = [];
+    timeGrains.forEach(tg => {
+      if (tg.value === 'auto') {
+        this.allowedTimeGrains.push(tg.value);
+      } else {
+        this.allowedTimeGrains.push(TimegrainConverter.createKbnUnitFromISO8601Duration(tg.value));
+      }
+    });
   }
 
   setAggregation(agg) {
@@ -48,12 +58,10 @@ export default class AzureMonitorFilterBuilder {
   createDatetimeAndTimeGrainConditions() {
     const dateTimeCondition = `timespan=${this.from.utc().format()}/${this.to.utc().format()}`;
 
-    if (this.timeGrain > 0) {
-      this.timeGrainInterval = TimegrainConverter.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
-    } else {
-      this.timeGrainInterval = this.calculateAutoTimeGrain();
+    if (this.timeGrain === 'auto') {
+      this.timeGrain = this.calculateAutoTimeGrain();
     }
-    const timeGrainCondition = `&interval=${this.timeGrainInterval}`;
+    const timeGrainCondition = `&interval=${this.timeGrain}`;
 
     return dateTimeCondition + timeGrainCondition;
   }

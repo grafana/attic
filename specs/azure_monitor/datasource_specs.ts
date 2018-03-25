@@ -94,8 +94,7 @@ describe('AzureMonitorDatasource', function() {
             resourceName: 'testRN',
             metricDefinition: 'Microsoft.Compute/virtualMachines',
             metricName: 'Percentage CPU',
-            timeGrain: 1,
-            timeGrainUnit: 'hour',
+            timeGrain: 'PT1H',
             alias: ''
           }
         }
@@ -577,6 +576,12 @@ describe('AzureMonitorDatasource', function() {
               'Maximum',
               'Total',
               'Count'
+            ],
+            metricAvailabilities: [
+              {timeGrain: 'PT1H', retention: 'P93D'},
+              {timeGrain: 'PT6H', retention: 'P93D'},
+              {timeGrain: 'PT12H', retention: 'P93D'},
+              {timeGrain: 'P1D', retention: 'P93D'}
             ]
           },
           {
@@ -589,6 +594,12 @@ describe('AzureMonitorDatasource', function() {
             supportedAggregationTypes: [
               'None',
               'Average',
+            ],
+            metricAvailabilities: [
+              {timeGrain: 'PT1H', retention: 'P93D'},
+              {timeGrain: 'PT6H', retention: 'P93D'},
+              {timeGrain: 'PT12H', retention: 'P93D'},
+              {timeGrain: 'P1D', retention: 'P93D'}
             ]
           },
         ]
@@ -636,6 +647,12 @@ describe('AzureMonitorDatasource', function() {
               'Maximum',
               'Total',
               'Count'
+            ],
+            metricAvailabilities: [
+              {timeGrain: 'PT1H', retention: 'P93D'},
+              {timeGrain: 'PT6H', retention: 'P93D'},
+              {timeGrain: 'PT12H', retention: 'P93D'},
+              {timeGrain: 'P1D', retention: 'P93D'}
             ]
           },
           {
@@ -648,6 +665,12 @@ describe('AzureMonitorDatasource', function() {
             supportedAggregationTypes: [
               'None',
               'Average',
+            ],
+            metricAvailabilities: [
+              {timeGrain: 'PT1H', retention: 'P93D'},
+              {timeGrain: 'PT6H', retention: 'P93D'},
+              {timeGrain: 'PT12H', retention: 'P93D'},
+              {timeGrain: 'P1D', retention: 'P93D'}
             ]
           },
         ]
@@ -670,6 +693,7 @@ describe('AzureMonitorDatasource', function() {
       return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'UsedCapacity').then(function(results) {
         expect(results.primaryAggType).to.equal('Total');
         expect(results.supportedAggTypes.length).to.equal(6);
+        expect(results.supportedTimeGrains.length).to.equal(4);
       });
     });
   });
