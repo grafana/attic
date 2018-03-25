@@ -116,9 +116,16 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                     }
                     var resourceNamesQuery = query.match(/^AzureMonitorResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
                     if (resourceNamesQuery) {
-                        var metricName = this.toVariable(resourceNamesQuery[1]);
+                        var resourceGroup = this.toVariable(resourceNamesQuery[1]);
                         var metricDefinition = this.toVariable(resourceNamesQuery[2]);
-                        return this.getResourceNames(metricName, metricDefinition);
+                        return this.getResourceNames(resourceGroup, metricDefinition);
+                    }
+                    var metricNamesQuery = query.match(/^AzureMonitorMetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
+                    if (metricNamesQuery) {
+                        var resourceGroup = this.toVariable(metricNamesQuery[1]);
+                        var metricDefinition = this.toVariable(metricNamesQuery[2]);
+                        var resourceName = this.toVariable(metricNamesQuery[3]);
+                        return this.getMetricNames(resourceGroup, metricDefinition, resourceName);
                     }
                 };
                 AzureMonitorDatasource.prototype.toVariable = function (metric) {

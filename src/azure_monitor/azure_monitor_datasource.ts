@@ -139,9 +139,18 @@ export default class AzureMonitorDatasource {
 
     const resourceNamesQuery = query.match(/^AzureMonitorResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
     if (resourceNamesQuery) {
-      const metricName = this.toVariable(resourceNamesQuery[1]);
+      const resourceGroup = this.toVariable(resourceNamesQuery[1]);
       const metricDefinition = this.toVariable(resourceNamesQuery[2]);
-      return this.getResourceNames(metricName, metricDefinition);
+      return this.getResourceNames(resourceGroup, metricDefinition);
+    }
+
+    const metricNamesQuery = query.match(/^AzureMonitorMetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
+
+    if (metricNamesQuery) {
+      const resourceGroup = this.toVariable(metricNamesQuery[1]);
+      const metricDefinition = this.toVariable(metricNamesQuery[2]);
+      const resourceName = this.toVariable(metricNamesQuery[3]);
+      return this.getMetricNames(resourceGroup, metricDefinition, resourceName);
     }
   }
 

@@ -393,6 +393,49 @@ describe('AzureMonitorDatasource', function() {
         });
       });
     });
+
+    describe('with metric names query', function() {
+      const response = {
+        data: {
+          value: [
+            {
+              name: {
+                value: 'Percentage CPU',
+                localizedValue: 'Percentage CPU'
+              },
+            },
+            {
+              name: {
+                value: 'UsedCapacity',
+                localizedValue: 'Used capacity'
+              },
+            }
+          ]
+        },
+        status: 200,
+        statusText: 'OK'
+      };
+
+      beforeEach(function() {
+        ctx.backendSrv.datasourceRequest = function(options) {
+          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          expect(options.url).to.be(baseUrl + '/nodeapp/providers/microsoft.insights/components/rn/providers/microsoft.insights/' +
+            'metricdefinitions?api-version=2018-01-01');
+          return ctx.$q.when(response);
+        };
+      });
+
+      it('should return a list of metric names', () => {
+        return ctx.ds.metricFindQuery('azureMonitorMetricNames(nodeapp, microsoft.insights/components, rn)').then(results => {
+          expect(results.length).to.equal(2);
+          expect(results[0].text).to.equal('Percentage CPU');
+          expect(results[0].value).to.equal('Percentage CPU');
+
+          expect(results[1].text).to.equal('Used capacity');
+          expect(results[1].value).to.equal('UsedCapacity');
+        });
+      });
+    });
   });
 
   describe('When performing getResourceGroups', function() {

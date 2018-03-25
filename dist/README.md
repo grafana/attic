@@ -164,6 +164,7 @@ Name | Description
 *AzureMonitorResourceGroups()* | Returns a list of resource groups.
 *AzureMonitorNamespaces(aResourceGroup)* | Returns a list of namespaces for the specified resource group.
 *AzureMonitorResourceNames(aResourceGroup, aNamespace)* | Returns a list of resource names.
+*AzureMonitorMetricNames(aResourceGroup, aNamespace, aResourceName)* | Returns a list of metric names.
 
 Examples:
 
