@@ -8,9 +8,11 @@ export default class AppInsightsQuerystringBuilder {
     timeGrainType: string;
     timeGrain: string;
     timeGrainUnit: string;
+    filter: string;
     constructor(from: any, to: any, grafanaInterval: any);
     setAggregation(aggregation: any): void;
     setGroupBy(groupBy: any): void;
     setInterval(timeGrainType: any, timeGrain: any, timeGrainUnit: any): void;
+    setFilter(filter: string): void;
     generate(): string;
 }

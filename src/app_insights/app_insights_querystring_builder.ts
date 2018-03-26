@@ -10,6 +10,7 @@ export default class AppInsightsQuerystringBuilder {
   timeGrainType = '';
   timeGrain = '';
   timeGrainUnit = '';
+  filter = '';
 
   constructor(private from, private to, public grafanaInterval) {
   }
@@ -26,6 +27,10 @@ export default class AppInsightsQuerystringBuilder {
     this.timeGrainType = timeGrainType;
     this.timeGrain = timeGrain;
     this.timeGrainUnit = timeGrainUnit;
+  }
+
+  setFilter(filter: string) {
+    this.filter = filter;
   }
 
   generate() {
@@ -45,6 +50,10 @@ export default class AppInsightsQuerystringBuilder {
 
     if (this.timeGrainType === 'auto') {
       querystring += `&interval=${TimeGrainConverter.createISO8601DurationFromInterval(this.grafanaInterval)}`;
+    }
+
+    if (this.filter) {
+      querystring += `&filter=${this.filter}`;
     }
 
     return querystring;

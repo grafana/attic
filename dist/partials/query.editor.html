@@ -141,6 +141,18 @@
         </gf-form-dropdown>
         <label class="gf-form-label min-width-20 pointer" ng-hide="ctrl.target.appInsights.groupBy === 'none'" ng-click="ctrl.resetAppInsightsGroupBy()">{{ctrl.target.appInsights.groupBy}} <i class="fa fa-remove"></i></label>
       </div>
+      <div class="gf-form-inline">
+        <div class="gf-form">
+          <label class="gf-form-label query-keyword width-9">Filter</label>
+          <input type="text" class="gf-form-input width-17" ng-model="ctrl.target.appInsights.filter" spellcheck="false" placeholder="your/groupby eq 'a_value'" ng-blur="ctrl.refresh()">
+        </div>
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div>
+
+    <div class="gf-form-inline">
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Time Grain</label>
         <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">

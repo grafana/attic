@@ -59,4 +59,15 @@ describe('AppInsightsQuerystringBuilder', function() {
       expect(builder.generate()).to.equal(querystring);
     });
   });
+
+  describe('with filter', function() {
+    beforeEach(() => {
+      builder.setFilter(`client/city eq 'Boydton'`);
+    });
+
+    it('should add datetime filtering and interval to the querystring', function() {
+      const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&filter=client/city eq 'Boydton'`;
+      expect(builder.generate()).to.equal(querystring);
+    });
+  });
 });

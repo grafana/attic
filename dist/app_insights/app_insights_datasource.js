@@ -40,6 +40,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         }
                         querystringBuilder.setAggregation(item.aggregation);
                         querystringBuilder.setInterval(item.timeGrainType, _this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
+                        querystringBuilder.setFilter(_this.templateSrv.replace((item.filter || '')));
                         var url = _this.baseUrl + "/" + _this.templateSrv.replace(item.metricName, options.scopedVars) + "?" + querystringBuilder.generate();
                         return {
                             refId: target.refId,

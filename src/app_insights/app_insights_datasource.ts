@@ -43,6 +43,8 @@ export default class AppInsightsDatasource {
         item.timeGrainUnit
       );
 
+      querystringBuilder.setFilter(this.templateSrv.replace((item.filter || '')));
+
       const url = `${this.baseUrl}/${this.templateSrv.replace(
         item.metricName,
         options.scopedVars

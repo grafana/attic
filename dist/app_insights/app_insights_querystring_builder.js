@@ -18,6 +18,7 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     this.timeGrainType = '';
                     this.timeGrain = '';
                     this.timeGrainUnit = '';
+                    this.filter = '';
                 }
                 AppInsightsQuerystringBuilder.prototype.setAggregation = function (aggregation) {
                     this.aggregation = aggregation;
@@ -29,6 +30,9 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     this.timeGrainType = timeGrainType;
                     this.timeGrain = timeGrain;
                     this.timeGrainUnit = timeGrainUnit;
+                };
+                AppInsightsQuerystringBuilder.prototype.setFilter = function (filter) {
+                    this.filter = filter;
                 };
                 AppInsightsQuerystringBuilder.prototype.generate = function () {
                     var querystring = "timespan=" + this.from.utc().format() + "/" + this.to.utc().format();
@@ -43,6 +47,9 @@ System.register(['../time_grain_converter'], function(exports_1) {
                     }
                     if (this.timeGrainType === 'auto') {
                         querystring += "&interval=" + time_grain_converter_1.default.createISO8601DurationFromInterval(this.grafanaInterval);
+                    }
+                    if (this.filter) {
+                        querystring += "&filter=" + this.filter;
                     }
                     return querystring;
                 };

@@ -138,6 +138,17 @@ Application Insights Examples:
 - `{{dimensionname}}` = replaced with dimension key/label (e.g. blobtype)
 - `{{dimensionvalue}}` = replaced with dimension value (e.g. BlockBlob)
 
+### Filter Expressions for Application Insights
+
+The filter field takes an Odata filter expression.
+
+Examples:
+
+- `client/city eq 'Boydton'`
+- `client/city ne 'Boydton'`
+- `client/city ne 'Boydton' and client/city ne 'Dublin'`
+- `client/city eq 'Boydton' or client/city eq 'Dublin'`
+
 ### Templating with Variables
 
 Instead of hard-coding things like server, application and sensor name in you metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns makes it easy to change the data being displayed in your dashboard.
