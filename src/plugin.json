@@ -47,7 +47,7 @@
       "method": "GET",
       "url": "https://management.usgovcloudapi.net",
       "tokenAuth": {
-        "url": " https://login.microsoftonline.us/{{.JsonData.tenantId}}/oauth2/token",
+        "url": "https://login.microsoftonline.us/{{.JsonData.tenantId}}/oauth2/token",
         "params": {
           "grant_type":  "client_credentials",
           "client_id": "{{.JsonData.clientId}}",
