@@ -51,8 +51,26 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     this.lastQueryError = null;
                 };
                 AzureMonitorQueryCtrl.prototype.onDataError = function (err) {
-                    if (err.data) {
+                    this.handleQueryCtrlError(err);
+                };
+                AzureMonitorQueryCtrl.prototype.handleQueryCtrlError = function (err) {
+                    if (err.query && err.query.refId && err.query.refId !== this.target.refId) {
+                        return;
+                    }
+                    if (err.error && err.error.data && err.error.data.error) {
+                        this.lastQueryError = err.error.data.error.message;
+                    }
+                    else if (err.error && err.error.data) {
+                        this.lastQueryError = err.error.data.message;
+                    }
+                    else if (err.data && err.data.error) {
+                        this.lastQueryError = err.data.error.message;
+                    }
+                    else if (err.data && err.data.message) {
                         this.lastQueryError = err.data.message;
+                    }
+                    else {
+                        this.lastQueryError = err;
                     }
                 };
                 AzureMonitorQueryCtrl.prototype.migrateTimeGrains = function () {
@@ -73,14 +91,15 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorDatasource.isConfigured()) {
                         return;
                     }
-                    return this.datasource.getResourceGroups();
+                    return this.datasource.getResourceGroups().catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
                         || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup));
+                    return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup))
+                        .catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
@@ -89,7 +108,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                         return;
                     }
                     var rg = this.templateSrv.replace(this.target.azureMonitor.resourceGroup, this.panelCtrl.panel.scopedVars);
-                    return this.datasource.getResourceNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition));
+                    return this.datasource.getResourceNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition)).catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.getMetricNames = function (query) {
                     if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup
@@ -98,7 +117,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                         || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
                         return;
                     }
-                    return this.datasource.getMetricNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName));
+                    return this.datasource.getMetricNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName)).catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.onResourceGroupChange = function () {
                     this.target.azureMonitor.metricDefinition = this.defaultDropdownValue;
@@ -132,7 +151,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                             _this.target.azureMonitor.dimension = metadata.dimensions[0].value;
                         }
                         return _this.refresh();
-                    });
+                    }).catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.getAutoInterval = function () {
                     if (this.target.azureMonitor.timeGrain === 'auto') {
@@ -149,7 +168,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     return this.panelCtrl.interval;
                 };
                 AzureMonitorQueryCtrl.prototype.getAppInsightsMetricNames = function () {
-                    return this.datasource.getAppInsightsMetricNames();
+                    return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.onAppInsightsMetricNameChange = function () {
                     var _this = this;
@@ -162,7 +181,7 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                         _this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
                         _this.target.appInsights.aggregation = aggData.primaryAggType;
                         return _this.refresh();
-                    });
+                    }).catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.getAppInsightsGroupBySegments = function (query) {
                     return lodash_1.default.map(this.target.appInsights.groupByOptions, function (option) {

@@ -122,6 +122,9 @@ System.register(['moment', 'lodash'], function(exports_1) {
                 };
                 ResponseParser.prototype.parseMetadata = function (metricName) {
                     var metric = this.results.data.metrics[metricName];
+                    if (!metric) {
+                        throw Error("No data found for metric: " + metricName);
+                    }
                     return {
                         primaryAggType: metric.defaultAggregation,
                         supportedAggTypes: metric.supportedAggregations,

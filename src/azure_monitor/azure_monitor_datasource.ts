@@ -120,6 +120,11 @@ export default class AzureMonitorDatasource {
           result: result,
           query: query,
         };
+      }).catch(err => {
+        throw {
+          error: err,
+          query: query
+        };
       });
     });
   }

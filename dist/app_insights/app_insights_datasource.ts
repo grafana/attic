@@ -77,6 +77,11 @@ export default class AppInsightsDatasource {
           result: result,
           query: query,
         };
+      }).catch(err => {
+        throw {
+          error: err,
+          query: query
+        };
       });
     });
   }

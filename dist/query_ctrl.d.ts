@@ -24,6 +24,7 @@ export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     constructor($scope: any, $injector: any, templateSrv: any);
     onDataReceived(dataList: any): void;
     onDataError(err: any): void;
+    handleQueryCtrlError(err: any): void;
     migrateTimeGrains(): void;
     replace(variable: string): any;
     getResourceGroups(query: any): any;

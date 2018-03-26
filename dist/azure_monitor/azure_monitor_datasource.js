@@ -101,6 +101,11 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                                 result: result,
                                 query: query,
                             };
+                        }).catch(function (err) {
+                            throw {
+                                error: err,
+                                query: query
+                            };
                         });
                     });
                 };

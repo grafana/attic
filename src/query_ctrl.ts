@@ -42,8 +42,24 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   onDataError(err) {
-    if (err.data) {
+    this.handleQueryCtrlError(err);
+  }
+
+  handleQueryCtrlError(err) {
+    if (err.query && err.query.refId && err.query.refId !== this.target.refId) {
+      return;
+    }
+
+    if (err.error && err.error.data && err.error.data.error) {
+      this.lastQueryError = err.error.data.error.message;
+    } else if (err.error && err.error.data) {
+      this.lastQueryError = err.error.data.message;
+    } else if (err.data && err.data.error) {
+      this.lastQueryError = err.data.error.message;
+    } else if (err.data && err.data.message) {
       this.lastQueryError = err.data.message;
+    } else {
+      this.lastQueryError = err;
     }
   }
 
@@ -70,7 +86,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       return;
     }
 
-    return this.datasource.getResourceGroups();
+    return this.datasource.getResourceGroups().catch(this.handleQueryCtrlError.bind(this));
   }
 
   getMetricDefinitions(query) {
@@ -78,7 +94,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
       return;
     }
-    return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup));
+    return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup))
+      .catch(this.handleQueryCtrlError.bind(this));
   }
 
   getResourceNames(query) {
@@ -93,7 +110,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     return this.datasource.getResourceNames(
       this.replace(this.target.azureMonitor.resourceGroup),
       this.replace(this.target.azureMonitor.metricDefinition)
-    );
+    ).catch(this.handleQueryCtrlError.bind(this));
   }
 
   getMetricNames(query) {
@@ -108,7 +125,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       this.replace(this.target.azureMonitor.resourceGroup),
       this.replace(this.target.azureMonitor.metricDefinition),
       this.replace(this.target.azureMonitor.resourceName)
-    );
+    ).catch(this.handleQueryCtrlError.bind(this));
   }
 
   onResourceGroupChange() {
@@ -152,7 +169,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
         this.target.azureMonitor.dimension = metadata.dimensions[0].value;
       }
       return this.refresh();
-    });
+    }).catch(this.handleQueryCtrlError.bind(this));
   }
 
   getAutoInterval() {
@@ -176,7 +193,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     return this.panelCtrl.interval;
   }
   getAppInsightsMetricNames() {
-    return this.datasource.getAppInsightsMetricNames();
+    return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
   }
 
   onAppInsightsMetricNameChange() {
@@ -190,7 +207,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
         this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
         this.target.appInsights.aggregation = aggData.primaryAggType;
         return this.refresh();
-      });
+      }).catch(this.handleQueryCtrlError.bind(this));
   }
 
   getAppInsightsGroupBySegments(query) {

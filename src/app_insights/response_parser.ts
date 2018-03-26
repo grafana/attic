@@ -135,6 +135,10 @@ export default class ResponseParser {
   parseMetadata(metricName: string) {
     const metric = this.results.data.metrics[metricName];
 
+    if (!metric) {
+      throw Error("No data found for metric: " + metricName);
+    }
+
     return {
       primaryAggType: metric.defaultAggregation,
       supportedAggTypes: metric.supportedAggregations,

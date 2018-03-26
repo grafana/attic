@@ -67,6 +67,11 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                                 result: result,
                                 query: query,
                             };
+                        }).catch(function (err) {
+                            throw {
+                                error: err,
+                                query: query
+                            };
                         });
                     });
                 };
