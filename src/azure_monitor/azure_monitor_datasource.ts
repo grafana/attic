@@ -132,24 +132,24 @@ export default class AzureMonitorDatasource {
   annotationQuery(options) {}
 
   metricFindQuery(query: string) {
-    const resourceGroupsQuery = query.match(/^AzureMonitorResourceGroups\(\)/i);
+    const resourceGroupsQuery = query.match(/^ResourceGroups\(\)/i);
     if (resourceGroupsQuery) {
       return this.getResourceGroups();
     }
 
-    const metricDefinitionsQuery = query.match(/^AzureMonitorNamespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);
+    const metricDefinitionsQuery = query.match(/^Namespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);
     if (metricDefinitionsQuery) {
       return this.getMetricDefinitions(this.toVariable(metricDefinitionsQuery[1]));
     }
 
-    const resourceNamesQuery = query.match(/^AzureMonitorResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
+    const resourceNamesQuery = query.match(/^ResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
     if (resourceNamesQuery) {
       const resourceGroup = this.toVariable(resourceNamesQuery[1]);
       const metricDefinition = this.toVariable(resourceNamesQuery[2]);
       return this.getResourceNames(resourceGroup, metricDefinition);
     }
 
-    const metricNamesQuery = query.match(/^AzureMonitorMetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
+    const metricNamesQuery = query.match(/^MetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
 
     if (metricNamesQuery) {
       const resourceGroup = this.toVariable(metricNamesQuery[1]);

@@ -111,21 +111,21 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                 };
                 AzureMonitorDatasource.prototype.annotationQuery = function (options) { };
                 AzureMonitorDatasource.prototype.metricFindQuery = function (query) {
-                    var resourceGroupsQuery = query.match(/^AzureMonitorResourceGroups\(\)/i);
+                    var resourceGroupsQuery = query.match(/^ResourceGroups\(\)/i);
                     if (resourceGroupsQuery) {
                         return this.getResourceGroups();
                     }
-                    var metricDefinitionsQuery = query.match(/^AzureMonitorNamespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);
+                    var metricDefinitionsQuery = query.match(/^Namespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);
                     if (metricDefinitionsQuery) {
                         return this.getMetricDefinitions(this.toVariable(metricDefinitionsQuery[1]));
                     }
-                    var resourceNamesQuery = query.match(/^AzureMonitorResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
+                    var resourceNamesQuery = query.match(/^ResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
                     if (resourceNamesQuery) {
                         var resourceGroup = this.toVariable(resourceNamesQuery[1]);
                         var metricDefinition = this.toVariable(resourceNamesQuery[2]);
                         return this.getResourceNames(resourceGroup, metricDefinition);
                     }
-                    var metricNamesQuery = query.match(/^AzureMonitorMetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
+                    var metricNamesQuery = query.match(/^MetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
                     if (metricNamesQuery) {
                         var resourceGroup = this.toVariable(metricNamesQuery[1]);
                         var metricDefinition = this.toVariable(metricNamesQuery[2]);

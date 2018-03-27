@@ -318,7 +318,7 @@ describe('AzureMonitorDatasource', function() {
       });
 
       it('should return a list of metric names', function() {
-        return ctx.ds.metricFindQuery('azureMonitorResourceGroups()').then(function(results) {
+        return ctx.ds.metricFindQuery('ResourceGroups()').then(function(results) {
           expect(results.length).to.be(2);
           expect(results[0].text).to.be('grp1');
           expect(results[0].value).to.be('grp1');
@@ -351,7 +351,7 @@ describe('AzureMonitorDatasource', function() {
       });
 
       it('should return a list of metric definitions', () => {
-        return ctx.ds.metricFindQuery('azureMonitorNamespaces(nodesapp)').then(results => {
+        return ctx.ds.metricFindQuery('Namespaces(nodesapp)').then(results => {
           expect(results.length).to.equal(1);
           expect(results[0].text).to.equal('Microsoft.Compute/disks');
           expect(results[0].value).to.equal('Microsoft.Compute/disks');
@@ -386,7 +386,7 @@ describe('AzureMonitorDatasource', function() {
       });
 
       it('should return a list of resource names', () => {
-        return ctx.ds.metricFindQuery('azureMonitorResourceNames(nodeapp, microsoft.insights/components )').then(results => {
+        return ctx.ds.metricFindQuery('resourceNames(nodeapp, microsoft.insights/components )').then(results => {
           expect(results.length).to.equal(1);
           expect(results[0].text).to.equal('nodeapp');
           expect(results[0].value).to.equal('nodeapp');
@@ -426,7 +426,7 @@ describe('AzureMonitorDatasource', function() {
       });
 
       it('should return a list of metric names', () => {
-        return ctx.ds.metricFindQuery('azureMonitorMetricNames(nodeapp, microsoft.insights/components, rn)').then(results => {
+        return ctx.ds.metricFindQuery('Metricnames(nodeapp, microsoft.insights/components, rn)').then(results => {
           expect(results.length).to.equal(2);
           expect(results[0].text).to.equal('Percentage CPU');
           expect(results[0].value).to.equal('Percentage CPU');

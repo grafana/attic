@@ -172,16 +172,16 @@ Examples:
 
 Name | Description
 ------- | --------
-*AzureMonitorResourceGroups()* | Returns a list of resource groups.
-*AzureMonitorNamespaces(aResourceGroup)* | Returns a list of namespaces for the specified resource group.
-*AzureMonitorResourceNames(aResourceGroup, aNamespace)* | Returns a list of resource names.
-*AzureMonitorMetricNames(aResourceGroup, aNamespace, aResourceName)* | Returns a list of metric names.
+*ResourceGroups()* | Returns a list of resource groups.
+*Namespaces(aResourceGroup)* | Returns a list of namespaces for the specified resource group.
+*ResourceNames(aResourceGroup, aNamespace)* | Returns a list of resource names.
+*MetricNames(aResourceGroup, aNamespace, aResourceName)* | Returns a list of metric names.
 
 Examples:
 
-- Resource Groups query: `AzureMonitorResourceGroups()`
-- Passing in metric name variable: `AzureMonitorNamespaces(cosmo)`
-- Chaining template variables: `AzureMonitorResourceNames($rg, $ns)`
+- Resource Groups query: `ResourceGroups()`
+- Passing in metric name variable: `Namespaces(cosmo)`
+- Chaining template variables: `ResourceNames($rg, $ns)`
 
 ### Development
 
@@ -235,3 +235,10 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 #### v0.0.9
 
 - Adds support for the `unique` aggregation for Application Insights.
+
+#### v0.1.0
+
+- Variable support for both Azure Monitor and Application Insights
+- Support for Azure US Government, Azure Germany and Azure China clouds
+- Filter support for Application Insights
+- Azure Monitor API version updated and time grain changes implemented. This is a possible breaking change for some dashboards - previously a wider range of time grains was allowed so you might get the following error after upgrading: `Detected invalid time grain input`. To fix, choose a valid time grain for that metric.
