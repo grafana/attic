@@ -140,7 +140,7 @@ Application Insights Examples:
 
 ### Filter Expressions for Application Insights
 
-The filter field takes an Odata filter expression.
+The filter field takes an OData filter expression.
 
 Examples:
 
@@ -182,6 +182,7 @@ Examples:
 - Resource Groups query: `ResourceGroups()`
 - Passing in metric name variable: `Namespaces(cosmo)`
 - Chaining template variables: `ResourceNames($rg, $ns)`
+- Do not quote parameters: `MetricNames(hg, Microsoft.Network/publicIPAddresses, grafanaIP)`
 
 ### Development
 

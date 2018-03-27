@@ -17,3 +17,14 @@ Format the legend keys any way you want by using alias patterns.
 - {{metric}} = replaced with metric name (e.g. Percentage CPU)
 - {{dimensionname}} = replaced with dimension key/label (e.g. blobtype)
 - {{dimensionvalue}} = replaced with dimension value (e.g. BlockBlob)
+
+#### Filter Expressions for Application Insights
+
+The filter field takes an OData filter expression.
+
+Examples:
+
+- `client/city eq 'Boydton'`
+- `client/city ne 'Boydton'`
+- `client/city ne 'Boydton' and client/city ne 'Dublin'`
+- `client/city eq 'Boydton' or client/city eq 'Dublin'`
