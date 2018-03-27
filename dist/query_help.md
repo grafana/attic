@@ -28,3 +28,7 @@ Examples:
 - `client/city ne 'Boydton'`
 - `client/city ne 'Boydton' and client/city ne 'Dublin'`
 - `client/city eq 'Boydton' or client/city eq 'Dublin'`
+
+#### Writing Queries for Template Variables
+
+See the [docs](https://github.com/grafana/azure-monitor-datasource#templating-with-variables) for details and examples.

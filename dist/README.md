@@ -1,4 +1,4 @@
-## Azure Monitor Data Source For Grafana
+# Azure Monitor Data Source For Grafana
 
 Azure Monitor is the platform service that provides a single source for monitoring Azure resources. Application Insights is an extensible Application Performance Management (APM) service for web developers on multiple platforms and can be used to monitor your live web application - it will automatically detect performance anomalies.
 
@@ -26,7 +26,8 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Monitor data source will be installed.
 
-### Installion Instructions on the Grafana Docs Site
+
+### Installation Instructions on the Grafana Docs Site
 
 - [Installing on Debian/Ubuntu](http://docs.grafana.org/installation/debian/)
 - [Installing on RPM-based Linux (CentOS, Fedora, OpenSuse, RedHat)](http://docs.grafana.org/installation/rpm/)
@@ -38,7 +39,7 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 1. Fetch the latest version of grafana from Docker Hub:
     `docker pull grafana/grafana:latest`
 2. Run Grafana and install the Azure Monitor plugin with this command:
-    ```
+    ```bash
     docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:latest
     ```
 3. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
@@ -47,7 +48,7 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 
 This ia an alternative command if you want to run Grafana on a different port than the default 3000 port:
 
-```
+```bash
 docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-monitor-datasource" grafana/grafana:master
 ```
 
@@ -82,23 +83,35 @@ The plugin can access metrics from both the Azure Monitor service and the Applic
 - [Quickstart Guide for Application Insights.](https://dev.applicationinsights.io/quickstart/)
 
 1. Accessed from the Grafana main menu, newly installed data sources can be added immediately within the Data Sources section. Next, click the  "Add data source" button in the upper right. The data source will be available for selection in the Type select box.
+
 2. Select Azure Monitor from the Type dropdown:
 ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_1_select_type.png)
 3. In the name field, fill in a name for the data source. It can be anything. Some suggestions are Azure Monitor or App Insights.
+
 4. If you are using Azure Monitor, then you need 4 pieces of information from the Azure portal (see link above for detailed instructions):
     - Subscription Id (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
     - Tenant Id (Azure Active Directory -> Properties -> Directory ID)
     - Client Id (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
     - Client Secret ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
+
 5. Paste these four items into the fields in the Azure Monitor API Details section:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_2_azure_monitor_api_details.png)
+
 6. If you are are using  Application Insights, then you need two pieces of information from the Azure Portal (see link above for detailed instructions):
     - Application ID
     - API Key
+
 7. Paste these two items into the appropriate fields in the Application Insights API Details section:
     ![Application Insights API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_3_app_insights_api_details.png)
+
 8. Test that the configuration details are correct by clicking on the "Save & Test" button:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_4_save_and_test.png)
+
+Alternatively on step 4 if creating a new Azure Active Directory App, use the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest):
+
+```bash
+az ad sp create-for-rbac -n "http://localhost:3000"
+```
 
 ### Formatting Legend Keys with Aliases
 
