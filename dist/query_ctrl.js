@@ -168,6 +168,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     return this.panelCtrl.interval;
                 };
                 AzureMonitorQueryCtrl.prototype.getAppInsightsMetricNames = function () {
+                    if (!this.datasource.appInsightsDatasource.isConfigured()) {
+                        return;
+                    }
                     return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
                 };
                 AzureMonitorQueryCtrl.prototype.onAppInsightsMetricNameChange = function () {

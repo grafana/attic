@@ -13,7 +13,7 @@ describe('AzureMonitorQueryCtrl', function() {
       panel: {scopedVars: []}
     };
     queryCtrl = new AzureMonitorQueryCtrl({}, {}, new TemplateSrvStub());
-    queryCtrl.datasource = {$q: Q};
+    queryCtrl.datasource = {$q: Q, appInsightsDatasource: {isConfigured: () => false}};
   });
 
   describe('init query_ctrl variables', function() {
@@ -208,6 +208,7 @@ describe('AzureMonitorQueryCtrl', function() {
       ];
 
       beforeEach(function() {
+        queryCtrl.datasource.appInsightsDatasource.isConfigured = () => true;
         queryCtrl.datasource.getAppInsightsMetricNames = function() {
           return this.$q.when(response);
         };

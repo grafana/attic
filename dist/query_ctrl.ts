@@ -193,6 +193,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     return this.panelCtrl.interval;
   }
   getAppInsightsMetricNames() {
+    if (!this.datasource.appInsightsDatasource.isConfigured()) {
+      return;
+    }
+
     return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
   }
 
