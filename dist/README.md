@@ -256,3 +256,7 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 - Support for Azure US Government, Azure Germany and Azure China clouds
 - Filter support for Application Insights
 - Azure Monitor API version updated and time grain changes implemented. This is a possible breaking change for some dashboards - previously a wider range of time grains was allowed so you might get the following error after upgrading: `Detected invalid time grain input`. To fix, choose a valid time grain for that metric.
+
+#### v0.1.1
+
+Small bugfix for the query editor when adding a new panel.
