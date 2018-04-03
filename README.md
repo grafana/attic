@@ -6,7 +6,7 @@ The Azure Monitor Data Source plugin supports both Azure Monitor and Application
 
 ## Features
 
-- Support for all the Azure APIAzure Monitor metrics
+- Support for all the Azure Monitor metrics
   - includes support for the latest API version that allows multi-dimensional filtering for the Storage and SQL metrics.
   - Automatic time grain mode which will group the metrics by the most appropriate time grain value depending on whether you have zoomed in to look at fine-grained metrics or zoomed out to look at an overview.
 - Application Insights metrics
@@ -89,10 +89,10 @@ The plugin can access metrics from both the Azure Monitor service and the Applic
 3. In the name field, fill in a name for the data source. It can be anything. Some suggestions are Azure Monitor or App Insights.
 
 4. If you are using Azure Monitor, then you need 4 pieces of information from the Azure portal (see link above for detailed instructions):
-    - Subscription Id (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
-    - Tenant Id (Azure Active Directory -> Properties -> Directory ID)
-    - Client Id (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
-    - Client Secret ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
+    - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
+    - **Subscription Id** (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
+    - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
+    - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
 5. Paste these four items into the fields in the Azure Monitor API Details section:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_2_azure_monitor_api_details.png)
