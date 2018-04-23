@@ -7,6 +7,7 @@ export default class Datasource {
   name: string;
   azureMonitorDatasource: AzureMonitorDatasource;
   appInsightsDatasource: AppInsightsDatasource;
+  columns: { text: string, value: string }[];
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
@@ -30,6 +31,7 @@ export default class Datasource {
     const promises = [];
     const azureMonitorOptions = _.cloneDeep(options);
     const appInsightsTargets = _.cloneDeep(options);
+    var that = this;
 
     azureMonitorOptions.targets = _.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
     appInsightsTargets.targets = _.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
@@ -42,8 +44,13 @@ export default class Datasource {
       promises.push(this.appInsightsDatasource.query(appInsightsTargets));
     }
 
-    return this.$q.all(promises).then(results => {
-      return { data: _.flatten(results) };
+    return Promise.all(promises).then(results => {
+      if(results[0].data) {
+        that.columns = results[0].columns
+        return { data: _.flatten(results[0].data) };
+      } else {
+        return { data: _.flatten(results) };
+      }
     });
   }
 
@@ -135,5 +142,9 @@ export default class Datasource {
 
   getAppInsightsMetricMetadata(metricName) {
     return this.appInsightsDatasource.getMetricMetadata(metricName);
+  }
+
+  getAppInsightsColumns() {
+    return this.columns;
   }
 }

@@ -83,6 +83,7 @@ System.register(['lodash', './azure_monitor_filter_builder', './url_builder', '.
                             url: url,
                             format: options.format,
                             alias: item.alias,
+                            raw: false,
                         };
                     });
                     if (queries.length === 0) {

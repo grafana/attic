@@ -1,6 +1,6 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register(['lodash', './app_insights_querystring_builder', './response_parser'], function(exports_1) {
-    var lodash_1, app_insights_querystring_builder_1, response_parser_1;
+System.register(['lodash', './app_insights_querystring_builder', './app_insights_rawquerystring_builder', './response_parser'], function(exports_1) {
+    var lodash_1, app_insights_querystring_builder_1, app_insights_rawquerystring_builder_1, response_parser_1;
     var AppInsightsDatasource;
     return {
         setters:[
@@ -9,6 +9,9 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
             },
             function (app_insights_querystring_builder_1_1) {
                 app_insights_querystring_builder_1 = app_insights_querystring_builder_1_1;
+            },
+            function (app_insights_rawquerystring_builder_1_1) {
+                app_insights_rawquerystring_builder_1 = app_insights_rawquerystring_builder_1_1;
             },
             function (response_parser_1_1) {
                 response_parser_1 = response_parser_1_1;
@@ -22,7 +25,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     this.version = 'beta';
                     this.id = instanceSettings.id;
                     this.applicationId = instanceSettings.jsonData.appInsightsAppId;
-                    this.baseUrl = "/appinsights/" + this.version + "/apps/" + this.applicationId + "/metrics";
+                    this.baseUrl = "/appinsights/" + this.version + "/apps/" + this.applicationId;
                     this.url = instanceSettings.url;
                 }
                 AppInsightsDatasource.prototype.isConfigured = function () {
@@ -34,23 +37,46 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                         return item.hide !== true;
                     }).map(function (target) {
                         var item = target.appInsights;
-                        var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to, options.interval);
-                        if (item.groupBy !== 'none') {
-                            querystringBuilder.setGroupBy(_this.templateSrv.replace(item.groupBy, options.scopedVars));
+                        if (item.rawQuery) {
+                            var querystringBuilder = new app_insights_rawquerystring_builder_1.default(item.rawQueryString, options);
+                            var url = _this.baseUrl + "/query?" + querystringBuilder.generate();
+                            return {
+                                refId: target.refId,
+                                intervalMs: options.intervalMs,
+                                maxDataPoints: options.maxDataPoints,
+                                datasourceId: _this.id,
+                                url: url,
+                                format: options.format,
+                                alias: item.alias,
+                                xaxis: item.xaxis,
+                                yaxis: item.yaxis,
+                                spliton: item.spliton,
+                                raw: true,
+                            };
                         }
-                        querystringBuilder.setAggregation(item.aggregation);
-                        querystringBuilder.setInterval(item.timeGrainType, _this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
-                        querystringBuilder.setFilter(_this.templateSrv.replace((item.filter || '')));
-                        var url = _this.baseUrl + "/" + _this.templateSrv.replace(item.metricName, options.scopedVars) + "?" + querystringBuilder.generate();
-                        return {
-                            refId: target.refId,
-                            intervalMs: options.intervalMs,
-                            maxDataPoints: options.maxDataPoints,
-                            datasourceId: _this.id,
-                            url: url,
-                            format: options.format,
-                            alias: item.alias,
-                        };
+                        else {
+                            var querystringBuilder = new app_insights_querystring_builder_1.default(options.range.from, options.range.to, options.interval);
+                            if (item.groupBy !== 'none') {
+                                querystringBuilder.setGroupBy(_this.templateSrv.replace(item.groupBy, options.scopedVars));
+                            }
+                            querystringBuilder.setAggregation(item.aggregation);
+                            querystringBuilder.setInterval(item.timeGrainType, _this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
+                            querystringBuilder.setFilter(_this.templateSrv.replace((item.filter || '')));
+                            var url = _this.baseUrl + "/metrics/" + _this.templateSrv.replace(item.metricName, options.scopedVars) + "?" + querystringBuilder.generate();
+                            return {
+                                refId: target.refId,
+                                intervalMs: options.intervalMs,
+                                maxDataPoints: options.maxDataPoints,
+                                datasourceId: _this.id,
+                                url: url,
+                                format: options.format,
+                                alias: item.alias,
+                                xaxis: '',
+                                yaxis: '',
+                                spliton: '',
+                                raw: false,
+                            };
+                        }
                     });
                     if (queries.length === 0) {
                         return this.$q.when({ data: [] });
@@ -89,7 +115,7 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     }
                 };
                 AppInsightsDatasource.prototype.testDatasource = function () {
-                    var url = this.baseUrl + "/metadata";
+                    var url = this.baseUrl + "/metrics/metadata";
                     return this.doRequest(url)
                         .then(function (response) {
                         if (response.status === 200) {
@@ -134,11 +160,11 @@ System.register(['lodash', './app_insights_querystring_builder', './response_par
                     });
                 };
                 AppInsightsDatasource.prototype.getMetricNames = function () {
-                    var url = this.baseUrl + "/metadata";
+                    var url = this.baseUrl + "/metrics/metadata";
                     return this.doRequest(url).then(response_parser_1.default.parseMetricNames);
                 };
                 AppInsightsDatasource.prototype.getMetricMetadata = function (metricName) {
-                    var url = this.baseUrl + "/metadata";
+                    var url = this.baseUrl + "/metrics/metadata";
                     return this.doRequest(url).then(function (result) {
                         return new response_parser_1.default(result).parseMetadata(metricName);
                     });
