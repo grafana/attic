@@ -1,0 +1,33 @@
+{
+  "type": "panel",
+  "name": "Starter",
+  "id": "grafana-starter-panel",
+
+  "info": {
+    "description": "Starter panel for grafana",
+    "author": {
+      "name": "GrafanaLabs",
+      "url": "https://grafana.com"
+    },
+    "keywords": ["tutorial", "panel"],
+    "logos": {
+      "small": "src/img/clock_panel_logo.svg",
+      "large": "src/img/clock_panel_logo.svg"
+    },
+    "links": [
+      {"name": "Project site", "url": "https://github.com/grafana/starter-panel"},
+      {"name": "MIT License", "url": "https://github.com/grafana/starter-panel/blob/master/LICENSE"}
+    ],
+    "screenshots": [
+      {"name": "Showcase", "path": "src/img/screenshot-showcase.png"},
+      {"name": "Options", "path": "src/img/screenshot-clock-options.png"}
+    ],
+    "version": "0.0.1",
+    "updated": "2018-05-02"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "4.x.x",
+    "plugins": [ ]
+  }
+}
