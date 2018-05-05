@@ -17,6 +17,7 @@ The goal is to make a simple panel that can:
 - Grafana
 - Nodejs
 - Npm
+- Grunt.cli (`npm install -g grunt-cli`)
 - Git
 - A code editor or IDE
 - Access to a Time Series Database (TSDB) datasource in Grafana (InfluxDB, Prometheus, Graphite, Elasticsearch or similar). The Grafana Testdata datasource which is included in Grafana can be used instead if this is not possible.
@@ -27,11 +28,12 @@ Task: Get started with a template plugin
 
 1. git clone https://github.com/grafana/starter-panel.git into the data/plugins directory of your running Grafana
 (or git clone git@github.com:grafana/starter-panel.git if using ssh)
-2. npm install
-3. grunt && grunt watch
-4. restart Grafana
-5. Check that your new plugin is available in Grafana. Refresh the page then create a new dashboard, then add the panel called Starter.
-6. Edit the panel and check that that you can change the background color option and the panel’s background changes color.
+2. `cd starter-panel`
+3. npm install
+4. grunt && grunt watch
+5. restart Grafana
+6. Check that your new plugin is available in Grafana. Refresh the page then create a new dashboard, then add the panel called Starter.
+7. Edit the panel and check that that you can change the background color option and the panel’s background changes color.
 
 ### Add a 3rd Party Library
 
