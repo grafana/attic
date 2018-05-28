@@ -9,7 +9,7 @@ export default class AppInsightsDatasource {
     version: string;
     applicationId: string;
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
-    isConfigured(): boolean;
+    isConfigured(): boolean | "";
     query(options: any): any;
     doQueries(queries: any): any;
     annotationQuery(options: any): void;

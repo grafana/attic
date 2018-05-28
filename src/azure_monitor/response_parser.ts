@@ -6,7 +6,7 @@ export default class ResponseParser {
   constructor(private results) {}
 
   parseQueryResult() {
-    const data = [];
+    const data: any[] = [];
     for (let i = 0; i < this.results.length; i++) {
       for (let j = 0; j < this.results[i].result.data.value.length; j++) {
         for (let k = 0; k < this.results[i].result.data.value[j].timeseries.length; k++) {
@@ -81,7 +81,7 @@ export default class ResponseParser {
   }
 
   static convertDataToPoints(timeSeriesData) {
-    const dataPoints = [];
+    const dataPoints: any[] = [];
 
     for (let k = 0; k < timeSeriesData.length; k++) {
       const epoch = ResponseParser.dateTimeToEpoch(timeSeriesData[k].timeStamp);
@@ -109,7 +109,7 @@ export default class ResponseParser {
   }
 
   static parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {
-    const list = [];
+    const list: any[] = [];
     for (let i = 0; i < result.data.value.length; i++) {
       if (! _.find(list, ['value', _.get(result.data.value[i], valueFieldName)])) {
         list.push({
@@ -122,7 +122,7 @@ export default class ResponseParser {
   }
 
   static parseResourceNames(result: any, metricDefinition: string) {
-    const list = [];
+    const list: any[] = [];
     for (let i = 0; i < result.data.value.length; i++) {
       if (result.data.value[i].type === metricDefinition) {
         list.push({
@@ -151,7 +151,7 @@ export default class ResponseParser {
   }
 
   static parseTimeGrains(metricAvailabilities) {
-    const timeGrains = [];
+    const timeGrains: any[] = [];
     metricAvailabilities.forEach(avail => {
       if (avail.timeGrain) {
         timeGrains.push({
@@ -164,7 +164,7 @@ export default class ResponseParser {
   }
 
   static parseDimensions(metricData: any) {
-    const dimensions = [];
+    const dimensions: any[] = [];
     if (!metricData.dimensions || metricData.dimensions.length === 0) {
       return dimensions;
     }

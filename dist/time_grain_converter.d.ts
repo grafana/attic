@@ -5,5 +5,5 @@ export default class TimeGrainConverter {
     static createTimeGrainFromISO8601Duration(duration: string): string;
     static timeUnitToText(value: number, unit: string): string;
     static createKbnUnitFromISO8601Duration(duration: string): string;
-    static timeUnitToKbn(value: number, unit: string): string;
+    static timeUnitToKbn(value: number, unit: string): "s" | "m" | "h" | "d" | undefined;
 }

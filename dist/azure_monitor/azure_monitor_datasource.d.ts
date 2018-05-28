@@ -14,7 +14,7 @@ export default class AzureMonitorDatasource {
     cloudName: string;
     supportedMetricNamespaces: any[];
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
-    isConfigured(): boolean;
+    isConfigured(): boolean | "";
     query(options: any): any;
     doQueries(queries: any): any;
     annotationQuery(options: any): void;
@@ -26,6 +26,6 @@ export default class AzureMonitorDatasource {
     getMetricNames(resourceGroup: string, metricDefinition: string, resourceName: string): any;
     getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
     testDatasource(): any;
-    isValidConfigField(field: string): boolean;
+    isValidConfigField(field: string): boolean | "";
     doRequest(url: any, maxRetries?: number): any;
 }

@@ -15,7 +15,7 @@ export default class AzureMonitorDatasource {
   url: string;
   defaultDropdownValue = 'select';
   cloudName: string;
-  supportedMetricNamespaces = [];
+  supportedMetricNamespaces: any[] = [];
 
   constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;

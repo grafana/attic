@@ -28,7 +28,7 @@ export default class Datasource {
   }
 
   query(options) {
-    const promises = [];
+    const promises: any[] = [];
     const azureMonitorOptions = _.cloneDeep(options);
     const appInsightsTargets = _.cloneDeep(options);
     var that = this;
@@ -77,7 +77,7 @@ export default class Datasource {
   }
 
   testDatasource() {
-    const promises = [];
+    const promises: any[] = [];
 
     if (this.azureMonitorDatasource.isConfigured()) {
       promises.push(this.azureMonitorDatasource.testDatasource());

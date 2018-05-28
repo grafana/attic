@@ -1,8 +1,9 @@
-import { QueryCtrl } from 'app/plugins/sdk';
+import { QueryCtrl } from 'grafana/app/plugins/sdk';
+import 'style-loader!./css/query_editor.css';
 export declare class AzureMonitorQueryCtrl extends QueryCtrl {
     private templateSrv;
     static templateUrl: string;
-    lastQueryError: string;
+    lastQueryError?: string;
     defaultDropdownValue: string;
     defaults: {
         queryType: string;

@@ -1,11 +1,12 @@
 import _ from 'lodash';
-import {QueryCtrl} from 'app/plugins/sdk';
-import './css/query_editor.css!';
+import {QueryCtrl} from 'grafana/app/plugins/sdk';
+import 'style-loader!./css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
+// import * as monaco from 'monaco-editor';
 
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
-  lastQueryError: string;
+  lastQueryError?: string;
 
   defaultDropdownValue = 'select';
 
@@ -40,10 +41,19 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
+
+    // monaco.editor.create(document.getElementById('container'), {
+    //   value: [
+    //     'function x() {',
+    //     '\tconsole.log("Hello world!");',
+    //     '}'
+    //   ].join('\n'),
+    //   language: 'javascript'
+    // });
   }
 
   onDataReceived(dataList) {
-    this.lastQueryError = null;
+    this.lastQueryError = undefined;
   }
 
   onDataError(err) {
