@@ -1,5 +1,3 @@
-import _ from 'lodash';
-import moment from 'moment';
 import TimegrainConverter from '../time_grain_converter';
 
 export default class AzureMonitorFilterBuilder {

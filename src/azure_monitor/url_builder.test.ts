@@ -1,5 +1,4 @@
-import {describe, beforeEach, it, expect} from '../lib/common';
-import UrlBuilder from '../../src/azure_monitor/url_builder';
+import UrlBuilder from './url_builder';
 
 describe('AzureMonitorUrlBuilder', function() {
   describe('when metric definition is Microsoft.Sql/servers/databases', function() {
@@ -11,7 +10,7 @@ describe('AzureMonitorUrlBuilder', function() {
         'rn1/rn2',
         '2017-05-01-preview'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Sql/servers/rn1/databases/rn2/' +
+      expect(url).toBe('/rg/providers/Microsoft.Sql/servers/rn1/databases/rn2/' +
         'providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview');
     });
   });
@@ -25,7 +24,7 @@ describe('AzureMonitorUrlBuilder', function() {
         'rn',
         '2017-05-01-preview'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Sql/servers/rn/' +
+      expect(url).toBe('/rg/providers/Microsoft.Sql/servers/rn/' +
         'providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview');
     });
   });
@@ -39,7 +38,7 @@ describe('AzureMonitorUrlBuilder', function() {
         'rn1/default',
         '2017-05-01-preview'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/blobServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/blobServices/default/' +
         'providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview');
     });
   });
@@ -54,7 +53,7 @@ describe('AzureMonitorUrlBuilder', function() {
         '2017-05-01-preview',
         'metricnames=aMetric'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/blobServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/blobServices/default/' +
         'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
@@ -68,7 +67,7 @@ describe('AzureMonitorUrlBuilder', function() {
         'rn1/default',
         '2017-05-01-preview'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/fileServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/fileServices/default/' +
         'providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview');
     });
   });
@@ -83,7 +82,7 @@ describe('AzureMonitorUrlBuilder', function() {
         '2017-05-01-preview',
         'metricnames=aMetric'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/fileServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/fileServices/default/' +
         'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
@@ -97,7 +96,7 @@ describe('AzureMonitorUrlBuilder', function() {
         'rn1/default',
         '2017-05-01-preview'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/tableServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/tableServices/default/' +
         'providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview');
     });
   });
@@ -112,7 +111,7 @@ describe('AzureMonitorUrlBuilder', function() {
         '2017-05-01-preview',
         'metricnames=aMetric'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/tableServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/tableServices/default/' +
         'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });
@@ -126,7 +125,7 @@ describe('AzureMonitorUrlBuilder', function() {
         'rn1/default',
         '2017-05-01-preview'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/queueServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/queueServices/default/' +
         'providers/microsoft.insights/metricdefinitions?api-version=2017-05-01-preview');
     });
   });
@@ -141,7 +140,7 @@ describe('AzureMonitorUrlBuilder', function() {
         '2017-05-01-preview',
         'metricnames=aMetric'
       );
-      expect(url).to.be('/rg/providers/Microsoft.Storage/storageAccounts/rn1/queueServices/default/' +
+      expect(url).toBe('/rg/providers/Microsoft.Storage/storageAccounts/rn1/queueServices/default/' +
         'providers/microsoft.insights/metrics?api-version=2017-05-01-preview&metricnames=aMetric');
     });
   });

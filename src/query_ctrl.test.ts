@@ -1,11 +1,19 @@
-import {describe, beforeEach, it, sinon, expect} from './lib/common';
+jest.mock('./css/query_editor.css', () => {
+  return {};
+});
+jest.mock('app/core/utils/kbn', () => {
+  return {
+    interval_to_ms: jest.fn(),
+  };
+});
+
+
 import {AzureMonitorQueryCtrl} from '../src/query_ctrl';
-import TemplateSrvStub from './lib/template_srv_stub';
+import TemplateSrvStub from '../specs/lib/template_srv_stub';
 import Q from 'q';
-import moment from 'moment';
 
 describe('AzureMonitorQueryCtrl', function() {
-  let queryCtrl;
+  let queryCtrl: any;
 
   beforeEach(function() {
     AzureMonitorQueryCtrl.prototype.panelCtrl = {
@@ -18,19 +26,19 @@ describe('AzureMonitorQueryCtrl', function() {
 
   describe('init query_ctrl variables', function() {
     it('should set default query type to Azure Monitor', function() {
-      expect(queryCtrl.target.queryType).to.be('Azure Monitor');
+      expect(queryCtrl.target.queryType).toBe('Azure Monitor');
     });
 
     it('should set default App Insights editor to be builder', function() {
-      expect(queryCtrl.target.appInsights.rawQuery).to.be(false);
+      expect(queryCtrl.target.appInsights.rawQuery).toBe(false);
     });
 
     it('should set query parts to select', function() {
-      expect(queryCtrl.target.azureMonitor.resourceGroup).to.be('select');
-      expect(queryCtrl.target.azureMonitor.metricDefinition).to.be('select');
-      expect(queryCtrl.target.azureMonitor.resourceName).to.be('select');
-      expect(queryCtrl.target.azureMonitor.metricName).to.be('select');
-      expect(queryCtrl.target.appInsights.groupBy).to.be('none');
+      expect(queryCtrl.target.azureMonitor.resourceGroup).toBe('select');
+      expect(queryCtrl.target.azureMonitor.metricDefinition).toBe('select');
+      expect(queryCtrl.target.azureMonitor.resourceName).toBe('select');
+      expect(queryCtrl.target.azureMonitor.metricName).toBe('select');
+      expect(queryCtrl.target.appInsights.groupBy).toBe('none');
     });
   });
 
@@ -54,7 +62,7 @@ describe('AzureMonitorQueryCtrl', function() {
 
       it('should return a list of Resource Groups', function() {
         return queryCtrl.getResourceGroups('').then(result => {
-          expect(result[0].text).to.be('nodeapp');
+          expect(result[0].text).toBe('nodeapp');
         });
       });
     });
@@ -69,15 +77,15 @@ describe('AzureMonitorQueryCtrl', function() {
         beforeEach(function() {
           queryCtrl.target.azureMonitor.resourceGroup = 'test';
           queryCtrl.datasource.getMetricDefinitions = function(query) {
-            expect(query).to.be('test');
+            expect(query).toBe('test');
             return this.$q.when(response);
           };
         });
 
         it('should return a list of Metric Definitions', function() {
           return queryCtrl.getMetricDefinitions('').then(result => {
-            expect(result[0].text).to.be('Microsoft.Compute/virtualMachines');
-            expect(result[1].text).to.be('Microsoft.Network/publicIPAddresses');
+            expect(result[0].text).toBe('Microsoft.Compute/virtualMachines');
+            expect(result[1].text).toBe('Microsoft.Network/publicIPAddresses');
           });
         });
       });
@@ -88,7 +96,7 @@ describe('AzureMonitorQueryCtrl', function() {
         });
 
         it('should return without making a call to datasource', function() {
-          expect(queryCtrl.getMetricDefinitions('')).to.be(undefined);
+          expect(queryCtrl.getMetricDefinitions('')).toBe(undefined);
         });
       });
 
@@ -105,16 +113,16 @@ describe('AzureMonitorQueryCtrl', function() {
           queryCtrl.target.azureMonitor.resourceGroup = 'test';
           queryCtrl.target.azureMonitor.metricDefinition = 'Microsoft.Compute/virtualMachines';
           queryCtrl.datasource.getResourceNames = function(resourceGroup, metricDefinition) {
-            expect(resourceGroup).to.be('test');
-            expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
+            expect(resourceGroup).toBe('test');
+            expect(metricDefinition).toBe('Microsoft.Compute/virtualMachines');
             return this.$q.when(response);
           };
         });
 
         it('should return a list of Resource Names', function() {
           return queryCtrl.getResourceNames('').then(result => {
-            expect(result[0].text).to.be('test1');
-            expect(result[1].text).to.be('test2');
+            expect(result[0].text).toBe('test1');
+            expect(result[1].text).toBe('test2');
           });
         });
       });
@@ -126,7 +134,7 @@ describe('AzureMonitorQueryCtrl', function() {
         });
 
         it('should return without making a call to datasource', function() {
-          expect(queryCtrl.getResourceNames('')).to.be(undefined);
+          expect(queryCtrl.getResourceNames('')).toBe(undefined);
         });
       });
     });
@@ -143,17 +151,17 @@ describe('AzureMonitorQueryCtrl', function() {
           queryCtrl.target.azureMonitor.metricDefinition = 'Microsoft.Compute/virtualMachines';
           queryCtrl.target.azureMonitor.resourceName = 'test';
           queryCtrl.datasource.getMetricNames = function(resourceGroup, metricDefinition, resourceName) {
-            expect(resourceGroup).to.be('test');
-            expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
-            expect(resourceName).to.be('test');
+            expect(resourceGroup).toBe('test');
+            expect(metricDefinition).toBe('Microsoft.Compute/virtualMachines');
+            expect(resourceName).toBe('test');
             return this.$q.when(response);
           };
         });
 
         it('should return a list of Metric Names', function() {
           return queryCtrl.getMetricNames('').then(result => {
-            expect(result[0].text).to.be('metric1');
-            expect(result[1].text).to.be('metric2');
+            expect(result[0].text).toBe('metric1');
+            expect(result[1].text).toBe('metric2');
           });
         });
       });
@@ -166,7 +174,7 @@ describe('AzureMonitorQueryCtrl', function() {
         });
 
         it('should return without making a call to datasource', function() {
-          expect(queryCtrl.getMetricNames('')).to.be(undefined);
+          expect(queryCtrl.getMetricNames('')).toBe(undefined);
         });
       });
     });
@@ -185,19 +193,19 @@ describe('AzureMonitorQueryCtrl', function() {
         queryCtrl.target.azureMonitor.resourceName = 'test';
         queryCtrl.target.azureMonitor.metricName = 'Percentage CPU';
         queryCtrl.datasource.getMetricMetadata = function(resourceGroup, metricDefinition, resourceName, metricName) {
-          expect(resourceGroup).to.be('test');
-          expect(metricDefinition).to.be('Microsoft.Compute/virtualMachines');
-          expect(resourceName).to.be('test');
-          expect(metricName).to.be('Percentage CPU');
+          expect(resourceGroup).toBe('test');
+          expect(metricDefinition).toBe('Microsoft.Compute/virtualMachines');
+          expect(resourceName).toBe('test');
+          expect(metricName).toBe('Percentage CPU');
           return this.$q.when(response);
         };
       });
 
       it('should set the options and default selected value for the Aggregations dropdown', function() {
         queryCtrl.onMetricNameChange().then(() => {
-          expect(queryCtrl.target.azureMonitor.aggregation).to.be('Average');
-          expect(queryCtrl.target.azureMonitor.aggOptions).to.be(['Average', 'Total']);
-          expect(queryCtrl.target.azureMonitor.timeGrains).to.be(['PT1M', 'P1D']);
+          expect(queryCtrl.target.azureMonitor.aggregation).toBe('Average');
+          expect(queryCtrl.target.azureMonitor.aggOptions).toBe(['Average', 'Total']);
+          expect(queryCtrl.target.azureMonitor.timeGrains).toBe(['PT1M', 'P1D']);
         });
       });
     });
@@ -219,8 +227,8 @@ describe('AzureMonitorQueryCtrl', function() {
 
       it('should return a list of Metric Names', function() {
         return queryCtrl.getAppInsightsMetricNames().then(result => {
-          expect(result[0].text).to.be('metric1');
-          expect(result[1].text).to.be('metric2');
+          expect(result[0].text).toBe('metric1');
+          expect(result[1].text).toBe('metric2');
         });
       });
     });
@@ -232,10 +240,10 @@ describe('AzureMonitorQueryCtrl', function() {
 
       it('should return a list of GroupBy segments', function() {
         const result = queryCtrl.getAppInsightsGroupBySegments('');
-        expect(result[0].text).to.be('opt1');
-        expect(result[0].value).to.be('opt1');
-        expect(result[1].text).to.be('opt2');
-        expect(result[1].value).to.be('opt2');
+        expect(result[0].text).toBe('opt1');
+        expect(result[0].value).toBe('opt1');
+        expect(result[1].text).toBe('opt2');
+        expect(result[1].value).toBe('opt2');
       });
     });
 
@@ -249,18 +257,18 @@ describe('AzureMonitorQueryCtrl', function() {
       beforeEach(function() {
         queryCtrl.target.appInsights.metricName = 'requests/failed';
         queryCtrl.datasource.getAppInsightsMetricMetadata = function(metricName) {
-          expect(metricName).to.be('requests/failed');
+          expect(metricName).toBe('requests/failed');
           return this.$q.when(response);
         };
       });
 
       it('should set the options and default selected value for the Aggregations dropdown', function() {
         return queryCtrl.onAppInsightsMetricNameChange().then(() => {
-          expect(queryCtrl.target.appInsights.aggregation).to.be('avg');
-          expect(queryCtrl.target.appInsights.aggOptions).to.contain('avg');
-          expect(queryCtrl.target.appInsights.aggOptions).to.contain('sum');
-          expect(queryCtrl.target.appInsights.groupByOptions).to.contain('client/os');
-          expect(queryCtrl.target.appInsights.groupByOptions).to.contain('client/city');
+          expect(queryCtrl.target.appInsights.aggregation).toBe('avg');
+          expect(queryCtrl.target.appInsights.aggOptions).toContain('avg');
+          expect(queryCtrl.target.appInsights.aggOptions).toContain('sum');
+          expect(queryCtrl.target.appInsights.groupByOptions).toContain('client/os');
+          expect(queryCtrl.target.appInsights.groupByOptions).toContain('client/city');
         });
       });
     });

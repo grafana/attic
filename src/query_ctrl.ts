@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import {QueryCtrl} from 'grafana/app/plugins/sdk';
-import 'style-loader!./css/query_editor.css';
+import {QueryCtrl} from 'app/plugins/sdk';
+import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
 // import * as monaco from 'monaco-editor';
 
@@ -119,8 +119,6 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
       return;
     }
-
-    const rg = this.templateSrv.replace(this.target.azureMonitor.resourceGroup, this.panelCtrl.panel.scopedVars);
 
     return this.datasource.getResourceNames(
       this.replace(this.target.azureMonitor.resourceGroup),

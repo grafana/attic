@@ -1,5 +1,3 @@
-///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -11,7 +9,7 @@ export default class ResponseParser {
     let data = [];
     let columns = [];
     for (let i = 0; i < this.results.length; i++) {
-      if(this.results[i].query.raw) {
+      if (this.results[i].query.raw) {
         const xaxis = this.results[i].query.xaxis;
         const yaxises = this.results[i].query.yaxis;
         const spliton = this.results[i].query.spliton;
@@ -32,19 +30,20 @@ export default class ResponseParser {
   }
 
   parseRawQueryResultRow(columns, rows, alias: string, xaxis: string, yaxises: string, spliton: string) {
-    const data = [];
-    const xaxis_column = columns.findIndex((column) => {return column.ColumnName === xaxis});
+    const data: any[] = [];
+    const xaxis_column = columns.findIndex((column) => { return column.ColumnName === xaxis; });
     const yaxises_split = yaxises.split(',');
     const yaxis_columns = {};
     _.forEach(yaxises_split, (yaxis) => {
-      yaxis_columns[yaxis] = columns.findIndex((column) => {return column.ColumnName === yaxis});
-    })
-    const spliton_column = columns.findIndex((column) => {return column.ColumnName === spliton});
+      yaxis_columns[yaxis] = columns.findIndex((column) => { return column.ColumnName === yaxis; });
+    });
+    const spliton_column = columns.findIndex((column) => { return column.ColumnName === spliton; });
     const convert_timestamp = xaxis === "timestamp";
 
     _.forEach(rows, function(row) {
       _.forEach(yaxis_columns, (yaxis_column, yaxis_name) => {
-        let bucket = spliton_column === -1 ? ResponseParser.findOrCreateBucket(data, yaxis_name) : ResponseParser.findOrCreateBucket(data, row[spliton_column]);
+        let bucket = spliton_column === -1 ?
+          ResponseParser.findOrCreateBucket(data, yaxis_name) : ResponseParser.findOrCreateBucket(data, row[spliton_column]);
         let epoch = convert_timestamp ? ResponseParser.dateTimeToEpoch(row[xaxis_column]) : row[xaxis_column];
         bucket.datapoints.push([row[yaxis_column], epoch]);
       });
@@ -55,7 +54,7 @@ export default class ResponseParser {
 
 
   parseQueryResultRow(value, alias: string) {
-    const data = [];
+    const data: any[] = [];
 
     if (ResponseParser.isSingleValue(value)) {
       const metricName = ResponseParser.getMetricFieldKey(value);
@@ -188,7 +187,7 @@ export default class ResponseParser {
   }
 
   static toTextValueList(values) {
-    const list = [];
+    const list: any[] = [];
     for (let i = 0; i < values.length; i++) {
       list.push({
         text: values[i],

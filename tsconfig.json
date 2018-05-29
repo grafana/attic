@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-      "target": "es2015",
+      "target": "es5",
       "module": "es6",
       "rootDir": "./src",
       "lib": [
@@ -9,19 +9,23 @@
             "es2015",
             "es2016"
         ],
+      "declaration": false,
+      "allowSyntheticDefaultImports": true,
+      "inlineSourceMap": false,
       "sourceMap": true,
-      "declaration": true,
-      "strictNullChecks": true,
-      "emitDecoratorMetadata": true,
+      "noEmitOnError": false,
+      "emitDecoratorMetadata": false,
       "experimentalDecorators": true,
-      "noImplicitAny": false
+      "noImplicitReturns": true,
+      "noImplicitThis": false,
+      "noImplicitUseStrict":false,
+      "noImplicitAny": false,
+      "noUnusedLocals": true,
+      "strictNullChecks": true,
   },
   "include": [
     "./src/**/*.ts"
   ],
-  // "files": [
-  //   "node_modules/grafana-sdk-mocks/app/headers/common.d.ts"
-  // ],
   "exclude": [
       "node_modules"
   ]

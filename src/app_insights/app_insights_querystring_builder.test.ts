@@ -1,5 +1,24 @@
-import {describe, beforeEach, it, sinon, expect, angularMocks} from '../lib/common';
-import AppInsightsQuerystringBuilder from '../../src/app_insights/app_insights_querystring_builder';
+jest.mock('app/core/utils/kbn', () => {
+  return {
+    interval_to_ms: (interval) => {
+      if (interval.substring(interval.length-1) === 's') {
+        return interval.substring(0, interval.length-1) * 1000;
+      }
+
+      if (interval.substring(interval.length-1) === 'm') {
+        return interval.substring(0, interval.length-1) * 1000 * 60;
+      }
+
+      if (interval.substring(interval.length-1) === 'd') {
+        return interval.substring(0, interval.length-1) * 1000 * 60 * 24;
+      }
+
+      return undefined;
+    }
+  };
+});
+
+import AppInsightsQuerystringBuilder from './app_insights_querystring_builder';
 import moment from 'moment';
 
 describe('AppInsightsQuerystringBuilder', function() {
@@ -12,7 +31,7 @@ describe('AppInsightsQuerystringBuilder', function() {
   describe('with only from/to date range', function() {
     it('should always add datetime filtering to the querystring', function() {
       const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z`;
-      expect(builder.generate()).to.equal(querystring);
+      expect(builder.generate()).toEqual(querystring);
     });
   });
 
@@ -23,7 +42,7 @@ describe('AppInsightsQuerystringBuilder', function() {
 
     it('should add datetime filtering and aggregation to the querystring', function() {
       const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&aggregation=avg`;
-      expect(builder.generate()).to.equal(querystring);
+      expect(builder.generate()).toEqual(querystring);
     });
   });
 
@@ -34,7 +53,7 @@ describe('AppInsightsQuerystringBuilder', function() {
 
     it('should add datetime filtering and segment to the querystring', function() {
       const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&segment=client/city`;
-      expect(builder.generate()).to.equal(querystring);
+      expect(builder.generate()).toEqual(querystring);
     });
   });
 
@@ -45,7 +64,7 @@ describe('AppInsightsQuerystringBuilder', function() {
 
     it('should add datetime filtering and interval to the querystring', function() {
       const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&interval=PT1H`;
-      expect(builder.generate()).to.equal(querystring);
+      expect(builder.generate()).toEqual(querystring);
     });
   });
 
@@ -56,7 +75,7 @@ describe('AppInsightsQuerystringBuilder', function() {
 
     it('should add datetime filtering and interval to the querystring', function() {
       const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&interval=PT1H`;
-      expect(builder.generate()).to.equal(querystring);
+      expect(builder.generate()).toEqual(querystring);
     });
   });
 
@@ -67,7 +86,7 @@ describe('AppInsightsQuerystringBuilder', function() {
 
     it('should add datetime filtering and interval to the querystring', function() {
       const querystring = `timespan=2017-08-22T06:00:00Z/2017-08-22T07:00:00Z&filter=client/city eq 'Boydton'`;
-      expect(builder.generate()).to.equal(querystring);
+      expect(builder.generate()).toEqual(querystring);
     });
   });
 });

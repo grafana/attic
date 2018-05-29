@@ -1,2 +1,2479 @@
-define(["lodash","moment","app/core/utils/kbn","app/plugins/sdk"],function(e,t,r,i){return function(e){var t={};function r(i){if(t[i])return t[i].exports;var n=t[i]={i:i,l:!1,exports:{}};return e[i].call(n.exports,n,n.exports,r),n.l=!0,n.exports}return r.m=e,r.c=t,r.d=function(e,t,i){r.o(e,t)||Object.defineProperty(e,t,{configurable:!1,enumerable:!0,get:i})},r.r=function(e){Object.defineProperty(e,"__esModule",{value:!0})},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="",r(r.s=4)}([function(t,r){t.exports=e},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=o(r(0)),a=o(r(8));function o(e){return e&&e.__esModule?e:{default:e}}var s=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e)}return i(e,null,[{key:"createISO8601Duration",value:function(e,t){return n.default.includes(["hour","minute","h","m"],t)?"PT"+e+t[0].toUpperCase():"P"+e+t[0].toUpperCase()}},{key:"createISO8601DurationFromInterval",value:function(t){var r=+t.slice(0,t.length-1),i=t[t.length-1];if(t.indexOf("ms")>-1)return e.createISO8601Duration(1,"m");if("s"===t[t.length-1]){var n=60*r%60;return n<1&&(n=1),e.createISO8601Duration(n,"m")}return e.createISO8601Duration(r,i)}},{key:"findClosestTimeGrain",value:function(e,t){for(var r=n.default.filter(t,function(e){return"auto"!==e}),i=r[0],o=a.default.interval_to_ms(e),s=0;s<r.length;s++)o>a.default.interval_to_ms(r[s])&&(i=s+1<r.length?r[s+1]:r[s]);return i}},{key:"createTimeGrainFromISO8601Duration",value:function(t){var r=1;"PT"===t.substring(0,2)&&(r=2);var i=t.substring(r,t.length-1),n=t.substring(t.length-1);return i+" "+e.timeUnitToText(+i,n)}},{key:"timeUnitToText",value:function(e,t){var r="";return"S"===t&&(r="second"),"M"===t&&(r="minute"),"H"===t&&(r="hour"),"D"===t&&(r="day"),e>1?r+"s":r}},{key:"createKbnUnitFromISO8601Duration",value:function(t){if("auto"===t)return"auto";var r=1;"PT"===t.substring(0,2)&&(r=2);var i=t.substring(r,t.length-1),n=t.substring(t.length-1);return i+e.timeUnitToKbn(+i,n)}},{key:"timeUnitToKbn",value:function(e,t){return"S"===t?"s":"M"===t?"m":"H"===t?"h":"D"===t?"d":void 0}}]),e}();t.default=s},function(e,r){e.exports=t},function(e,t,r){var i,n,a={},o=(i=function(){return window&&document&&document.all&&!window.atob},function(){return void 0===n&&(n=i.apply(this,arguments)),n}),s=function(e){var t={};return function(e){if("function"==typeof e)return e();if(void 0===t[e]){var r=function(e){return document.querySelector(e)}.call(this,e);if(window.HTMLIFrameElement&&r instanceof window.HTMLIFrameElement)try{r=r.contentDocument.head}catch(e){r=null}t[e]=r}return t[e]}}(),u=null,c=0,l=[],f=r(21);function p(e,t){for(var r=0;r<e.length;r++){var i=e[r],n=a[i.id];if(n){n.refs++;for(var o=0;o<n.parts.length;o++)n.parts[o](i.parts[o]);for(;o<i.parts.length;o++)n.parts.push(y(i.parts[o],t))}else{var s=[];for(o=0;o<i.parts.length;o++)s.push(y(i.parts[o],t));a[i.id]={id:i.id,refs:1,parts:s}}}}function d(e,t){for(var r=[],i={},n=0;n<e.length;n++){var a=e[n],o=t.base?a[0]+t.base:a[0],s={css:a[1],media:a[2],sourceMap:a[3]};i[o]?i[o].parts.push(s):r.push(i[o]={id:o,parts:[s]})}return r}function h(e,t){var r=s(e.insertInto);if(!r)throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");var i=l[l.length-1];if("top"===e.insertAt)i?i.nextSibling?r.insertBefore(t,i.nextSibling):r.appendChild(t):r.insertBefore(t,r.firstChild),l.push(t);else if("bottom"===e.insertAt)r.appendChild(t);else{if("object"!=typeof e.insertAt||!e.insertAt.before)throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");var n=s(e.insertInto+" "+e.insertAt.before);r.insertBefore(t,n)}}function m(e){if(null===e.parentNode)return!1;e.parentNode.removeChild(e);var t=l.indexOf(e);t>=0&&l.splice(t,1)}function g(e){var t=document.createElement("style");return void 0===e.attrs.type&&(e.attrs.type="text/css"),v(t,e.attrs),h(e,t),t}function v(e,t){Object.keys(t).forEach(function(r){e.setAttribute(r,t[r])})}function y(e,t){var r,i,n,a;if(t.transform&&e.css){if(!(a=t.transform(e.css)))return function(){};e.css=a}if(t.singleton){var o=c++;r=u||(u=g(t)),i=w.bind(null,r,o,!1),n=w.bind(null,r,o,!0)}else e.sourceMap&&"function"==typeof URL&&"function"==typeof URL.createObjectURL&&"function"==typeof URL.revokeObjectURL&&"function"==typeof Blob&&"function"==typeof btoa?(r=function(e){var t=document.createElement("link");return void 0===e.attrs.type&&(e.attrs.type="text/css"),e.attrs.rel="stylesheet",v(t,e.attrs),h(e,t),t}(t),i=function(e,t,r){var i=r.css,n=r.sourceMap,a=void 0===t.convertToAbsoluteUrls&&n;(t.convertToAbsoluteUrls||a)&&(i=f(i));n&&(i+="\n/*# sourceMappingURL=data:application/json;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(n))))+" */");var o=new Blob([i],{type:"text/css"}),s=e.href;e.href=URL.createObjectURL(o),s&&URL.revokeObjectURL(s)}.bind(null,r,t),n=function(){m(r),r.href&&URL.revokeObjectURL(r.href)}):(r=g(t),i=function(e,t){var r=t.css,i=t.media;i&&e.setAttribute("media",i);if(e.styleSheet)e.styleSheet.cssText=r;else{for(;e.firstChild;)e.removeChild(e.firstChild);e.appendChild(document.createTextNode(r))}}.bind(null,r),n=function(){m(r)});return i(e),function(t){if(t){if(t.css===e.css&&t.media===e.media&&t.sourceMap===e.sourceMap)return;i(e=t)}else n()}}e.exports=function(e,t){if("undefined"!=typeof DEBUG&&DEBUG&&"object"!=typeof document)throw new Error("The style-loader cannot be used in a non-browser environment");(t=t||{}).attrs="object"==typeof t.attrs?t.attrs:{},t.singleton||"boolean"==typeof t.singleton||(t.singleton=o()),t.insertInto||(t.insertInto="head"),t.insertAt||(t.insertAt="bottom");var r=d(e,t);return p(r,t),function(e){for(var i=[],n=0;n<r.length;n++){var o=r[n];(s=a[o.id]).refs--,i.push(s)}e&&p(d(e,t),t);for(n=0;n<i.length;n++){var s;if(0===(s=i[n]).refs){for(var u=0;u<s.parts.length;u++)s.parts[u]();delete a[s.id]}}}};var M,b=(M=[],function(e,t){return M[e]=t,M.filter(Boolean).join("\n")});function w(e,t,r,i){var n=r?"":i.css;if(e.styleSheet)e.styleSheet.cssText=b(t,n);else{var a=document.createTextNode(n),o=e.childNodes;o[t]&&e.removeChild(o[t]),o.length?e.insertBefore(a,o[t]):e.appendChild(a)}}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.AnnotationsQueryCtrl=t.QueryOptionsCtrl=t.ConfigCtrl=t.QueryCtrl=t.Datasource=void 0;var i,n=r(5),a=(i=n)&&i.__esModule?i:{default:i},o=r(15),s=r(22);function u(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var c=function e(){u(this,e)};c.templateUrl="partials/query.options.html";var l=function e(){u(this,e)};l.templateUrl="partials/annotations.editor.html",t.Datasource=a.default,t.QueryCtrl=o.AzureMonitorQueryCtrl,t.ConfigCtrl=s.AzureMonitorConfigCtrl,t.QueryOptionsCtrl=c,t.AnnotationsQueryCtrl=l},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=s(r(0)),a=s(r(6)),o=s(r(12));function s(e){return e&&e.__esModule?e:{default:e}}var u=function(){function e(t,r,i,n){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.backendSrv=r,this.templateSrv=i,this.$q=n,this.name=t.name,this.id=t.id,this.azureMonitorDatasource=new a.default(t,this.backendSrv,this.templateSrv,this.$q),this.appInsightsDatasource=new o.default(t,this.backendSrv,this.templateSrv,this.$q)}return e.$inject=["instanceSettings","backendSrv","templateSrv","$q"],i(e,[{key:"query",value:function(e){var t=[],r=n.default.cloneDeep(e),i=n.default.cloneDeep(e);return r.targets=n.default.filter(r.targets,["queryType","Azure Monitor"]),i.targets=n.default.filter(i.targets,["queryType","Application Insights"]),r.targets.length>0&&t.push(this.azureMonitorDatasource.query(r)),i.targets.length>0&&t.push(this.appInsightsDatasource.query(i)),this.$q.all(t).then(function(e){return{data:n.default.flatten(e)}})}},{key:"annotationQuery",value:function(e){throw new Error("Annotation Support not implemented yet.")}},{key:"metricFindQuery",value:function(e){if(!e)return Promise.resolve([]);var t=this.appInsightsDatasource.metricFindQuery(e);if(t)return t;var r=this.azureMonitorDatasource.metricFindQuery(e);return r||Promise.resolve([])}},{key:"testDatasource",value:function(){var e=[];return this.azureMonitorDatasource.isConfigured()&&e.push(this.azureMonitorDatasource.testDatasource()),this.appInsightsDatasource.isConfigured()&&e.push(this.appInsightsDatasource.testDatasource()),0===e.length?{status:"error",message:"Nothing configured. At least one of the API's must be configured.",title:"Error"}:this.$q.all(e).then(function(e){for(var t="success",r="",i=0;i<e.length;i++)"success"!==e[i].status&&(t=e[i].status),r+=i+1+". "+e[i].message+" ";return{status:t,message:r,title:n.default.upperFirst(t)}})}},{key:"getResourceGroups",value:function(){return this.azureMonitorDatasource.getResourceGroups()}},{key:"getMetricDefinitions",value:function(e){return this.azureMonitorDatasource.getMetricDefinitions(e)}},{key:"getResourceNames",value:function(e,t){return this.azureMonitorDatasource.getResourceNames(e,t)}},{key:"getMetricNames",value:function(e,t,r){return this.azureMonitorDatasource.getMetricNames(e,t,r)}},{key:"getMetricMetadata",value:function(e,t,r,i){return this.azureMonitorDatasource.getMetricMetadata(e,t,r,i)}},{key:"getAppInsightsMetricNames",value:function(){return this.appInsightsDatasource.getMetricNames()}},{key:"getAppInsightsMetricMetadata",value:function(e){return this.appInsightsDatasource.getMetricMetadata(e)}}]),e}();t.default=u},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=l(r(0)),a=l(r(7)),o=l(r(9)),s=l(r(10)),u=l(r(11)),c=l(r(1));function l(e){return e&&e.__esModule?e:{default:e}}var f=function(){function e(t,r,i,n){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.instanceSettings=t,this.backendSrv=r,this.templateSrv=i,this.$q=n,this.apiVersion="2018-01-01",this.defaultDropdownValue="select",this.supportedMetricNamespaces=[],this.id=t.id,this.subscriptionId=t.jsonData.subscriptionId,this.cloudName=t.jsonData.cloudName||"azuremonitor",this.baseUrl="/"+this.cloudName+"/subscriptions/"+this.subscriptionId+"/resourceGroups",this.url=t.url,this.supportedMetricNamespaces=new u.default(this.cloudName).get()}return i(e,[{key:"isConfigured",value:function(){return this.subscriptionId&&this.subscriptionId.length>0}},{key:"query",value:function(e){var t=this,r=n.default.filter(e.targets,function(e){return!0!==e.hide&&e.azureMonitor.resourceGroup&&e.azureMonitor.resourceGroup!==t.defaultDropdownValue&&e.azureMonitor.resourceName&&e.azureMonitor.resourceName!==t.defaultDropdownValue&&e.azureMonitor.metricDefinition&&e.azureMonitor.metricDefinition!==t.defaultDropdownValue&&e.azureMonitor.metricName&&e.azureMonitor.metricName!==t.defaultDropdownValue}).map(function(r){var i=r.azureMonitor;i.timeGrainUnit&&"auto"!==i.timeGrain&&(i.timeGrain=c.default.createISO8601Duration(i.timeGrain,i.timeGrainUnit));var n=t.templateSrv.replace(i.resourceGroup,e.scopedVars),s=t.templateSrv.replace(i.resourceName,e.scopedVars),u=t.templateSrv.replace(i.metricDefinition,e.scopedVars),l=(t.templateSrv.replace(i.metricName,e.scopedVars),t.templateSrv.replace((i.timeGrain||"").toString(),e.scopedVars)),f=new a.default(i.metricName,e.range.from,e.range.to,l,e.interval);i.timeGrains&&f.setAllowedTimeGrains(i.timeGrains),i.aggregation&&f.setAggregation(i.aggregation),i.dimension&&"None"!==i.dimension&&f.setDimensionFilter(i.dimension,i.dimensionFilter);var p=t.templateSrv.replace(f.generateFilter(),e.scopedVars),d=o.default.buildAzureMonitorQueryUrl(t.baseUrl,n,u,s,t.apiVersion,p);return{refId:r.refId,intervalMs:e.intervalMs,maxDataPoints:e.maxDataPoints,datasourceId:t.id,url:d,format:e.format,alias:i.alias}});if(0===r.length)return this.$q.when({data:[]});var i=this.doQueries(r);return this.$q.all(i).then(function(e){return new s.default(e).parseQueryResult()})}},{key:"doQueries",value:function(e){var t=this;return n.default.map(e,function(e){return t.doRequest(e.url).then(function(t){return{result:t,query:e}}).catch(function(t){throw{error:t,query:e}})})}},{key:"annotationQuery",value:function(e){}},{key:"metricFindQuery",value:function(e){if(e.match(/^ResourceGroups\(\)/i))return this.getResourceGroups();var t=e.match(/^Namespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);if(t)return this.getMetricDefinitions(this.toVariable(t[1]));var r=e.match(/^ResourceNames\(([^,]+?),\s?([^,]+?)\)/i);if(r){var i=this.toVariable(r[1]),n=this.toVariable(r[2]);return this.getResourceNames(i,n)}var a=e.match(/^MetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);if(a){var o=this.toVariable(a[1]),s=this.toVariable(a[2]),u=this.toVariable(a[3]);return this.getMetricNames(o,s,u)}}},{key:"toVariable",value:function(e){return this.templateSrv.replace((e||"").trim())}},{key:"getResourceGroups",value:function(){var e=this.baseUrl+"?api-version=2018-01-01";return this.doRequest(e).then(function(e){return s.default.parseResponseValues(e,"name","name")})}},{key:"getMetricDefinitions",value:function(e){var t=this,r=this.baseUrl+"/"+e+"/resources?api-version=2018-01-01";return this.doRequest(r).then(function(e){return s.default.parseResponseValues(e,"type","type")}).then(function(e){return n.default.filter(e,function(e){for(var r=0;r<t.supportedMetricNamespaces.length;r++)if(n.default.startsWith(e.value.toLowerCase(),t.supportedMetricNamespaces[r].toLowerCase()))return!0;return!1})}).then(function(e){for(var t=!1,r=0;r<e.length;r++)if("Microsoft.Storage/storageAccounts"===e[r].value){t=!0;break}return t&&(e.push({text:"Microsoft.Storage/storageAccounts/blobServices",value:"Microsoft.Storage/storageAccounts/blobServices"}),e.push({text:"Microsoft.Storage/storageAccounts/fileServices",value:"Microsoft.Storage/storageAccounts/fileServices"}),e.push({text:"Microsoft.Storage/storageAccounts/tableServices",value:"Microsoft.Storage/storageAccounts/tableServices"}),e.push({text:"Microsoft.Storage/storageAccounts/queueServices",value:"Microsoft.Storage/storageAccounts/queueServices"})),e})}},{key:"getResourceNames",value:function(e,t){var r=this.baseUrl+"/"+e+"/resources?api-version=2018-01-01";return this.doRequest(r).then(function(e){if(!n.default.startsWith(t,"Microsoft.Storage/storageAccounts/"))return s.default.parseResourceNames(e,t);for(var r=s.default.parseResourceNames(e,"Microsoft.Storage/storageAccounts"),i=0;i<r.length;i++)r[i].text+="/default",r[i].value+="/default";return r})}},{key:"getMetricNames",value:function(e,t,r){var i=o.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl,e,t,r,this.apiVersion);return this.doRequest(i).then(function(e){return s.default.parseResponseValues(e,"name.localizedValue","name.value")})}},{key:"getMetricMetadata",value:function(e,t,r,i){var n=o.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl,e,t,r,this.apiVersion);return this.doRequest(n).then(function(e){return s.default.parseMetadata(e,i)})}},{key:"testDatasource",value:function(){if(!this.isValidConfigField(this.instanceSettings.jsonData.tenantId))return{status:"error",message:"The Tenant Id field is required."};if(!this.isValidConfigField(this.instanceSettings.jsonData.clientId))return{status:"error",message:"The Client Id field is required."};var e=this.baseUrl+"?api-version=2018-01-01";return this.doRequest(e).then(function(e){if(200===e.status)return{status:"success",message:"Successfully queried the Azure Monitor service.",title:"Success"}}).catch(function(e){var t="Azure Monitor: ";return t+=e.statusText?e.statusText+": ":"",e.data&&e.data.error&&e.data.error.code?t+=e.data.error.code+". "+e.data.error.message:e.data&&e.data.error?t+=e.data.error:e.data?t+=e.data:t+="Cannot connect to Azure Monitor REST API.",{status:"error",message:t}})}},{key:"isValidConfigField",value:function(e){return e&&e.length>0}},{key:"doRequest",value:function(e){var t=this,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:1;return this.backendSrv.datasourceRequest({url:this.url+e,method:"GET"}).catch(function(i){if(r>0)return t.doRequest(e,r-1);throw i})}}]),e}();t.default=f},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i,n=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),a=r(1),o=(i=a)&&i.__esModule?i:{default:i};var s=function(){function e(t,r,i,n,a){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.metricName=t,this.from=r,this.to=i,this.timeGrain=n,this.grafanaInterval=a,this.timeGrainInterval="",this.allowedTimeGrains=["1m","5m","15m","30m","1h","6h","12h","1d"]}return n(e,[{key:"setAllowedTimeGrains",value:function(e){var t=this;this.allowedTimeGrains=[],e.forEach(function(e){"auto"===e.value?t.allowedTimeGrains.push(e.value):t.allowedTimeGrains.push(o.default.createKbnUnitFromISO8601Duration(e.value))})}},{key:"setAggregation",value:function(e){this.aggregation=e}},{key:"setDimensionFilter",value:function(e,t){this.dimension=e,this.dimensionFilter=t}},{key:"generateFilter",value:function(){var e=this.createDatetimeAndTimeGrainConditions();return this.aggregation&&(e+="&aggregation="+this.aggregation),this.metricName&&this.metricName.trim().length>0&&(e+="&metricnames="+this.metricName),this.dimension&&this.dimensionFilter&&this.dimensionFilter.trim().length>0&&(e+="&$filter="+this.dimension+" eq '"+this.dimensionFilter+"'"),e}},{key:"createDatetimeAndTimeGrainConditions",value:function(){var e="timespan="+this.from.utc().format()+"/"+this.to.utc().format();return"auto"===this.timeGrain&&(this.timeGrain=this.calculateAutoTimeGrain()),e+("&interval="+this.timeGrain)}},{key:"calculateAutoTimeGrain",value:function(){var e=o.default.findClosestTimeGrain(this.grafanaInterval,this.allowedTimeGrains);return o.default.createISO8601DurationFromInterval(e)}}]),e}();t.default=s},function(e,t){e.exports=r},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i,n=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),a=r(0),o=(i=a)&&i.__esModule?i:{default:i};var s=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e)}return n(e,null,[{key:"buildAzureMonitorQueryUrl",value:function(e,t,r,i,n,a){if(o.default.startsWith(r,"Microsoft.Storage/storageAccounts/")||"Microsoft.Sql/servers/databases"===r){var s=i.split("/"),u=r.substring(r.lastIndexOf("/")+1);return e+"/"+t+"/providers/"+r.substring(0,r.lastIndexOf("/"))+"/"+s[0]+"/"+u+"/"+s[1]+"/providers/microsoft.insights/metrics?api-version="+n+"&"+a}return e+"/"+t+"/providers/"+r+"/"+i+"/providers/microsoft.insights/metrics?api-version="+n+"&"+a}},{key:"buildAzureMonitorGetMetricNamesUrl",value:function(e,t,r,i,n){if(o.default.startsWith(r,"Microsoft.Storage/storageAccounts/")||"Microsoft.Sql/servers/databases"===r){var a=i.split("/"),s=r.substring(r.lastIndexOf("/")+1);return e+"/"+t+"/providers/"+r.substring(0,r.lastIndexOf("/"))+"/"+a[0]+"/"+s+"/"+a[1]+"/providers/microsoft.insights/metricdefinitions?api-version="+n}return e+"/"+t+"/providers/"+r+"/"+i+"/providers/microsoft.insights/metricdefinitions?api-version="+n}}]),e}();t.default=s},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=s(r(2)),a=s(r(0)),o=s(r(1));function s(e){return e&&e.__esModule?e:{default:e}}var u=function(){function e(t){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.results=t}return i(e,[{key:"parseQueryResult",value:function(){for(var t=[],r=0;r<this.results.length;r++)for(var i=0;i<this.results[r].result.data.value.length;i++)for(var n=0;n<this.results[r].result.data.value[i].timeseries.length;n++){var a=this.results[r].query.alias;t.push({target:e.createTarget(this.results[r].result.data.value[i],this.results[r].result.data.value[i].timeseries[n].metadatavalues,a),datapoints:e.convertDataToPoints(this.results[r].result.data.value[i].timeseries[n].data)})}return t}}],[{key:"createTarget",value:function(t,r,i){var n=e.parseResourceGroupFromId(t.id),a=e.parseResourceNameFromId(t.id),o=e.parseNamespaceFromId(t.id,a);if(i){return i.replace(/\{\{([\s\S]+?)\}\}/g,function(e,i,s){var u=i||s;return"resourcegroup"===u?n:"namespace"===u?o:"resourcename"===u?a:"metric"===u?t.name.value:"dimensionname"===u?r&&r.length>0?r[0].name.value:"":"dimensionvalue"===u?r&&r.length>0?r[0].value:"":e})}return r&&r.length>0?a+"{"+r[0].name.value+"="+r[0].value+"}."+t.name.value:a+"."+t.name.value}},{key:"parseResourceGroupFromId",value:function(e){var t=e.indexOf("/resourceGroups/")+16,r=e.indexOf("/providers");return e.substring(t,r)}},{key:"parseNamespaceFromId",value:function(e,t){var r=e.indexOf("/providers/")+11,i=e.indexOf("/"+t);return e.substring(r,i)}},{key:"parseResourceNameFromId",value:function(e){var t=e.lastIndexOf("/providers"),r=e.slice(0,t).lastIndexOf("/")+1;return e.substring(r,t)}},{key:"convertDataToPoints",value:function(t){for(var r=[],i=0;i<t.length;i++){var n=e.dateTimeToEpoch(t[i].timeStamp),a=e.getKeyForAggregationField(t[i]);a&&r.push([t[i][a],n])}return r}},{key:"dateTimeToEpoch",value:function(e){return(0,n.default)(e).valueOf()}},{key:"getKeyForAggregationField",value:function(e){var t=a.default.keys(e);if(!(t.length<2))return a.default.intersection(t,["total","average","maximum","minimum","count"])}},{key:"parseResponseValues",value:function(e,t,r){for(var i=[],n=0;n<e.data.value.length;n++)a.default.find(i,["value",a.default.get(e.data.value[n],r)])||i.push({text:a.default.get(e.data.value[n],t),value:a.default.get(e.data.value[n],r)});return i}},{key:"parseResourceNames",value:function(e,t){for(var r=[],i=0;i<e.data.value.length;i++)e.data.value[i].type===t&&r.push({text:e.data.value[i].name,value:e.data.value[i].name});return r}},{key:"parseMetadata",value:function(t,r){var i=a.default.find(t.data.value,function(e){return a.default.get(e,"name.value")===r});return{primaryAggType:i.primaryAggregationType,supportedAggTypes:i.supportedAggregationTypes||["None","Average","Minimum","Maximum","Total","Count"],supportedTimeGrains:e.parseTimeGrains(i.metricAvailabilities||[]),dimensions:e.parseDimensions(i)}}},{key:"parseTimeGrains",value:function(e){var t=[];return e.forEach(function(e){e.timeGrain&&t.push({text:o.default.createTimeGrainFromISO8601Duration(e.timeGrain),value:e.timeGrain})}),t}},{key:"parseDimensions",value:function(e){var t=[];if(!e.dimensions||0===e.dimensions.length)return t;e.isDimensionRequired||t.push({text:"None",value:"None"});for(var r=0;r<e.dimensions.length;r++)t.push({text:e.dimensions[r].localizedValue,value:e.dimensions[r].value});return t}}]),e}();t.default=u},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}();var n=function(){function e(t){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.cloudName=t,this.supportedMetricNamespaces={azuremonitor:["Microsoft.Compute","Microsoft.ClassicCompute","Microsoft.Storage","Microsoft.Sql","Microsoft.Web","Microsoft.EventHub","Microsoft.ServiceBus","Microsoft.Devices","Microsoft.DocumentDb","Microsoft.Network","Microsoft.Cache/Redis","Microsoft.AnalysisServices/servers","Microsoft.ApiManagement/service","Microsoft.Automation/automationAccounts","Microsoft.Batch/batchAccounts","Microsoft.CognitiveServices/accounts","Microsoft.CustomerInsights/hubs","Microsoft.DataLakeAnalytics/accounts","Microsoft.DataLakeStore/accounts","Microsoft.DBforMySQL/servers","Microsoft.DBforPostgreSQL/servers","Microsoft.Logic/workflows","Microsoft.NotificationHubs/Namespaces/NotificationHubs","Microsoft.Search/searchServices","Microsoft.StreamAnalytics/streamingjobs","Microsoft.DataFactory/datafactories","Microsoft.DataFactory/factories","Microsoft.KeyVaults/vaults","Microsoft.LocationBasedServices/accounts","Microsoft.PowerBIDedicated/capacities","Microsoft.Relay/namespaces"],govazuremonitor:["Microsoft.AnalysisServices/Servers","Microsoft.ApiManagement/service","Microsoft.Compute/virtualMachines","Microsoft.Compute/virtualMachineScaleSets","Microsoft.Compute/virtualMachineScaleSets/virtualMachines","Microsoft.Devices/IotHubs","Microsoft.Devices/provisioningServices","Microsoft.Devices/ElasticPools","Microsoft.Devices/ElasticPools/IotHubtTenants","Microsoft.EventHubs/namespaces","Microsoft.Insights/AutoscaleSettings","Microsoft.KeyVault/vaults","Microsoft.Network/loadBalancers","Microsoft.Network/publicIPAdresses","Microsoft.Network/applicationGateways","Microsoft.Network/virtualNetworkGateways","Microsoft.Network/expressRouteCircuits","Microsoft.Network/trafficManagerProfiles","Microsoft.NotificationHubs/Namespaces/NotificationHubs","Microsoft.PowerBiDedicated/capacities","Microsoft.ServiceBus/namespaces","Microsoft.Sql/servers/databases","Microsoft.Sql/servers/elasticPools","Microsoft.Sql/servers","Microsoft.Web/serverfarms","Microsoft.Web/sites","Microsoft.Web/sites/slots","Microsoft.Web/hostingEnvironments/multiRolePools","Microsoft.Web/hostingEnvironments/workerPools"],germanyazuremonitor:["Microsoft.AnalysisServices/Servers","Microsoft.Compute/virtualMachines","Microsoft.Compute/virtualMachineScaleSets","Microsoft.Compute/virtualMachineScaleSets/virtualMachines","Microsoft.Devices/IotHubs","Microsoft.Devices/provisioningServices","Microsoft.Devices/ElasticPools","Microsoft.Devices/ElasticPools/IotHubtTenants","Microsoft.EventHubs/namespaces","Microsoft.Insights/AutoscaleSettings","Microsoft.KeyVault/vaults","Microsoft.Network/loadBalancers","Microsoft.Network/publicIPAdresses","Microsoft.Network/applicationGateways","Microsoft.Network/virtualNetworkGateways","Microsoft.Network/expressRouteCircuits","Microsoft.Network/trafficManagerProfiles","Microsoft.NotificationHubs/Namespaces/NotificationHubs","Microsoft.ServiceBus/namespaces","Microsoft.Sql/servers/databases","Microsoft.Sql/servers/elasticPools","Microsoft.Sql/servers","Microsoft.Web/serverfarms","Microsoft.Web/sites","Microsoft.Web/sites/slots","Microsoft.Web/hostingEnvironments/multiRolePools","Microsoft.Web/hostingEnvironments/workerPools"],chinaazuremonitor:["Microsoft.AnalysisServices/Servers","Microsoft.ApiManagement/service","Microsoft.Compute/virtualMachines","Microsoft.Compute/virtualMachineScaleSets","Microsoft.Compute/virtualMachineScaleSets/virtualMachines","Microsoft.Devices/IotHubs","Microsoft.Devices/provisioningServices","Microsoft.Devices/ElasticPools","Microsoft.Devices/ElasticPools/IotHubtTenants","Microsoft.EventHubs/namespaces","Microsoft.Insights/AutoscaleSettings","Microsoft.KeyVault/vaults","Microsoft.Network/loadBalancers","Microsoft.Network/publicIPAdresses","Microsoft.Network/applicationGateways","Microsoft.Network/virtualNetworkGateways","Microsoft.Network/expressRouteCircuits","Microsoft.Network/trafficManagerProfiles","Microsoft.NotificationHubs/Namespaces/NotificationHubs","Microsoft.ServiceBus/namespaces","Microsoft.Sql/servers/databases","Microsoft.Sql/servers/elasticPools","Microsoft.Sql/servers","Microsoft.Web/serverfarms","Microsoft.Web/sites","Microsoft.Web/sites/slots","Microsoft.Web/hostingEnvironments/multiRolePools","Microsoft.Web/hostingEnvironments/workerPools"]}}return i(e,[{key:"get",value:function(){return this.supportedMetricNamespaces[this.cloudName]}}]),e}();t.default=n},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=s(r(0)),a=s(r(13)),o=s(r(14));function s(e){return e&&e.__esModule?e:{default:e}}var u=function(){function e(t,r,i,n){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.backendSrv=r,this.templateSrv=i,this.$q=n,this.version="beta",this.id=t.id,this.applicationId=t.jsonData.appInsightsAppId,this.baseUrl="/appinsights/"+this.version+"/apps/"+this.applicationId+"/metrics",this.url=t.url}return i(e,[{key:"isConfigured",value:function(){return this.applicationId&&this.applicationId.length>0}},{key:"query",value:function(e){var t=this,r=n.default.filter(e.targets,function(e){return!0!==e.hide}).map(function(r){var i=r.appInsights,n=new a.default(e.range.from,e.range.to,e.interval);"none"!==i.groupBy&&n.setGroupBy(t.templateSrv.replace(i.groupBy,e.scopedVars)),n.setAggregation(i.aggregation),n.setInterval(i.timeGrainType,t.templateSrv.replace(i.timeGrain,e.scopedVars),i.timeGrainUnit),n.setFilter(t.templateSrv.replace(i.filter||""));var o=t.baseUrl+"/"+t.templateSrv.replace(i.metricName,e.scopedVars)+"?"+n.generate();return{refId:r.refId,intervalMs:e.intervalMs,maxDataPoints:e.maxDataPoints,datasourceId:t.id,url:o,format:e.format,alias:i.alias}});if(0===r.length)return this.$q.when({data:[]});var i=this.doQueries(r);return this.$q.all(i).then(function(e){return new o.default(e).parseQueryResult()})}},{key:"doQueries",value:function(e){var t=this;return n.default.map(e,function(e){return t.doRequest(e.url).then(function(t){return{result:t,query:e}}).catch(function(t){throw{error:t,query:e}})})}},{key:"annotationQuery",value:function(e){}},{key:"metricFindQuery",value:function(e){if(e.match(/^AppInsightsMetricNames\(\)/i))return this.getMetricNames();var t=e.match(/^AppInsightsGroupBys\(([^\)]+?)(,\s?([^,]+?))?\)/i);if(t){var r=t[1];return this.getGroupBys(this.templateSrv.replace(r))}}},{key:"testDatasource",value:function(){var e=this.baseUrl+"/metadata";return this.doRequest(e).then(function(e){if(200===e.status)return{status:"success",message:"Successfully queried the Application Insights service.",title:"Success"}}).catch(function(e){var t="Application Insights: ";return t+=e.statusText?e.statusText+": ":"",e.data&&e.data.error&&"PathNotFoundError"===e.data.error.code?t+="Invalid Application Id for Application Insights service.":e.data&&e.data.error?t+=e.data.error.code+". "+e.data.error.message:t+="Cannot connect to Application Insights REST API.",{status:"error",message:t}})}},{key:"doRequest",value:function(e){var t=this,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:1;return this.backendSrv.datasourceRequest({url:this.url+e,method:"GET"}).catch(function(i){if(r>0)return t.doRequest(e,r-1);throw i})}},{key:"getMetricNames",value:function(){var e=this.baseUrl+"/metadata";return this.doRequest(e).then(o.default.parseMetricNames)}},{key:"getMetricMetadata",value:function(e){var t=this.baseUrl+"/metadata";return this.doRequest(t).then(function(t){return new o.default(t).parseMetadata(e)})}},{key:"getGroupBys",value:function(e){return this.getMetricMetadata(e).then(function(e){return new o.default(e).parseGroupBys()})}}]),e}();t.default=u},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i,n=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),a=r(1),o=(i=a)&&i.__esModule?i:{default:i};var s=function(){function e(t,r,i){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.from=t,this.to=r,this.grafanaInterval=i,this.aggregation="",this.groupBy="",this.timeGrainType="",this.timeGrain="",this.timeGrainUnit="",this.filter=""}return n(e,[{key:"setAggregation",value:function(e){this.aggregation=e}},{key:"setGroupBy",value:function(e){this.groupBy=e}},{key:"setInterval",value:function(e,t,r){this.timeGrainType=e,this.timeGrain=t,this.timeGrainUnit=r}},{key:"setFilter",value:function(e){this.filter=e}},{key:"generate",value:function(){var e="timespan="+this.from.utc().format()+"/"+this.to.utc().format();return this.aggregation&&this.aggregation.length>0&&(e+="&aggregation="+this.aggregation),this.groupBy&&this.groupBy.length>0&&(e+="&segment="+this.groupBy),"specific"===this.timeGrainType&&this.timeGrain&&this.timeGrainUnit&&(e+="&interval="+o.default.createISO8601Duration(this.timeGrain,this.timeGrainUnit)),"auto"===this.timeGrainType&&(e+="&interval="+o.default.createISO8601DurationFromInterval(this.grafanaInterval)),this.filter&&(e+="&filter="+this.filter),e}}]),e}();t.default=s},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=o(r(2)),a=o(r(0));function o(e){return e&&e.__esModule?e:{default:e}}var s=function(){function e(t){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.results=t}return i(e,[{key:"parseQueryResult",value:function(){for(var e=[],t=0;t<this.results.length;t++){var r=this.results[t].result.data.value,i=this.results[t].query.alias;e=a.default.concat(e,this.parseQueryResultRow(r,i))}return e}},{key:"parseQueryResultRow",value:function(t,r){var i=[];if(e.isSingleValue(t)){var n=e.getMetricFieldKey(t),a=e.getKeyForAggregationField(t[n]),o=e.dateTimeToEpoch(t.end);return i.push({target:n,datapoints:[[t[n][a],o]]}),i}if(e.hasSegmentsField(t.segments[0]))for(var s=0;s<t.segments.length;s++)for(var u=e.dateTimeToEpoch(t.segments[s].end),c=0;c<t.segments[s].segments.length;c++){var l=e.getMetricFieldKey(t.segments[s].segments[c]),f=e.getKeyForAggregationField(t.segments[s].segments[c][l]),p=this.getTargetName(t.segments[s].segments[c],r);e.findOrCreateBucket(i,p).datapoints.push([t.segments[s].segments[c][l][f],u])}else for(var d=e.getMetricFieldKey(t.segments[0]),h=e.findOrCreateBucket(i,d),m=0;m<t.segments.length;m++){var g=e.dateTimeToEpoch(t.segments[m].end),v=e.getKeyForAggregationField(t.segments[m][d]);h.datapoints.push([t.segments[m][d][v],g])}return i}},{key:"getTargetName",value:function(e,t){var r="",i="",n="";for(var o in e)a.default.isObject(e[o])?r=o:(i=o,n=e[o]);if(t){return t.replace(/\{\{([\s\S]+?)\}\}/g,function(e,t,a){var o=t||a;return"metric"===o?r:"groupbyname"===o?i:"groupbyvalue"===o?n:e})}return r+"{"+i+'="'+n+'"}'}},{key:"parseMetadata",value:function(e){var t=this.results.data.metrics[e];if(!t)throw Error("No data found for metric: "+e);return{primaryAggType:t.defaultAggregation,supportedAggTypes:t.supportedAggregations,supportedGroupBy:t.supportedGroupBy.all}}},{key:"parseGroupBys",value:function(){return e.toTextValueList(this.results.supportedGroupBy)}}],[{key:"isSingleValue",value:function(t){return!e.hasSegmentsField(t)}},{key:"findOrCreateBucket",value:function(e,t){var r=a.default.find(e,["target",t]);return r||(r={target:t,datapoints:[]},e.push(r)),r}},{key:"hasSegmentsField",value:function(e){var t=a.default.keys(e);return a.default.indexOf(t,"segments")>-1}},{key:"getMetricFieldKey",value:function(e){var t=a.default.keys(e);return a.default.filter(a.default.without(t,"start","end"),function(t){return a.default.isObject(e[t])})[0]}},{key:"getKeyForAggregationField",value:function(e){var t=a.default.keys(e);return a.default.intersection(t,["sum","avg","min","max","count","unique"])}},{key:"dateTimeToEpoch",value:function(e){return(0,n.default)(e).valueOf()}},{key:"parseMetricNames",value:function(t){var r=a.default.keys(t.data.metrics);return e.toTextValueList(r)}},{key:"toTextValueList",value:function(e){for(var t=[],r=0;r<e.length;r++)t.push({text:e[r],value:e[r]});return t}}]),e}();t.default=s},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.AzureMonitorQueryCtrl=void 0;var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var i=t[r];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,r,i){return r&&e(t.prototype,r),i&&e(t,i),t}}(),n=s(r(0)),a=r(16);r(17);var o=s(r(1));function s(e){return e&&e.__esModule?e:{default:e}}(t.AzureMonitorQueryCtrl=function(e){function t(e,r,i){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t);var a=function(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e,r));return a.templateSrv=i,a.defaultDropdownValue="select",a.defaults={queryType:"Azure Monitor",azureMonitor:{resourceGroup:a.defaultDropdownValue,metricDefinition:a.defaultDropdownValue,resourceName:a.defaultDropdownValue,metricName:a.defaultDropdownValue,dimensionFilter:"*",timeGrain:"auto"},appInsights:{metricName:a.defaultDropdownValue,groupBy:"none",timeGrainType:"auto"}},n.default.defaultsDeep(a.target,a.defaults),a.migrateTimeGrains(),a.panelCtrl.events.on("data-received",a.onDataReceived.bind(a),e),a.panelCtrl.events.on("data-error",a.onDataError.bind(a),e),a}return t.$inject=["$scope","$injector","templateSrv"],function(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}(t,e),i(t,[{key:"onDataReceived",value:function(e){this.lastQueryError=void 0}},{key:"onDataError",value:function(e){this.handleQueryCtrlError(e)}},{key:"handleQueryCtrlError",value:function(e){e.query&&e.query.refId&&e.query.refId!==this.target.refId||(e.error&&e.error.data&&e.error.data.error?this.lastQueryError=e.error.data.error.message:e.error&&e.error.data?this.lastQueryError=e.error.data.message:e.data&&e.data.error?this.lastQueryError=e.data.error.message:e.data&&e.data.message?this.lastQueryError=e.data.message:this.lastQueryError=e)}},{key:"migrateTimeGrains",value:function(){this.target.azureMonitor.timeGrainUnit&&("auto"!==this.target.azureMonitor.timeGrain&&(this.target.azureMonitor.timeGrain=o.default.createISO8601Duration(this.target.azureMonitor.timeGrain,this.target.azureMonitor.timeGrainUnit)),delete this.target.azureMonitor.timeGrainUnit,this.onMetricNameChange())}},{key:"replace",value:function(e){return this.templateSrv.replace(e,this.panelCtrl.panel.scopedVars)}},{key:"getResourceGroups",value:function(e){if("Azure Monitor"===this.target.queryType&&this.datasource.azureMonitorDatasource.isConfigured())return this.datasource.getResourceGroups().catch(this.handleQueryCtrlError.bind(this))}},{key:"getMetricDefinitions",value:function(e){if("Azure Monitor"===this.target.queryType&&this.target.azureMonitor.resourceGroup&&this.target.azureMonitor.resourceGroup!==this.defaultDropdownValue)return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup)).catch(this.handleQueryCtrlError.bind(this))}},{key:"getResourceNames",value:function(e){if("Azure Monitor"===this.target.queryType&&this.target.azureMonitor.resourceGroup&&this.target.azureMonitor.resourceGroup!==this.defaultDropdownValue&&this.target.azureMonitor.metricDefinition&&this.target.azureMonitor.metricDefinition!==this.defaultDropdownValue){this.templateSrv.replace(this.target.azureMonitor.resourceGroup,this.panelCtrl.panel.scopedVars);return this.datasource.getResourceNames(this.replace(this.target.azureMonitor.resourceGroup),this.replace(this.target.azureMonitor.metricDefinition)).catch(this.handleQueryCtrlError.bind(this))}}},{key:"getMetricNames",value:function(e){if("Azure Monitor"===this.target.queryType&&this.target.azureMonitor.resourceGroup&&this.target.azureMonitor.resourceGroup!==this.defaultDropdownValue&&this.target.azureMonitor.metricDefinition&&this.target.azureMonitor.metricDefinition!==this.defaultDropdownValue&&this.target.azureMonitor.resourceName&&this.target.azureMonitor.resourceName!==this.defaultDropdownValue)return this.datasource.getMetricNames(this.replace(this.target.azureMonitor.resourceGroup),this.replace(this.target.azureMonitor.metricDefinition),this.replace(this.target.azureMonitor.resourceName)).catch(this.handleQueryCtrlError.bind(this))}},{key:"onResourceGroupChange",value:function(){this.target.azureMonitor.metricDefinition=this.defaultDropdownValue,this.target.azureMonitor.resourceName=this.defaultDropdownValue,this.target.azureMonitor.metricName=this.defaultDropdownValue,this.target.azureMonitor.dimensions=[],this.target.azureMonitor.dimension=""}},{key:"onMetricDefinitionChange",value:function(){this.target.azureMonitor.resourceName=this.defaultDropdownValue,this.target.azureMonitor.metricName=this.defaultDropdownValue,this.target.azureMonitor.dimensions=[],this.target.azureMonitor.dimension=""}},{key:"onResourceNameChange",value:function(){this.target.azureMonitor.metricName=this.defaultDropdownValue,this.target.azureMonitor.dimensions=[],this.target.azureMonitor.dimension=""}},{key:"onMetricNameChange",value:function(){var e=this;if(this.target.azureMonitor.metricName&&this.target.azureMonitor.metricName!==this.defaultDropdownValue)return this.datasource.getMetricMetadata(this.replace(this.target.azureMonitor.resourceGroup),this.replace(this.target.azureMonitor.metricDefinition),this.replace(this.target.azureMonitor.resourceName),this.replace(this.target.azureMonitor.metricName)).then(function(t){return e.target.azureMonitor.aggOptions=t.supportedAggTypes||[t.primaryAggType],e.target.azureMonitor.aggregation=t.primaryAggType,e.target.azureMonitor.timeGrains=[{text:"auto",value:"auto"}].concat(t.supportedTimeGrains),e.target.azureMonitor.dimensions=t.dimensions,t.dimensions.length>0&&(e.target.azureMonitor.dimension=t.dimensions[0].value),e.refresh()}).catch(this.handleQueryCtrlError.bind(this))}},{key:"getAutoInterval",value:function(){return"auto"===this.target.azureMonitor.timeGrain?o.default.findClosestTimeGrain(this.panelCtrl.interval,n.default.map(this.target.azureMonitor.timeGrains,function(e){return o.default.createKbnUnitFromISO8601Duration(e.value)})||["1m","5m","15m","30m","1h","6h","12h","1d"]):""}},{key:"getAppInsightsAutoInterval",value:function(){return"s"===this.panelCtrl.interval[this.panelCtrl.interval.length-1]?"1m":this.panelCtrl.interval}},{key:"getAppInsightsMetricNames",value:function(){if(this.datasource.appInsightsDatasource.isConfigured())return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this))}},{key:"onAppInsightsMetricNameChange",value:function(){var e=this;if(this.target.appInsights.metricName&&this.target.appInsights.metricName!==this.defaultDropdownValue)return this.datasource.getAppInsightsMetricMetadata(this.replace(this.target.appInsights.metricName)).then(function(t){return e.target.appInsights.aggOptions=t.supportedAggTypes,e.target.appInsights.groupByOptions=t.supportedGroupBy,e.target.appInsights.aggregation=t.primaryAggType,e.refresh()}).catch(this.handleQueryCtrlError.bind(this))}},{key:"getAppInsightsGroupBySegments",value:function(e){return n.default.map(this.target.appInsights.groupByOptions,function(e){return{text:e,value:e}})}},{key:"resetAppInsightsGroupBy",value:function(){this.target.appInsights.groupBy="none",this.refresh()}},{key:"updateTimeGrainType",value:function(){"specific"===this.target.appInsights.timeGrainType?(this.target.appInsights.timeGrain="1",this.target.appInsights.timeGrainUnit="minute"):this.target.appInsights.timeGrain="",this.refresh()}}]),t}(a.QueryCtrl)).templateUrl="partials/query.editor.html"},function(e,t){e.exports=i},function(e,t,r){var i=r(18);"string"==typeof i&&(i=[[e.i,i,""]]);var n={hmr:!0,transform:void 0,insertInto:void 0};r(3)(i,n);i.locals&&(e.exports=i.locals)},function(e,t,r){var i=r(19);"string"==typeof i&&(i=[[e.i,i,""]]);var n={hmr:!0,transform:void 0,insertInto:void 0};r(3)(i,n);i.locals&&(e.exports=i.locals)},function(e,t,r){(e.exports=r(20)(!0)).push([e.i,".min-width-10 {\n  min-width: 10rem;\n}\n\n.min-width-12 {\n  min-width: 12rem;\n}\n\n.min-width-20 {\n  min-width: 20rem;\n}\n\n.gf-form-select-wrapper select.gf-form-input {\n  height: 2.64rem;\n}\n\n.gf-form-select-wrapper--caret-indent.gf-form-select-wrapper::after {\n  right: 0.775rem\n}\n\n.service-dropdown {\n  width: 12rem;\n}\n\n.aggregation-dropdown-wrapper {\n  max-width: 29.1rem;\n}\n\n.timegrainunit-dropdown-wrapper {\n  width: 8rem;\n}\n","",{version:3,sources:["/home/daniel/dev/go/src/github.com/grafana/grafana/data/plugins/grafana-azure-monitor-datasource/src/css/query_editor.css"],names:[],mappings:"AAAA;EACE,iBAAiB;CAClB;;AAED;EACE,iBAAiB;CAClB;;AAED;EACE,iBAAiB;CAClB;;AAED;EACE,gBAAgB;CACjB;;AAED;EACE,eAAe;CAChB;;AAED;EACE,aAAa;CACd;;AAED;EACE,mBAAmB;CACpB;;AAED;EACE,YAAY;CACb",file:"query_editor.css",sourcesContent:[".min-width-10 {\n  min-width: 10rem;\n}\n\n.min-width-12 {\n  min-width: 12rem;\n}\n\n.min-width-20 {\n  min-width: 20rem;\n}\n\n.gf-form-select-wrapper select.gf-form-input {\n  height: 2.64rem;\n}\n\n.gf-form-select-wrapper--caret-indent.gf-form-select-wrapper::after {\n  right: 0.775rem\n}\n\n.service-dropdown {\n  width: 12rem;\n}\n\n.aggregation-dropdown-wrapper {\n  max-width: 29.1rem;\n}\n\n.timegrainunit-dropdown-wrapper {\n  width: 8rem;\n}\n"],sourceRoot:""}])},function(e,t){e.exports=function(e){var t=[];return t.toString=function(){return this.map(function(t){var r=function(e,t){var r=e[1]||"",i=e[3];if(!i)return r;if(t&&"function"==typeof btoa){var n=(o=i,"/*# sourceMappingURL=data:application/json;charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))+" */"),a=i.sources.map(function(e){return"/*# sourceURL="+i.sourceRoot+e+" */"});return[r].concat(a).concat([n]).join("\n")}var o;return[r].join("\n")}(t,e);return t[2]?"@media "+t[2]+"{"+r+"}":r}).join("")},t.i=function(e,r){"string"==typeof e&&(e=[[null,e,""]]);for(var i={},n=0;n<this.length;n++){var a=this[n][0];"number"==typeof a&&(i[a]=!0)}for(n=0;n<e.length;n++){var o=e[n];"number"==typeof o[0]&&i[o[0]]||(r&&!o[2]?o[2]=r:r&&(o[2]="("+o[2]+") and ("+r+")"),t.push(o))}},t}},function(e,t){e.exports=function(e){var t="undefined"!=typeof window&&window.location;if(!t)throw new Error("fixUrls requires window.location");if(!e||"string"!=typeof e)return e;var r=t.protocol+"//"+t.host,i=r+t.pathname.replace(/\/[^\/]*$/,"/");return e.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi,function(e,t){var n,a=t.trim().replace(/^"(.*)"$/,function(e,t){return t}).replace(/^'(.*)'$/,function(e,t){return t});return/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/|\s*$)/i.test(a)?e:(n=0===a.indexOf("//")?a:0===a.indexOf("/")?r+a:i+a.replace(/^\.\//,""),"url("+JSON.stringify(n)+")")})}},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),(t.AzureMonitorConfigCtrl=function e(t){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.current.jsonData.cloudName=this.current.jsonData.cloudName||"azuremonitor"}).templateUrl="partials/config.html"}])});
+define(["app/core/utils/kbn","app/plugins/sdk","lodash","moment"], function(__WEBPACK_EXTERNAL_MODULE_app_core_utils_kbn__, __WEBPACK_EXTERNAL_MODULE_app_plugins_sdk__, __WEBPACK_EXTERNAL_MODULE_lodash__, __WEBPACK_EXTERNAL_MODULE_moment__) { return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./module.ts");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "../node_modules/css-loader/index.js??ref--5-1!./css/query_editor.css":
+/*!*******************************************************************!*\
+  !*** ../node_modules/css-loader??ref--5-1!./css/query_editor.css ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "../node_modules/css-loader/lib/css-base.js")(true);
+// imports
+
+
+// module
+exports.push([module.i, ".min-width-10 {\n  min-width: 10rem;\n}\n\n.min-width-12 {\n  min-width: 12rem;\n}\n\n.min-width-20 {\n  min-width: 20rem;\n}\n\n.gf-form-select-wrapper select.gf-form-input {\n  height: 2.64rem;\n}\n\n.gf-form-select-wrapper--caret-indent.gf-form-select-wrapper::after {\n  right: 0.775rem\n}\n\n.service-dropdown {\n  width: 12rem;\n}\n\n.aggregation-dropdown-wrapper {\n  max-width: 29.1rem;\n}\n\n.timegrainunit-dropdown-wrapper {\n  width: 8rem;\n}\n", "", {"version":3,"sources":["/home/daniel/dev/go/src/github.com/grafana/grafana/data/plugins/grafana-azure-monitor-datasource/src/css/query_editor.css"],"names":[],"mappings":"AAAA;EACE,iBAAiB;CAClB;;AAED;EACE,iBAAiB;CAClB;;AAED;EACE,iBAAiB;CAClB;;AAED;EACE,gBAAgB;CACjB;;AAED;EACE,eAAe;CAChB;;AAED;EACE,aAAa;CACd;;AAED;EACE,mBAAmB;CACpB;;AAED;EACE,YAAY;CACb","file":"query_editor.css","sourcesContent":[".min-width-10 {\n  min-width: 10rem;\n}\n\n.min-width-12 {\n  min-width: 12rem;\n}\n\n.min-width-20 {\n  min-width: 20rem;\n}\n\n.gf-form-select-wrapper select.gf-form-input {\n  height: 2.64rem;\n}\n\n.gf-form-select-wrapper--caret-indent.gf-form-select-wrapper::after {\n  right: 0.775rem\n}\n\n.service-dropdown {\n  width: 12rem;\n}\n\n.aggregation-dropdown-wrapper {\n  max-width: 29.1rem;\n}\n\n.timegrainunit-dropdown-wrapper {\n  width: 8rem;\n}\n"],"sourceRoot":""}]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "../node_modules/css-loader/lib/css-base.js":
+/*!**************************************************!*\
+  !*** ../node_modules/css-loader/lib/css-base.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+
+/***/ "../node_modules/style-loader/lib/addStyles.js":
+/*!*****************************************************!*\
+  !*** ../node_modules/style-loader/lib/addStyles.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+var stylesInDom = {};
+
+var	memoize = function (fn) {
+	var memo;
+
+	return function () {
+		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+		return memo;
+	};
+};
+
+var isOldIE = memoize(function () {
+	// Test for IE <= 9 as proposed by Browserhacks
+	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+	// Tests for existence of standard globals is to allow style-loader
+	// to operate correctly into non-standard environments
+	// @see https://github.com/webpack-contrib/style-loader/issues/177
+	return window && document && document.all && !window.atob;
+});
+
+var getTarget = function (target) {
+  return document.querySelector(target);
+};
+
+var getElement = (function (fn) {
+	var memo = {};
+
+	return function(target) {
+                // If passing function in options, then use it for resolve "head" element.
+                // Useful for Shadow Root style i.e
+                // {
+                //   insertInto: function () { return document.querySelector("#foo").shadowRoot }
+                // }
+                if (typeof target === 'function') {
+                        return target();
+                }
+                if (typeof memo[target] === "undefined") {
+			var styleTarget = getTarget.call(this, target);
+			// Special case to return head of iframe instead of iframe itself
+			if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+				try {
+					// This will throw an exception if access to iframe is blocked
+					// due to cross-origin restrictions
+					styleTarget = styleTarget.contentDocument.head;
+				} catch(e) {
+					styleTarget = null;
+				}
+			}
+			memo[target] = styleTarget;
+		}
+		return memo[target]
+	};
+})();
+
+var singleton = null;
+var	singletonCounter = 0;
+var	stylesInsertedAtTop = [];
+
+var	fixUrls = __webpack_require__(/*! ./urls */ "../node_modules/style-loader/lib/urls.js");
+
+module.exports = function(list, options) {
+	if (typeof DEBUG !== "undefined" && DEBUG) {
+		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+
+	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
+
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (!options.singleton && typeof options.singleton !== "boolean") options.singleton = isOldIE();
+
+	// By default, add <style> tags to the <head> element
+        if (!options.insertInto) options.insertInto = "head";
+
+	// By default, add <style> tags to the bottom of the target
+	if (!options.insertAt) options.insertAt = "bottom";
+
+	var styles = listToStyles(list, options);
+
+	addStylesToDom(styles, options);
+
+	return function update (newList) {
+		var mayRemove = [];
+
+		for (var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+
+		if(newList) {
+			var newStyles = listToStyles(newList, options);
+			addStylesToDom(newStyles, options);
+		}
+
+		for (var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+
+			if(domStyle.refs === 0) {
+				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+};
+
+function addStylesToDom (styles, options) {
+	for (var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+
+		if(domStyle) {
+			domStyle.refs++;
+
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles (list, options) {
+	var styles = [];
+	var newStyles = {};
+
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = options.base ? item[0] + options.base : item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+
+		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
+		else newStyles[id].parts.push(part);
+	}
+
+	return styles;
+}
+
+function insertStyleElement (options, style) {
+	var target = getElement(options.insertInto)
+
+	if (!target) {
+		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+	}
+
+	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
+
+	if (options.insertAt === "top") {
+		if (!lastStyleElementInsertedAtTop) {
+			target.insertBefore(style, target.firstChild);
+		} else if (lastStyleElementInsertedAtTop.nextSibling) {
+			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			target.appendChild(style);
+		}
+		stylesInsertedAtTop.push(style);
+	} else if (options.insertAt === "bottom") {
+		target.appendChild(style);
+	} else if (typeof options.insertAt === "object" && options.insertAt.before) {
+		var nextSibling = getElement(options.insertInto + " " + options.insertAt.before);
+		target.insertBefore(style, nextSibling);
+	} else {
+		throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");
+	}
+}
+
+function removeStyleElement (style) {
+	if (style.parentNode === null) return false;
+	style.parentNode.removeChild(style);
+
+	var idx = stylesInsertedAtTop.indexOf(style);
+	if(idx >= 0) {
+		stylesInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement (options) {
+	var style = document.createElement("style");
+
+	if(options.attrs.type === undefined) {
+		options.attrs.type = "text/css";
+	}
+
+	addAttrs(style, options.attrs);
+	insertStyleElement(options, style);
+
+	return style;
+}
+
+function createLinkElement (options) {
+	var link = document.createElement("link");
+
+	if(options.attrs.type === undefined) {
+		options.attrs.type = "text/css";
+	}
+	options.attrs.rel = "stylesheet";
+
+	addAttrs(link, options.attrs);
+	insertStyleElement(options, link);
+
+	return link;
+}
+
+function addAttrs (el, attrs) {
+	Object.keys(attrs).forEach(function (key) {
+		el.setAttribute(key, attrs[key]);
+	});
+}
+
+function addStyle (obj, options) {
+	var style, update, remove, result;
+
+	// If a transform function was defined, run it on the css
+	if (options.transform && obj.css) {
+	    result = options.transform(obj.css);
+
+	    if (result) {
+	    	// If transform returns a value, use that instead of the original css.
+	    	// This allows running runtime transformations on the css.
+	    	obj.css = result;
+	    } else {
+	    	// If the transform function returns a falsy value, don't add this css.
+	    	// This allows conditional loading of css
+	    	return function() {
+	    		// noop
+	    	};
+	    }
+	}
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+
+		style = singleton || (singleton = createStyleElement(options));
+
+		update = applyToSingletonTag.bind(null, style, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+
+	} else if (
+		obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function"
+	) {
+		style = createLinkElement(options);
+		update = updateLink.bind(null, style, options);
+		remove = function () {
+			removeStyleElement(style);
+
+			if(style.href) URL.revokeObjectURL(style.href);
+		};
+	} else {
+		style = createStyleElement(options);
+		update = applyToTag.bind(null, style);
+		remove = function () {
+			removeStyleElement(style);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle (newObj) {
+		if (newObj) {
+			if (
+				newObj.css === obj.css &&
+				newObj.media === obj.media &&
+				newObj.sourceMap === obj.sourceMap
+			) {
+				return;
+			}
+
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag (style, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (style.styleSheet) {
+		style.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = style.childNodes;
+
+		if (childNodes[index]) style.removeChild(childNodes[index]);
+
+		if (childNodes.length) {
+			style.insertBefore(cssNode, childNodes[index]);
+		} else {
+			style.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag (style, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		style.setAttribute("media", media)
+	}
+
+	if(style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		while(style.firstChild) {
+			style.removeChild(style.firstChild);
+		}
+
+		style.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink (link, options, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	/*
+		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
+		and there is no publicPath defined then lets turn convertToAbsoluteUrls
+		on by default.  Otherwise default to the convertToAbsoluteUrls option
+		directly
+	*/
+	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
+
+	if (options.convertToAbsoluteUrls || autoFixUrls) {
+		css = fixUrls(css);
+	}
+
+	if (sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = link.href;
+
+	link.href = URL.createObjectURL(blob);
+
+	if(oldSrc) URL.revokeObjectURL(oldSrc);
+}
+
+
+/***/ }),
+
+/***/ "../node_modules/style-loader/lib/urls.js":
+/*!************************************************!*\
+  !*** ../node_modules/style-loader/lib/urls.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+/**
+ * When source maps are enabled, `style-loader` uses a link element with a data-uri to
+ * embed the css on the page. This breaks all relative urls because now they are relative to a
+ * bundle instead of the current page.
+ *
+ * One solution is to only use full urls, but that may be impossible.
+ *
+ * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
+ *
+ * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
+ *
+ */
+
+module.exports = function (css) {
+  // get current location
+  var location = typeof window !== "undefined" && window.location;
+
+  if (!location) {
+    throw new Error("fixUrls requires window.location");
+  }
+
+	// blank or null?
+	if (!css || typeof css !== "string") {
+	  return css;
+  }
+
+  var baseUrl = location.protocol + "//" + location.host;
+  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
+
+	// convert each url(...)
+	/*
+	This regular expression is just a way to recursively match brackets within
+	a string.
+
+	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
+	   (  = Start a capturing group
+	     (?:  = Start a non-capturing group
+	         [^)(]  = Match anything that isn't a parentheses
+	         |  = OR
+	         \(  = Match a start parentheses
+	             (?:  = Start another non-capturing groups
+	                 [^)(]+  = Match anything that isn't a parentheses
+	                 |  = OR
+	                 \(  = Match a start parentheses
+	                     [^)(]*  = Match anything that isn't a parentheses
+	                 \)  = Match a end parentheses
+	             )  = End Group
+              *\) = Match anything and then a close parens
+          )  = Close non-capturing group
+          *  = Match anything
+       )  = Close capturing group
+	 \)  = Match a close parens
+
+	 /gi  = Get all matches, not the first.  Be case insensitive.
+	 */
+	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
+		// strip quotes (if they exist)
+		var unquotedOrigUrl = origUrl
+			.trim()
+			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
+			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
+
+		// already a full url? no change
+		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/|\s*$)/i.test(unquotedOrigUrl)) {
+		  return fullMatch;
+		}
+
+		// convert the url to a full url
+		var newUrl;
+
+		if (unquotedOrigUrl.indexOf("//") === 0) {
+		  	//TODO: should we add protocol?
+			newUrl = unquotedOrigUrl;
+		} else if (unquotedOrigUrl.indexOf("/") === 0) {
+			// path should be relative to the base url
+			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
+		} else {
+			// path should be relative to current directory
+			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
+		}
+
+		// send back the fixed url(...)
+		return "url(" + JSON.stringify(newUrl) + ")";
+	});
+
+	// send back the fixed css
+	return fixedCss;
+};
+
+
+/***/ }),
+
+/***/ "./app_insights/app_insights_datasource.ts":
+/*!*************************************************!*\
+  !*** ./app_insights/app_insights_datasource.ts ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _app_insights_querystring_builder = __webpack_require__(/*! ./app_insights_querystring_builder */ "./app_insights/app_insights_querystring_builder.ts");
+
+var _app_insights_querystring_builder2 = _interopRequireDefault(_app_insights_querystring_builder);
+
+var _app_insights_rawquerystring_builder = __webpack_require__(/*! ./app_insights_rawquerystring_builder */ "./app_insights/app_insights_rawquerystring_builder.ts");
+
+var _app_insights_rawquerystring_builder2 = _interopRequireDefault(_app_insights_rawquerystring_builder);
+
+var _response_parser = __webpack_require__(/*! ./response_parser */ "./app_insights/response_parser.ts");
+
+var _response_parser2 = _interopRequireDefault(_response_parser);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+var AppInsightsDatasource = /** @class */function () {
+    function AppInsightsDatasource(instanceSettings, backendSrv, templateSrv, $q) {
+        this.backendSrv = backendSrv;
+        this.templateSrv = templateSrv;
+        this.$q = $q;
+        this.version = 'beta';
+        this.id = instanceSettings.id;
+        this.applicationId = instanceSettings.jsonData.appInsightsAppId;
+        this.baseUrl = "/appinsights/" + this.version + "/apps/" + this.applicationId;
+        this.url = instanceSettings.url;
+    }
+    AppInsightsDatasource.prototype.isConfigured = function () {
+        return this.applicationId && this.applicationId.length > 0;
+    };
+    AppInsightsDatasource.prototype.query = function (options) {
+        var _this = this;
+        var queries = _lodash2.default.filter(options.targets, function (item) {
+            return item.hide !== true;
+        }).map(function (target) {
+            var item = target.appInsights;
+            if (item.rawQuery) {
+                var querystringBuilder = new _app_insights_rawquerystring_builder2.default(item.rawQueryString, options);
+                var url = _this.baseUrl + "/query?" + querystringBuilder.generate();
+                return {
+                    refId: target.refId,
+                    intervalMs: options.intervalMs,
+                    maxDataPoints: options.maxDataPoints,
+                    datasourceId: _this.id,
+                    url: url,
+                    format: options.format,
+                    alias: item.alias,
+                    xaxis: item.xaxis,
+                    yaxis: item.yaxis,
+                    spliton: item.spliton,
+                    raw: true
+                };
+            } else {
+                var querystringBuilder = new _app_insights_querystring_builder2.default(options.range.from, options.range.to, options.interval);
+                if (item.groupBy !== 'none') {
+                    querystringBuilder.setGroupBy(_this.templateSrv.replace(item.groupBy, options.scopedVars));
+                }
+                querystringBuilder.setAggregation(item.aggregation);
+                querystringBuilder.setInterval(item.timeGrainType, _this.templateSrv.replace(item.timeGrain, options.scopedVars), item.timeGrainUnit);
+                querystringBuilder.setFilter(_this.templateSrv.replace(item.filter || ''));
+                var url = _this.baseUrl + "/metrics/" + _this.templateSrv.replace(item.metricName, options.scopedVars) + "?" + querystringBuilder.generate();
+                return {
+                    refId: target.refId,
+                    intervalMs: options.intervalMs,
+                    maxDataPoints: options.maxDataPoints,
+                    datasourceId: _this.id,
+                    url: url,
+                    format: options.format,
+                    alias: item.alias,
+                    xaxis: '',
+                    yaxis: '',
+                    spliton: '',
+                    raw: false
+                };
+            }
+        });
+        if (queries.length === 0) {
+            return this.$q.when({ data: [] });
+        }
+        var promises = this.doQueries(queries);
+        return this.$q.all(promises).then(function (results) {
+            return new _response_parser2.default(results).parseQueryResult();
+        });
+    };
+    AppInsightsDatasource.prototype.doQueries = function (queries) {
+        var _this = this;
+        return _lodash2.default.map(queries, function (query) {
+            return _this.doRequest(query.url).then(function (result) {
+                return {
+                    result: result,
+                    query: query
+                };
+            }).catch(function (err) {
+                throw {
+                    error: err,
+                    query: query
+                };
+            });
+        });
+    };
+    AppInsightsDatasource.prototype.annotationQuery = function (options) {};
+    AppInsightsDatasource.prototype.metricFindQuery = function (query) {
+        var appInsightsMetricNameQuery = query.match(/^AppInsightsMetricNames\(\)/i);
+        if (appInsightsMetricNameQuery) {
+            return this.getMetricNames();
+        }
+        var appInsightsGroupByQuery = query.match(/^AppInsightsGroupBys\(([^\)]+?)(,\s?([^,]+?))?\)/i);
+        if (appInsightsGroupByQuery) {
+            var metricName = appInsightsGroupByQuery[1];
+            return this.getGroupBys(this.templateSrv.replace(metricName));
+        }
+        return undefined;
+    };
+    AppInsightsDatasource.prototype.testDatasource = function () {
+        var url = this.baseUrl + "/metrics/metadata";
+        return this.doRequest(url).then(function (response) {
+            if (response.status === 200) {
+                return {
+                    status: 'success',
+                    message: 'Successfully queried the Application Insights service.',
+                    title: 'Success'
+                };
+            }
+            return {
+                status: 'error',
+                message: 'Returned http status code ' + response.status
+            };
+        }).catch(function (error) {
+            var message = 'Application Insights: ';
+            message += error.statusText ? error.statusText + ': ' : '';
+            if (error.data && error.data.error && error.data.error.code === 'PathNotFoundError') {
+                message += 'Invalid Application Id for Application Insights service.';
+            } else if (error.data && error.data.error) {
+                message += error.data.error.code + '. ' + error.data.error.message;
+            } else {
+                message += 'Cannot connect to Application Insights REST API.';
+            }
+            return {
+                status: 'error',
+                message: message
+            };
+        });
+    };
+    AppInsightsDatasource.prototype.doRequest = function (url, maxRetries) {
+        var _this = this;
+        if (maxRetries === void 0) {
+            maxRetries = 1;
+        }
+        return this.backendSrv.datasourceRequest({
+            url: this.url + url,
+            method: 'GET'
+        }).catch(function (error) {
+            if (maxRetries > 0) {
+                return _this.doRequest(url, maxRetries - 1);
+            }
+            throw error;
+        });
+    };
+    AppInsightsDatasource.prototype.getMetricNames = function () {
+        var url = this.baseUrl + "/metrics/metadata";
+        return this.doRequest(url).then(_response_parser2.default.parseMetricNames);
+    };
+    AppInsightsDatasource.prototype.getMetricMetadata = function (metricName) {
+        var url = this.baseUrl + "/metrics/metadata";
+        return this.doRequest(url).then(function (result) {
+            return new _response_parser2.default(result).parseMetadata(metricName);
+        });
+    };
+    AppInsightsDatasource.prototype.getGroupBys = function (metricName) {
+        return this.getMetricMetadata(metricName).then(function (result) {
+            return new _response_parser2.default(result).parseGroupBys();
+        });
+    };
+    return AppInsightsDatasource;
+}();
+exports.default = AppInsightsDatasource;
+
+/***/ }),
+
+/***/ "./app_insights/app_insights_querystring_builder.ts":
+/*!**********************************************************!*\
+  !*** ./app_insights/app_insights_querystring_builder.ts ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _time_grain_converter = __webpack_require__(/*! ../time_grain_converter */ "./time_grain_converter.ts");
+
+var _time_grain_converter2 = _interopRequireDefault(_time_grain_converter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var AppInsightsQuerystringBuilder = /** @class */function () {
+    function AppInsightsQuerystringBuilder(from, to, grafanaInterval) {
+        this.from = from;
+        this.to = to;
+        this.grafanaInterval = grafanaInterval;
+        this.aggregation = '';
+        this.groupBy = '';
+        this.timeGrainType = '';
+        this.timeGrain = '';
+        this.timeGrainUnit = '';
+        this.filter = '';
+    }
+    AppInsightsQuerystringBuilder.prototype.setAggregation = function (aggregation) {
+        this.aggregation = aggregation;
+    };
+    AppInsightsQuerystringBuilder.prototype.setGroupBy = function (groupBy) {
+        this.groupBy = groupBy;
+    };
+    AppInsightsQuerystringBuilder.prototype.setInterval = function (timeGrainType, timeGrain, timeGrainUnit) {
+        this.timeGrainType = timeGrainType;
+        this.timeGrain = timeGrain;
+        this.timeGrainUnit = timeGrainUnit;
+    };
+    AppInsightsQuerystringBuilder.prototype.setFilter = function (filter) {
+        this.filter = filter;
+    };
+    AppInsightsQuerystringBuilder.prototype.generate = function () {
+        var querystring = "timespan=" + this.from.utc().format() + "/" + this.to.utc().format();
+        if (this.aggregation && this.aggregation.length > 0) {
+            querystring += "&aggregation=" + this.aggregation;
+        }
+        if (this.groupBy && this.groupBy.length > 0) {
+            querystring += "&segment=" + this.groupBy;
+        }
+        if (this.timeGrainType === 'specific' && this.timeGrain && this.timeGrainUnit) {
+            querystring += "&interval=" + _time_grain_converter2.default.createISO8601Duration(this.timeGrain, this.timeGrainUnit);
+        }
+        if (this.timeGrainType === 'auto') {
+            querystring += "&interval=" + _time_grain_converter2.default.createISO8601DurationFromInterval(this.grafanaInterval);
+        }
+        if (this.filter) {
+            querystring += "&filter=" + this.filter;
+        }
+        return querystring;
+    };
+    return AppInsightsQuerystringBuilder;
+}();
+exports.default = AppInsightsQuerystringBuilder;
+
+/***/ }),
+
+/***/ "./app_insights/app_insights_rawquerystring_builder.ts":
+/*!*************************************************************!*\
+  !*** ./app_insights/app_insights_rawquerystring_builder.ts ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var AppInsightsRawQuerystringBuilder = /** @class */function () {
+    function AppInsightsRawQuerystringBuilder(rawQueryString, options) {
+        this.rawQueryString = rawQueryString;
+        this.options = options;
+    }
+    AppInsightsRawQuerystringBuilder.prototype.generate = function () {
+        var queryString = this.rawQueryString;
+        queryString = queryString.replace(/\$__interval/gi, this.options.interval);
+        queryString = queryString.replace(/\$timeFilter/gi, this.getTimeFilter(this.options));
+        queryString = queryString.replace(/\$from/gi, this.getFrom(this.options));
+        queryString = queryString.replace(/\$until/gi, this.getUntil(this.options));
+        queryString = encodeURIComponent(queryString);
+        var uriString = "query=" + queryString;
+        return uriString;
+    };
+    AppInsightsRawQuerystringBuilder.prototype.getFrom = function (options) {
+        var from = options.range.from;
+        return "datetime(" + from.toISOString() + ")";
+    };
+    AppInsightsRawQuerystringBuilder.prototype.getUntil = function (options) {
+        if (options.rangeRaw.to === 'now') {
+            return "now()";
+        } else {
+            var until = options.range.to;
+            return "datetime(" + until.toISOString() + ")";
+        }
+    };
+    AppInsightsRawQuerystringBuilder.prototype.getTimeFilter = function (options) {
+        if (options.rangeRaw.to === 'now') {
+            return "timestamp >= " + this.getFrom(options);
+        } else {
+            return "timestamp >= " + this.getFrom(options) + " and timestamp <= " + this.getUntil(options);
+        }
+    };
+    return AppInsightsRawQuerystringBuilder;
+}();
+exports.default = AppInsightsRawQuerystringBuilder;
+
+/***/ }),
+
+/***/ "./app_insights/response_parser.ts":
+/*!*****************************************!*\
+  !*** ./app_insights/response_parser.ts ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _moment = __webpack_require__(/*! moment */ "moment");
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ResponseParser = /** @class */function () {
+    function ResponseParser(results) {
+        this.results = results;
+    }
+    ResponseParser.prototype.parseQueryResult = function () {
+        var data = [];
+        var columns = [];
+        for (var i = 0; i < this.results.length; i++) {
+            if (this.results[i].query.raw) {
+                var xaxis = this.results[i].query.xaxis;
+                var yaxises = this.results[i].query.yaxis;
+                var spliton = this.results[i].query.spliton;
+                columns = this.results[i].result.data.Tables[0].Columns;
+                var rows = this.results[i].result.data.Tables[0].Rows;
+                var alias = this.results[i].query.alias;
+                data = _lodash2.default.concat(data, this.parseRawQueryResultRow(columns, rows, alias, xaxis, yaxises, spliton));
+            } else {
+                var value = this.results[i].result.data.value;
+                var alias = this.results[i].query.alias;
+                data = _lodash2.default.concat(data, this.parseQueryResultRow(value, alias));
+            }
+        }
+        var columns_for_dropdowns = _lodash2.default.map(columns, function (column) {
+            return { text: column.ColumnName, value: column.ColumnName };
+        });
+        return { data: data, columns: columns_for_dropdowns };
+        ;
+    };
+    ResponseParser.prototype.parseRawQueryResultRow = function (columns, rows, alias, xaxis, yaxises, spliton) {
+        var data = [];
+        var xaxis_column = columns.findIndex(function (column) {
+            return column.ColumnName === xaxis;
+        });
+        var yaxises_split = yaxises.split(',');
+        var yaxis_columns = {};
+        _lodash2.default.forEach(yaxises_split, function (yaxis) {
+            yaxis_columns[yaxis] = columns.findIndex(function (column) {
+                return column.ColumnName === yaxis;
+            });
+        });
+        var spliton_column = columns.findIndex(function (column) {
+            return column.ColumnName === spliton;
+        });
+        var convert_timestamp = xaxis === "timestamp";
+        _lodash2.default.forEach(rows, function (row) {
+            _lodash2.default.forEach(yaxis_columns, function (yaxis_column, yaxis_name) {
+                var bucket = spliton_column === -1 ? ResponseParser.findOrCreateBucket(data, yaxis_name) : ResponseParser.findOrCreateBucket(data, row[spliton_column]);
+                var epoch = convert_timestamp ? ResponseParser.dateTimeToEpoch(row[xaxis_column]) : row[xaxis_column];
+                bucket.datapoints.push([row[yaxis_column], epoch]);
+            });
+        });
+        return data;
+    };
+    ResponseParser.prototype.parseQueryResultRow = function (value, alias) {
+        var data = [];
+        if (ResponseParser.isSingleValue(value)) {
+            var metricName = ResponseParser.getMetricFieldKey(value);
+            var aggField = ResponseParser.getKeyForAggregationField(value[metricName]);
+            var epoch = ResponseParser.dateTimeToEpoch(value.end);
+            data.push({ target: metricName, datapoints: [[value[metricName][aggField], epoch]] });
+            return data;
+        }
+        var groupedBy = ResponseParser.hasSegmentsField(value.segments[0]);
+        if (!groupedBy) {
+            var metricName = ResponseParser.getMetricFieldKey(value.segments[0]);
+            var dataTarget = ResponseParser.findOrCreateBucket(data, metricName);
+            for (var i = 0; i < value.segments.length; i++) {
+                var epoch = ResponseParser.dateTimeToEpoch(value.segments[i].end);
+                var aggField = ResponseParser.getKeyForAggregationField(value.segments[i][metricName]);
+                dataTarget.datapoints.push([value.segments[i][metricName][aggField], epoch]);
+            }
+        } else {
+            for (var i = 0; i < value.segments.length; i++) {
+                var epoch = ResponseParser.dateTimeToEpoch(value.segments[i].end);
+                for (var j = 0; j < value.segments[i].segments.length; j++) {
+                    var metricName = ResponseParser.getMetricFieldKey(value.segments[i].segments[j]);
+                    var aggField = ResponseParser.getKeyForAggregationField(value.segments[i].segments[j][metricName]);
+                    var target = this.getTargetName(value.segments[i].segments[j], alias);
+                    var bucket = ResponseParser.findOrCreateBucket(data, target);
+                    bucket.datapoints.push([value.segments[i].segments[j][metricName][aggField], epoch]);
+                }
+            }
+        }
+        return data;
+    };
+    ResponseParser.prototype.getTargetName = function (segment, alias) {
+        var metric = '';
+        var segmentName = '';
+        var segmentValue = '';
+        for (var prop in segment) {
+            if (_lodash2.default.isObject(segment[prop])) {
+                metric = prop;
+            } else {
+                segmentName = prop;
+                segmentValue = segment[prop];
+            }
+        }
+        if (alias) {
+            var regex = /\{\{([\s\S]+?)\}\}/g;
+            return alias.replace(regex, function (match, g1, g2) {
+                var group = g1 || g2;
+                if (group === 'metric') {
+                    return metric;
+                } else if (group === 'groupbyname') {
+                    return segmentName;
+                } else if (group === 'groupbyvalue') {
+                    return segmentValue;
+                }
+                return match;
+            });
+        }
+        return metric + ("{" + segmentName + "=\"" + segmentValue + "\"}");
+    };
+    ResponseParser.isSingleValue = function (value) {
+        return !ResponseParser.hasSegmentsField(value);
+    };
+    ResponseParser.findOrCreateBucket = function (data, target) {
+        var dataTarget = _lodash2.default.find(data, ['target', target]);
+        if (!dataTarget) {
+            dataTarget = { target: target, datapoints: [] };
+            data.push(dataTarget);
+        }
+        return dataTarget;
+    };
+    ResponseParser.hasSegmentsField = function (obj) {
+        var keys = _lodash2.default.keys(obj);
+        return _lodash2.default.indexOf(keys, 'segments') > -1;
+    };
+    ResponseParser.getMetricFieldKey = function (segment) {
+        var keys = _lodash2.default.keys(segment);
+        return _lodash2.default.filter(_lodash2.default.without(keys, 'start', 'end'), function (key) {
+            return _lodash2.default.isObject(segment[key]);
+        })[0];
+    };
+    ResponseParser.getKeyForAggregationField = function (dataObj) {
+        var keys = _lodash2.default.keys(dataObj);
+        return _lodash2.default.intersection(keys, ['sum', 'avg', 'min', 'max', 'count', 'unique']);
+    };
+    ResponseParser.dateTimeToEpoch = function (dateTime) {
+        return (0, _moment2.default)(dateTime).valueOf();
+    };
+    ResponseParser.parseMetricNames = function (result) {
+        var keys = _lodash2.default.keys(result.data.metrics);
+        return ResponseParser.toTextValueList(keys);
+    };
+    ResponseParser.prototype.parseMetadata = function (metricName) {
+        var metric = this.results.data.metrics[metricName];
+        if (!metric) {
+            throw Error("No data found for metric: " + metricName);
+        }
+        return {
+            primaryAggType: metric.defaultAggregation,
+            supportedAggTypes: metric.supportedAggregations,
+            supportedGroupBy: metric.supportedGroupBy.all
+        };
+    };
+    ResponseParser.prototype.parseGroupBys = function () {
+        return ResponseParser.toTextValueList(this.results.supportedGroupBy);
+    };
+    ResponseParser.toTextValueList = function (values) {
+        var list = [];
+        for (var i = 0; i < values.length; i++) {
+            list.push({
+                text: values[i],
+                value: values[i]
+            });
+        }
+        return list;
+    };
+    return ResponseParser;
+}();
+exports.default = ResponseParser;
+
+/***/ }),
+
+/***/ "./azure_monitor/azure_monitor_datasource.ts":
+/*!***************************************************!*\
+  !*** ./azure_monitor/azure_monitor_datasource.ts ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _azure_monitor_filter_builder = __webpack_require__(/*! ./azure_monitor_filter_builder */ "./azure_monitor/azure_monitor_filter_builder.ts");
+
+var _azure_monitor_filter_builder2 = _interopRequireDefault(_azure_monitor_filter_builder);
+
+var _url_builder = __webpack_require__(/*! ./url_builder */ "./azure_monitor/url_builder.ts");
+
+var _url_builder2 = _interopRequireDefault(_url_builder);
+
+var _response_parser = __webpack_require__(/*! ./response_parser */ "./azure_monitor/response_parser.ts");
+
+var _response_parser2 = _interopRequireDefault(_response_parser);
+
+var _supported_namespaces = __webpack_require__(/*! ./supported_namespaces */ "./azure_monitor/supported_namespaces.ts");
+
+var _supported_namespaces2 = _interopRequireDefault(_supported_namespaces);
+
+var _time_grain_converter = __webpack_require__(/*! ../time_grain_converter */ "./time_grain_converter.ts");
+
+var _time_grain_converter2 = _interopRequireDefault(_time_grain_converter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var AzureMonitorDatasource = /** @class */function () {
+    function AzureMonitorDatasource(instanceSettings, backendSrv, templateSrv, $q) {
+        this.instanceSettings = instanceSettings;
+        this.backendSrv = backendSrv;
+        this.templateSrv = templateSrv;
+        this.$q = $q;
+        this.apiVersion = '2018-01-01';
+        this.defaultDropdownValue = 'select';
+        this.supportedMetricNamespaces = [];
+        this.id = instanceSettings.id;
+        this.subscriptionId = instanceSettings.jsonData.subscriptionId;
+        this.cloudName = instanceSettings.jsonData.cloudName || 'azuremonitor';
+        this.baseUrl = "/" + this.cloudName + "/subscriptions/" + this.subscriptionId + "/resourceGroups";
+        this.url = instanceSettings.url;
+        this.supportedMetricNamespaces = new _supported_namespaces2.default(this.cloudName).get();
+    }
+    AzureMonitorDatasource.prototype.isConfigured = function () {
+        return this.subscriptionId && this.subscriptionId.length > 0;
+    };
+    AzureMonitorDatasource.prototype.query = function (options) {
+        var _this = this;
+        var queries = _lodash2.default.filter(options.targets, function (item) {
+            return item.hide !== true && item.azureMonitor.resourceGroup && item.azureMonitor.resourceGroup !== _this.defaultDropdownValue && item.azureMonitor.resourceName && item.azureMonitor.resourceName !== _this.defaultDropdownValue && item.azureMonitor.metricDefinition && item.azureMonitor.metricDefinition !== _this.defaultDropdownValue && item.azureMonitor.metricName && item.azureMonitor.metricName !== _this.defaultDropdownValue;
+        }).map(function (target) {
+            var item = target.azureMonitor;
+            if (item.timeGrainUnit && item.timeGrain !== 'auto') {
+                item.timeGrain = _time_grain_converter2.default.createISO8601Duration(item.timeGrain, item.timeGrainUnit);
+            }
+            var resourceGroup = _this.templateSrv.replace(item.resourceGroup, options.scopedVars);
+            var resourceName = _this.templateSrv.replace(item.resourceName, options.scopedVars);
+            var metricDefinition = _this.templateSrv.replace(item.metricDefinition, options.scopedVars);
+            var timeGrain = _this.templateSrv.replace((item.timeGrain || '').toString(), options.scopedVars);
+            var filterBuilder = new _azure_monitor_filter_builder2.default(item.metricName, options.range.from, options.range.to, timeGrain, options.interval);
+            if (item.timeGrains) {
+                filterBuilder.setAllowedTimeGrains(item.timeGrains);
+            }
+            if (item.aggregation) {
+                filterBuilder.setAggregation(item.aggregation);
+            }
+            if (item.dimension && item.dimension !== 'None') {
+                filterBuilder.setDimensionFilter(item.dimension, item.dimensionFilter);
+            }
+            var filter = _this.templateSrv.replace(filterBuilder.generateFilter(), options.scopedVars);
+            var url = _url_builder2.default.buildAzureMonitorQueryUrl(_this.baseUrl, resourceGroup, metricDefinition, resourceName, _this.apiVersion, filter);
+            return {
+                refId: target.refId,
+                intervalMs: options.intervalMs,
+                maxDataPoints: options.maxDataPoints,
+                datasourceId: _this.id,
+                url: url,
+                format: options.format,
+                alias: item.alias,
+                raw: false
+            };
+        });
+        if (queries.length === 0) {
+            return this.$q.when({ data: [] });
+        }
+        var promises = this.doQueries(queries);
+        return this.$q.all(promises).then(function (results) {
+            return new _response_parser2.default(results).parseQueryResult();
+        });
+    };
+    AzureMonitorDatasource.prototype.doQueries = function (queries) {
+        var _this = this;
+        return _lodash2.default.map(queries, function (query) {
+            return _this.doRequest(query.url).then(function (result) {
+                return {
+                    result: result,
+                    query: query
+                };
+            }).catch(function (err) {
+                throw {
+                    error: err,
+                    query: query
+                };
+            });
+        });
+    };
+    AzureMonitorDatasource.prototype.annotationQuery = function (options) {};
+    AzureMonitorDatasource.prototype.metricFindQuery = function (query) {
+        console.log(query);
+        var resourceGroupsQuery = query.match(/^ResourceGroups\(\)/i);
+        if (resourceGroupsQuery) {
+            return this.getResourceGroups();
+        }
+        var metricDefinitionsQuery = query.match(/^Namespaces\(([^\)]+?)(,\s?([^,]+?))?\)/i);
+        if (metricDefinitionsQuery) {
+            return this.getMetricDefinitions(this.toVariable(metricDefinitionsQuery[1]));
+        }
+        var resourceNamesQuery = query.match(/^ResourceNames\(([^,]+?),\s?([^,]+?)\)/i);
+        if (resourceNamesQuery) {
+            var resourceGroup = this.toVariable(resourceNamesQuery[1]);
+            var metricDefinition = this.toVariable(resourceNamesQuery[2]);
+            return this.getResourceNames(resourceGroup, metricDefinition);
+        }
+        var metricNamesQuery = query.match(/^MetricNames\(([^,]+?),\s?([^,]+?),\s?(.+?)\)/i);
+        if (metricNamesQuery) {
+            var resourceGroup = this.toVariable(metricNamesQuery[1]);
+            var metricDefinition = this.toVariable(metricNamesQuery[2]);
+            var resourceName = this.toVariable(metricNamesQuery[3]);
+            return this.getMetricNames(resourceGroup, metricDefinition, resourceName);
+        }
+        return Promise.resolve([]);
+    };
+    AzureMonitorDatasource.prototype.toVariable = function (metric) {
+        return this.templateSrv.replace((metric || '').trim());
+    };
+    AzureMonitorDatasource.prototype.getResourceGroups = function () {
+        var url = this.baseUrl + "?api-version=2018-01-01";
+        return this.doRequest(url).then(function (result) {
+            return _response_parser2.default.parseResponseValues(result, 'name', 'name');
+        });
+    };
+    AzureMonitorDatasource.prototype.getMetricDefinitions = function (resourceGroup) {
+        var _this = this;
+        var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2018-01-01";
+        return this.doRequest(url).then(function (result) {
+            return _response_parser2.default.parseResponseValues(result, 'type', 'type');
+        }).then(function (result) {
+            return _lodash2.default.filter(result, function (t) {
+                for (var i = 0; i < _this.supportedMetricNamespaces.length; i++) {
+                    if (_lodash2.default.startsWith(t.value.toLowerCase(), _this.supportedMetricNamespaces[i].toLowerCase())) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }).then(function (result) {
+            var shouldHardcodeBlobStorage = false;
+            for (var i = 0; i < result.length; i++) {
+                if (result[i].value === 'Microsoft.Storage/storageAccounts') {
+                    shouldHardcodeBlobStorage = true;
+                    break;
+                }
+            }
+            if (shouldHardcodeBlobStorage) {
+                result.push({
+                    text: 'Microsoft.Storage/storageAccounts/blobServices',
+                    value: 'Microsoft.Storage/storageAccounts/blobServices'
+                });
+                result.push({
+                    text: 'Microsoft.Storage/storageAccounts/fileServices',
+                    value: 'Microsoft.Storage/storageAccounts/fileServices'
+                });
+                result.push({
+                    text: 'Microsoft.Storage/storageAccounts/tableServices',
+                    value: 'Microsoft.Storage/storageAccounts/tableServices'
+                });
+                result.push({
+                    text: 'Microsoft.Storage/storageAccounts/queueServices',
+                    value: 'Microsoft.Storage/storageAccounts/queueServices'
+                });
+            }
+            return result;
+        });
+    };
+    AzureMonitorDatasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
+        var url = this.baseUrl + "/" + resourceGroup + "/resources?api-version=2018-01-01";
+        return this.doRequest(url).then(function (result) {
+            if (!_lodash2.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
+                return _response_parser2.default.parseResourceNames(result, metricDefinition);
+            }
+            var list = _response_parser2.default.parseResourceNames(result, 'Microsoft.Storage/storageAccounts');
+            for (var i = 0; i < list.length; i++) {
+                list[i].text += '/default';
+                list[i].value += '/default';
+            }
+            return list;
+        });
+    };
+    AzureMonitorDatasource.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
+        var url = _url_builder2.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName, this.apiVersion);
+        return this.doRequest(url).then(function (result) {
+            return _response_parser2.default.parseResponseValues(result, 'name.localizedValue', 'name.value');
+        });
+    };
+    AzureMonitorDatasource.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
+        var url = _url_builder2.default.buildAzureMonitorGetMetricNamesUrl(this.baseUrl, resourceGroup, metricDefinition, resourceName, this.apiVersion);
+        return this.doRequest(url).then(function (result) {
+            return _response_parser2.default.parseMetadata(result, metricName);
+        });
+    };
+    AzureMonitorDatasource.prototype.testDatasource = function () {
+        if (!this.isValidConfigField(this.instanceSettings.jsonData.tenantId)) {
+            return {
+                status: 'error',
+                message: 'The Tenant Id field is required.'
+            };
+        }
+        if (!this.isValidConfigField(this.instanceSettings.jsonData.clientId)) {
+            return {
+                status: 'error',
+                message: 'The Client Id field is required.'
+            };
+        }
+        var url = this.baseUrl + "?api-version=2018-01-01";
+        return this.doRequest(url).then(function (response) {
+            if (response.status === 200) {
+                return {
+                    status: 'success',
+                    message: 'Successfully queried the Azure Monitor service.',
+                    title: 'Success'
+                };
+            }
+            return {
+                status: 'error',
+                message: 'Returned http status code ' + response.status
+            };
+        }).catch(function (error) {
+            var message = 'Azure Monitor: ';
+            message += error.statusText ? error.statusText + ': ' : '';
+            if (error.data && error.data.error && error.data.error.code) {
+                message += error.data.error.code + '. ' + error.data.error.message;
+            } else if (error.data && error.data.error) {
+                message += error.data.error;
+            } else if (error.data) {
+                message += error.data;
+            } else {
+                message += 'Cannot connect to Azure Monitor REST API.';
+            }
+            return {
+                status: 'error',
+                message: message
+            };
+        });
+    };
+    AzureMonitorDatasource.prototype.isValidConfigField = function (field) {
+        return field && field.length > 0;
+    };
+    AzureMonitorDatasource.prototype.doRequest = function (url, maxRetries) {
+        var _this = this;
+        if (maxRetries === void 0) {
+            maxRetries = 1;
+        }
+        return this.backendSrv.datasourceRequest({
+            url: this.url + url,
+            method: 'GET'
+        }).catch(function (error) {
+            if (maxRetries > 0) {
+                return _this.doRequest(url, maxRetries - 1);
+            }
+            throw error;
+        });
+    };
+    return AzureMonitorDatasource;
+}();
+exports.default = AzureMonitorDatasource;
+
+/***/ }),
+
+/***/ "./azure_monitor/azure_monitor_filter_builder.ts":
+/*!*******************************************************!*\
+  !*** ./azure_monitor/azure_monitor_filter_builder.ts ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _time_grain_converter = __webpack_require__(/*! ../time_grain_converter */ "./time_grain_converter.ts");
+
+var _time_grain_converter2 = _interopRequireDefault(_time_grain_converter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var AzureMonitorFilterBuilder = /** @class */function () {
+    function AzureMonitorFilterBuilder(metricName, from, to, timeGrain, grafanaInterval) {
+        this.metricName = metricName;
+        this.from = from;
+        this.to = to;
+        this.timeGrain = timeGrain;
+        this.grafanaInterval = grafanaInterval;
+        this.timeGrainInterval = '';
+        this.allowedTimeGrains = ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d'];
+    }
+    AzureMonitorFilterBuilder.prototype.setAllowedTimeGrains = function (timeGrains) {
+        var _this = this;
+        this.allowedTimeGrains = [];
+        timeGrains.forEach(function (tg) {
+            if (tg.value === 'auto') {
+                _this.allowedTimeGrains.push(tg.value);
+            } else {
+                _this.allowedTimeGrains.push(_time_grain_converter2.default.createKbnUnitFromISO8601Duration(tg.value));
+            }
+        });
+    };
+    AzureMonitorFilterBuilder.prototype.setAggregation = function (agg) {
+        this.aggregation = agg;
+    };
+    AzureMonitorFilterBuilder.prototype.setDimensionFilter = function (dimension, dimensionFilter) {
+        this.dimension = dimension;
+        this.dimensionFilter = dimensionFilter;
+    };
+    AzureMonitorFilterBuilder.prototype.generateFilter = function () {
+        var filter = this.createDatetimeAndTimeGrainConditions();
+        if (this.aggregation) {
+            filter += "&aggregation=" + this.aggregation;
+        }
+        if (this.metricName && this.metricName.trim().length > 0) {
+            filter += "&metricnames=" + this.metricName;
+        }
+        if (this.dimension && this.dimensionFilter && this.dimensionFilter.trim().length > 0) {
+            filter += "&$filter=" + this.dimension + " eq '" + this.dimensionFilter + "'";
+        }
+        return filter;
+    };
+    AzureMonitorFilterBuilder.prototype.createDatetimeAndTimeGrainConditions = function () {
+        var dateTimeCondition = "timespan=" + this.from.utc().format() + "/" + this.to.utc().format();
+        if (this.timeGrain === 'auto') {
+            this.timeGrain = this.calculateAutoTimeGrain();
+        }
+        var timeGrainCondition = "&interval=" + this.timeGrain;
+        return dateTimeCondition + timeGrainCondition;
+    };
+    AzureMonitorFilterBuilder.prototype.calculateAutoTimeGrain = function () {
+        var roundedInterval = _time_grain_converter2.default.findClosestTimeGrain(this.grafanaInterval, this.allowedTimeGrains);
+        return _time_grain_converter2.default.createISO8601DurationFromInterval(roundedInterval);
+    };
+    return AzureMonitorFilterBuilder;
+}();
+exports.default = AzureMonitorFilterBuilder;
+
+/***/ }),
+
+/***/ "./azure_monitor/response_parser.ts":
+/*!******************************************!*\
+  !*** ./azure_monitor/response_parser.ts ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _moment = __webpack_require__(/*! moment */ "moment");
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _time_grain_converter = __webpack_require__(/*! ../time_grain_converter */ "./time_grain_converter.ts");
+
+var _time_grain_converter2 = _interopRequireDefault(_time_grain_converter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ResponseParser = /** @class */function () {
+    function ResponseParser(results) {
+        this.results = results;
+    }
+    ResponseParser.prototype.parseQueryResult = function () {
+        var data = [];
+        for (var i = 0; i < this.results.length; i++) {
+            for (var j = 0; j < this.results[i].result.data.value.length; j++) {
+                for (var k = 0; k < this.results[i].result.data.value[j].timeseries.length; k++) {
+                    var alias = this.results[i].query.alias;
+                    data.push({
+                        target: ResponseParser.createTarget(this.results[i].result.data.value[j], this.results[i].result.data.value[j].timeseries[k].metadatavalues, alias),
+                        datapoints: ResponseParser.convertDataToPoints(this.results[i].result.data.value[j].timeseries[k].data)
+                    });
+                }
+            }
+        }
+        return data;
+    };
+    ResponseParser.createTarget = function (data, metadatavalues, alias) {
+        var resourceGroup = ResponseParser.parseResourceGroupFromId(data.id);
+        var resourceName = ResponseParser.parseResourceNameFromId(data.id);
+        var namespace = ResponseParser.parseNamespaceFromId(data.id, resourceName);
+        if (alias) {
+            var regex = /\{\{([\s\S]+?)\}\}/g;
+            return alias.replace(regex, function (match, g1, g2) {
+                var group = g1 || g2;
+                if (group === 'resourcegroup') {
+                    return resourceGroup;
+                } else if (group === 'namespace') {
+                    return namespace;
+                } else if (group === 'resourcename') {
+                    return resourceName;
+                } else if (group === 'metric') {
+                    return data.name.value;
+                } else if (group === 'dimensionname') {
+                    return metadatavalues && metadatavalues.length > 0 ? metadatavalues[0].name.value : '';
+                } else if (group === 'dimensionvalue') {
+                    return metadatavalues && metadatavalues.length > 0 ? metadatavalues[0].value : '';
+                }
+                return match;
+            });
+        }
+        if (metadatavalues && metadatavalues.length > 0) {
+            return resourceName + "{" + metadatavalues[0].name.value + "=" + metadatavalues[0].value + "}." + data.name.value;
+        }
+        return resourceName + "." + data.name.value;
+    };
+    ResponseParser.parseResourceGroupFromId = function (id) {
+        var startIndex = id.indexOf('/resourceGroups/') + 16;
+        var endIndex = id.indexOf('/providers');
+        return id.substring(startIndex, endIndex);
+    };
+    ResponseParser.parseNamespaceFromId = function (id, resourceName) {
+        var startIndex = id.indexOf('/providers/') + 11;
+        var endIndex = id.indexOf('/' + resourceName);
+        return id.substring(startIndex, endIndex);
+    };
+    ResponseParser.parseResourceNameFromId = function (id) {
+        var endIndex = id.lastIndexOf('/providers');
+        var startIndex = id.slice(0, endIndex).lastIndexOf('/') + 1;
+        return id.substring(startIndex, endIndex);
+    };
+    ResponseParser.convertDataToPoints = function (timeSeriesData) {
+        var dataPoints = [];
+        for (var k = 0; k < timeSeriesData.length; k++) {
+            var epoch = ResponseParser.dateTimeToEpoch(timeSeriesData[k].timeStamp);
+            var aggKey = ResponseParser.getKeyForAggregationField(timeSeriesData[k]);
+            if (aggKey) {
+                dataPoints.push([timeSeriesData[k][aggKey], epoch]);
+            }
+        }
+        return dataPoints;
+    };
+    ResponseParser.dateTimeToEpoch = function (dateTime) {
+        return (0, _moment2.default)(dateTime).valueOf();
+    };
+    ResponseParser.getKeyForAggregationField = function (dataObj) {
+        var keys = _lodash2.default.keys(dataObj);
+        if (keys.length < 2) {
+            return;
+        }
+        return _lodash2.default.intersection(keys, ['total', 'average', 'maximum', 'minimum', 'count']);
+    };
+    ResponseParser.parseResponseValues = function (result, textFieldName, valueFieldName) {
+        var list = [];
+        for (var i = 0; i < result.data.value.length; i++) {
+            if (!_lodash2.default.find(list, ['value', _lodash2.default.get(result.data.value[i], valueFieldName)])) {
+                list.push({
+                    text: _lodash2.default.get(result.data.value[i], textFieldName),
+                    value: _lodash2.default.get(result.data.value[i], valueFieldName)
+                });
+            }
+        }
+        return list;
+    };
+    ResponseParser.parseResourceNames = function (result, metricDefinition) {
+        var list = [];
+        for (var i = 0; i < result.data.value.length; i++) {
+            if (result.data.value[i].type === metricDefinition) {
+                list.push({
+                    text: result.data.value[i].name,
+                    value: result.data.value[i].name
+                });
+            }
+        }
+        return list;
+    };
+    ResponseParser.parseMetadata = function (result, metricName) {
+        var metricData = _lodash2.default.find(result.data.value, function (o) {
+            return _lodash2.default.get(o, 'name.value') === metricName;
+        });
+        var defaultAggTypes = ['None', 'Average', 'Minimum', 'Maximum', 'Total', 'Count'];
+        return {
+            primaryAggType: metricData.primaryAggregationType,
+            supportedAggTypes: metricData.supportedAggregationTypes || defaultAggTypes,
+            supportedTimeGrains: ResponseParser.parseTimeGrains(metricData.metricAvailabilities || []),
+            dimensions: ResponseParser.parseDimensions(metricData)
+        };
+    };
+    ResponseParser.parseTimeGrains = function (metricAvailabilities) {
+        var timeGrains = [];
+        metricAvailabilities.forEach(function (avail) {
+            if (avail.timeGrain) {
+                timeGrains.push({
+                    text: _time_grain_converter2.default.createTimeGrainFromISO8601Duration(avail.timeGrain),
+                    value: avail.timeGrain
+                });
+            }
+        });
+        return timeGrains;
+    };
+    ResponseParser.parseDimensions = function (metricData) {
+        var dimensions = [];
+        if (!metricData.dimensions || metricData.dimensions.length === 0) {
+            return dimensions;
+        }
+        if (!metricData.isDimensionRequired) {
+            dimensions.push({ text: 'None', value: 'None' });
+        }
+        for (var i = 0; i < metricData.dimensions.length; i++) {
+            dimensions.push({
+                text: metricData.dimensions[i].localizedValue,
+                value: metricData.dimensions[i].value
+            });
+        }
+        return dimensions;
+    };
+    return ResponseParser;
+}();
+exports.default = ResponseParser;
+
+/***/ }),
+
+/***/ "./azure_monitor/supported_namespaces.ts":
+/*!***********************************************!*\
+  !*** ./azure_monitor/supported_namespaces.ts ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var SupportedNamespaces = /** @class */function () {
+    function SupportedNamespaces(cloudName) {
+        this.cloudName = cloudName;
+        this.supportedMetricNamespaces = {
+            'azuremonitor': ['Microsoft.Compute', 'Microsoft.ClassicCompute', 'Microsoft.Storage', 'Microsoft.Sql', 'Microsoft.Web', 'Microsoft.EventHub', 'Microsoft.ServiceBus', 'Microsoft.Devices', 'Microsoft.DocumentDb', 'Microsoft.Network', 'Microsoft.Cache/Redis', 'Microsoft.AnalysisServices/servers', 'Microsoft.ApiManagement/service', 'Microsoft.Automation/automationAccounts', 'Microsoft.Batch/batchAccounts', 'Microsoft.CognitiveServices/accounts', 'Microsoft.CustomerInsights/hubs', 'Microsoft.DataLakeAnalytics/accounts', 'Microsoft.DataLakeStore/accounts', 'Microsoft.DBforMySQL/servers', 'Microsoft.DBforPostgreSQL/servers', 'Microsoft.Logic/workflows', 'Microsoft.NotificationHubs/Namespaces/NotificationHubs', 'Microsoft.Search/searchServices', 'Microsoft.StreamAnalytics/streamingjobs', 'Microsoft.DataFactory/datafactories', 'Microsoft.DataFactory/factories', 'Microsoft.KeyVaults/vaults', 'Microsoft.LocationBasedServices/accounts', 'Microsoft.PowerBIDedicated/capacities', 'Microsoft.Relay/namespaces'],
+            'govazuremonitor': ['Microsoft.AnalysisServices/Servers', 'Microsoft.ApiManagement/service', 'Microsoft.Compute/virtualMachines', 'Microsoft.Compute/virtualMachineScaleSets', 'Microsoft.Compute/virtualMachineScaleSets/virtualMachines', 'Microsoft.Devices/IotHubs', 'Microsoft.Devices/provisioningServices', 'Microsoft.Devices/ElasticPools', 'Microsoft.Devices/ElasticPools/IotHubtTenants', 'Microsoft.EventHubs/namespaces', 'Microsoft.Insights/AutoscaleSettings', 'Microsoft.KeyVault/vaults', 'Microsoft.Network/loadBalancers', 'Microsoft.Network/publicIPAdresses', 'Microsoft.Network/applicationGateways', 'Microsoft.Network/virtualNetworkGateways', 'Microsoft.Network/expressRouteCircuits', 'Microsoft.Network/trafficManagerProfiles', 'Microsoft.NotificationHubs/Namespaces/NotificationHubs', 'Microsoft.PowerBiDedicated/capacities', 'Microsoft.ServiceBus/namespaces', 'Microsoft.Sql/servers/databases', 'Microsoft.Sql/servers/elasticPools', 'Microsoft.Sql/servers', 'Microsoft.Web/serverfarms', 'Microsoft.Web/sites', 'Microsoft.Web/sites/slots', 'Microsoft.Web/hostingEnvironments/multiRolePools', 'Microsoft.Web/hostingEnvironments/workerPools'],
+            'germanyazuremonitor': ['Microsoft.AnalysisServices/Servers', 'Microsoft.Compute/virtualMachines', 'Microsoft.Compute/virtualMachineScaleSets', 'Microsoft.Compute/virtualMachineScaleSets/virtualMachines', 'Microsoft.Devices/IotHubs', 'Microsoft.Devices/provisioningServices', 'Microsoft.Devices/ElasticPools', 'Microsoft.Devices/ElasticPools/IotHubtTenants', 'Microsoft.EventHubs/namespaces', 'Microsoft.Insights/AutoscaleSettings', 'Microsoft.KeyVault/vaults', 'Microsoft.Network/loadBalancers', 'Microsoft.Network/publicIPAdresses', 'Microsoft.Network/applicationGateways', 'Microsoft.Network/virtualNetworkGateways', 'Microsoft.Network/expressRouteCircuits', 'Microsoft.Network/trafficManagerProfiles', 'Microsoft.NotificationHubs/Namespaces/NotificationHubs', 'Microsoft.ServiceBus/namespaces', 'Microsoft.Sql/servers/databases', 'Microsoft.Sql/servers/elasticPools', 'Microsoft.Sql/servers', 'Microsoft.Web/serverfarms', 'Microsoft.Web/sites', 'Microsoft.Web/sites/slots', 'Microsoft.Web/hostingEnvironments/multiRolePools', 'Microsoft.Web/hostingEnvironments/workerPools'],
+            'chinaazuremonitor': ['Microsoft.AnalysisServices/Servers', 'Microsoft.ApiManagement/service', 'Microsoft.Compute/virtualMachines', 'Microsoft.Compute/virtualMachineScaleSets', 'Microsoft.Compute/virtualMachineScaleSets/virtualMachines', 'Microsoft.Devices/IotHubs', 'Microsoft.Devices/provisioningServices', 'Microsoft.Devices/ElasticPools', 'Microsoft.Devices/ElasticPools/IotHubtTenants', 'Microsoft.EventHubs/namespaces', 'Microsoft.Insights/AutoscaleSettings', 'Microsoft.KeyVault/vaults', 'Microsoft.Network/loadBalancers', 'Microsoft.Network/publicIPAdresses', 'Microsoft.Network/applicationGateways', 'Microsoft.Network/virtualNetworkGateways', 'Microsoft.Network/expressRouteCircuits', 'Microsoft.Network/trafficManagerProfiles', 'Microsoft.NotificationHubs/Namespaces/NotificationHubs', 'Microsoft.ServiceBus/namespaces', 'Microsoft.Sql/servers/databases', 'Microsoft.Sql/servers/elasticPools', 'Microsoft.Sql/servers', 'Microsoft.Web/serverfarms', 'Microsoft.Web/sites', 'Microsoft.Web/sites/slots', 'Microsoft.Web/hostingEnvironments/multiRolePools', 'Microsoft.Web/hostingEnvironments/workerPools']
+        };
+    }
+    SupportedNamespaces.prototype.get = function () {
+        return this.supportedMetricNamespaces[this.cloudName];
+    };
+    return SupportedNamespaces;
+}();
+exports.default = SupportedNamespaces;
+
+/***/ }),
+
+/***/ "./azure_monitor/url_builder.ts":
+/*!**************************************!*\
+  !*** ./azure_monitor/url_builder.ts ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var UrlBuilder = /** @class */function () {
+    function UrlBuilder() {}
+    UrlBuilder.buildAzureMonitorQueryUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion, filter) {
+        if (_lodash2.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/') || metricDefinition === 'Microsoft.Sql/servers/databases') {
+            var rn = resourceName.split('/');
+            var service = metricDefinition.substring(metricDefinition.lastIndexOf('/') + 1);
+            var md = metricDefinition.substring(0, metricDefinition.lastIndexOf('/'));
+            return baseUrl + "/" + resourceGroup + "/providers/" + md + "/" + rn[0] + "/" + service + "/" + rn[1] + ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
+        }
+        return baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName + ("/providers/microsoft.insights/metrics?api-version=" + apiVersion + "&" + filter);
+    };
+    UrlBuilder.buildAzureMonitorGetMetricNamesUrl = function (baseUrl, resourceGroup, metricDefinition, resourceName, apiVersion) {
+        if (_lodash2.default.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/') || metricDefinition === 'Microsoft.Sql/servers/databases') {
+            var rn = resourceName.split('/');
+            var service = metricDefinition.substring(metricDefinition.lastIndexOf('/') + 1);
+            var md = metricDefinition.substring(0, metricDefinition.lastIndexOf('/'));
+            return baseUrl + "/" + resourceGroup + "/providers/" + md + "/" + rn[0] + "/" + service + "/" + rn[1] + ("/providers/microsoft.insights/metricdefinitions?api-version=" + apiVersion);
+        }
+        return baseUrl + "/" + resourceGroup + "/providers/" + metricDefinition + "/" + resourceName + ("/providers/microsoft.insights/metricdefinitions?api-version=" + apiVersion);
+    };
+    return UrlBuilder;
+}();
+exports.default = UrlBuilder;
+
+/***/ }),
+
+/***/ "./config_ctrl.ts":
+/*!************************!*\
+  !*** ./config_ctrl.ts ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var AzureMonitorConfigCtrl = /** @class */function () {
+    function AzureMonitorConfigCtrl($scope) {
+        this.current.jsonData.cloudName = this.current.jsonData.cloudName || 'azuremonitor';
+    }
+    AzureMonitorConfigCtrl.templateUrl = 'partials/config.html';
+    return AzureMonitorConfigCtrl;
+}();
+exports.AzureMonitorConfigCtrl = AzureMonitorConfigCtrl;
+
+/***/ }),
+
+/***/ "./css/query_editor.css":
+/*!******************************!*\
+  !*** ./css/query_editor.css ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader??ref--5-1!./query_editor.css */ "../node_modules/css-loader/index.js??ref--5-1!./css/query_editor.css");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "../node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./datasource.ts":
+/*!***********************!*\
+  !*** ./datasource.ts ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _azure_monitor_datasource = __webpack_require__(/*! ./azure_monitor/azure_monitor_datasource */ "./azure_monitor/azure_monitor_datasource.ts");
+
+var _azure_monitor_datasource2 = _interopRequireDefault(_azure_monitor_datasource);
+
+var _app_insights_datasource = __webpack_require__(/*! ./app_insights/app_insights_datasource */ "./app_insights/app_insights_datasource.ts");
+
+var _app_insights_datasource2 = _interopRequireDefault(_app_insights_datasource);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Datasource = /** @class */function () {
+    /** @ngInject */
+    function Datasource(instanceSettings, backendSrv, templateSrv, $q) {
+        this.backendSrv = backendSrv;
+        this.templateSrv = templateSrv;
+        this.$q = $q;
+        this.name = instanceSettings.name;
+        this.id = instanceSettings.id;
+        this.azureMonitorDatasource = new _azure_monitor_datasource2.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
+        this.appInsightsDatasource = new _app_insights_datasource2.default(instanceSettings, this.backendSrv, this.templateSrv, this.$q);
+    }
+    Datasource.prototype.query = function (options) {
+        var promises = [];
+        var azureMonitorOptions = _lodash2.default.cloneDeep(options);
+        var appInsightsTargets = _lodash2.default.cloneDeep(options);
+        var that = this;
+        azureMonitorOptions.targets = _lodash2.default.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
+        appInsightsTargets.targets = _lodash2.default.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
+        if (azureMonitorOptions.targets.length > 0) {
+            promises.push(this.azureMonitorDatasource.query(azureMonitorOptions));
+        }
+        if (appInsightsTargets.targets.length > 0) {
+            promises.push(this.appInsightsDatasource.query(appInsightsTargets));
+        }
+        return Promise.all(promises).then(function (results) {
+            if (results[0].data) {
+                that.columns = results[0].columns;
+                return { data: _lodash2.default.flatten(results[0].data) };
+            } else {
+                return { data: _lodash2.default.flatten(results) };
+            }
+        });
+    };
+    Datasource.prototype.annotationQuery = function (options) {
+        throw new Error('Annotation Support not implemented yet.');
+    };
+    Datasource.prototype.metricFindQuery = function (query) {
+        if (!query) {
+            return Promise.resolve([]);
+        }
+        var aiResult = this.appInsightsDatasource.metricFindQuery(query);
+        if (aiResult) {
+            return aiResult;
+        }
+        var amResult = this.azureMonitorDatasource.metricFindQuery(query);
+        if (amResult) {
+            return amResult;
+        }
+        return Promise.resolve([]);
+    };
+    Datasource.prototype.testDatasource = function () {
+        var promises = [];
+        if (this.azureMonitorDatasource.isConfigured()) {
+            promises.push(this.azureMonitorDatasource.testDatasource());
+        }
+        if (this.appInsightsDatasource.isConfigured()) {
+            promises.push(this.appInsightsDatasource.testDatasource());
+        }
+        if (promises.length === 0) {
+            return {
+                status: 'error',
+                message: "Nothing configured. At least one of the API's must be configured.",
+                title: 'Error'
+            };
+        }
+        return this.$q.all(promises).then(function (results) {
+            var status = 'success';
+            var message = '';
+            for (var i = 0; i < results.length; i++) {
+                if (results[i].status !== 'success') {
+                    status = results[i].status;
+                }
+                message += i + 1 + ". " + results[i].message + " ";
+            }
+            return {
+                status: status,
+                message: message,
+                title: _lodash2.default.upperFirst(status)
+            };
+        });
+    };
+    /* Azure Monitor REST API methods */
+    Datasource.prototype.getResourceGroups = function () {
+        return this.azureMonitorDatasource.getResourceGroups();
+    };
+    Datasource.prototype.getMetricDefinitions = function (resourceGroup) {
+        return this.azureMonitorDatasource.getMetricDefinitions(resourceGroup);
+    };
+    Datasource.prototype.getResourceNames = function (resourceGroup, metricDefinition) {
+        return this.azureMonitorDatasource.getResourceNames(resourceGroup, metricDefinition);
+    };
+    Datasource.prototype.getMetricNames = function (resourceGroup, metricDefinition, resourceName) {
+        return this.azureMonitorDatasource.getMetricNames(resourceGroup, metricDefinition, resourceName);
+    };
+    Datasource.prototype.getMetricMetadata = function (resourceGroup, metricDefinition, resourceName, metricName) {
+        return this.azureMonitorDatasource.getMetricMetadata(resourceGroup, metricDefinition, resourceName, metricName);
+    };
+    /* Application Insights API method */
+    Datasource.prototype.getAppInsightsMetricNames = function () {
+        return this.appInsightsDatasource.getMetricNames();
+    };
+    Datasource.prototype.getAppInsightsMetricMetadata = function (metricName) {
+        return this.appInsightsDatasource.getMetricMetadata(metricName);
+    };
+    Datasource.prototype.getAppInsightsColumns = function () {
+        return this.columns;
+    };
+    return Datasource;
+}();
+exports.default = Datasource;
+
+/***/ }),
+
+/***/ "./module.ts":
+/*!*******************!*\
+  !*** ./module.ts ***!
+  \*******************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.AnnotationsQueryCtrl = exports.QueryOptionsCtrl = exports.ConfigCtrl = exports.QueryCtrl = exports.Datasource = undefined;
+
+var _datasource = __webpack_require__(/*! ./datasource */ "./datasource.ts");
+
+var _datasource2 = _interopRequireDefault(_datasource);
+
+var _query_ctrl = __webpack_require__(/*! ./query_ctrl */ "./query_ctrl.ts");
+
+var _config_ctrl = __webpack_require__(/*! ./config_ctrl */ "./config_ctrl.ts");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var AzureMonitorQueryOptionsCtrl = /** @class */function () {
+    function AzureMonitorQueryOptionsCtrl() {}
+    AzureMonitorQueryOptionsCtrl.templateUrl = 'partials/query.options.html';
+    return AzureMonitorQueryOptionsCtrl;
+}();
+var AzureMonitorAnnotationsQueryCtrl = /** @class */function () {
+    function AzureMonitorAnnotationsQueryCtrl() {}
+    AzureMonitorAnnotationsQueryCtrl.templateUrl = 'partials/annotations.editor.html';
+    return AzureMonitorAnnotationsQueryCtrl;
+}();
+exports.Datasource = _datasource2.default;
+exports.QueryCtrl = _query_ctrl.AzureMonitorQueryCtrl;
+exports.ConfigCtrl = _config_ctrl.AzureMonitorConfigCtrl;
+exports.QueryOptionsCtrl = AzureMonitorQueryOptionsCtrl;
+exports.AnnotationsQueryCtrl = AzureMonitorAnnotationsQueryCtrl;
+
+/***/ }),
+
+/***/ "./query_ctrl.ts":
+/*!***********************!*\
+  !*** ./query_ctrl.ts ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.AzureMonitorQueryCtrl = undefined;
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _sdk = __webpack_require__(/*! app/plugins/sdk */ "app/plugins/sdk");
+
+__webpack_require__(/*! ./css/query_editor.css */ "./css/query_editor.css");
+
+var _time_grain_converter = __webpack_require__(/*! ./time_grain_converter */ "./time_grain_converter.ts");
+
+var _time_grain_converter2 = _interopRequireDefault(_time_grain_converter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __extends = undefined && undefined.__extends || function () {
+    var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function (d, b) {
+        d.__proto__ = b;
+    } || function (d, b) {
+        for (var p in b) {
+            if (b.hasOwnProperty(p)) d[p] = b[p];
+        }
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+
+// import * as monaco from 'monaco-editor';
+var AzureMonitorQueryCtrl = /** @class */function (_super) {
+    __extends(AzureMonitorQueryCtrl, _super);
+    /** @ngInject **/
+    function AzureMonitorQueryCtrl($scope, $injector, templateSrv) {
+        var _this = _super.call(this, $scope, $injector) || this;
+        _this.templateSrv = templateSrv;
+        _this.defaultDropdownValue = 'select';
+        _this.defaults = {
+            queryType: 'Azure Monitor',
+            azureMonitor: {
+                resourceGroup: _this.defaultDropdownValue,
+                metricDefinition: _this.defaultDropdownValue,
+                resourceName: _this.defaultDropdownValue,
+                metricName: _this.defaultDropdownValue,
+                dimensionFilter: '*',
+                timeGrain: 'auto'
+            },
+            appInsights: {
+                metricName: _this.defaultDropdownValue,
+                rawQuery: false,
+                rawQueryString: '',
+                groupBy: 'none',
+                timeGrainType: 'auto',
+                xaxis: 'timestamp',
+                yaxis: '',
+                spliton: ''
+            }
+        };
+        _lodash2.default.defaultsDeep(_this.target, _this.defaults);
+        _this.migrateTimeGrains();
+        _this.panelCtrl.events.on('data-received', _this.onDataReceived.bind(_this), $scope);
+        _this.panelCtrl.events.on('data-error', _this.onDataError.bind(_this), $scope);
+        return _this;
+        // monaco.editor.create(document.getElementById('container'), {
+        //   value: [
+        //     'function x() {',
+        //     '\tconsole.log("Hello world!");',
+        //     '}'
+        //   ].join('\n'),
+        //   language: 'javascript'
+        // });
+    }
+    AzureMonitorQueryCtrl.prototype.onDataReceived = function (dataList) {
+        this.lastQueryError = undefined;
+    };
+    AzureMonitorQueryCtrl.prototype.onDataError = function (err) {
+        this.handleQueryCtrlError(err);
+    };
+    AzureMonitorQueryCtrl.prototype.handleQueryCtrlError = function (err) {
+        if (err.query && err.query.refId && err.query.refId !== this.target.refId) {
+            return;
+        }
+        if (err.error && err.error.data && err.error.data.error) {
+            this.lastQueryError = err.error.data.error.message;
+        } else if (err.error && err.error.data) {
+            this.lastQueryError = err.error.data.message;
+        } else if (err.data && err.data.error) {
+            this.lastQueryError = err.data.error.message;
+        } else if (err.data && err.data.message) {
+            this.lastQueryError = err.data.message;
+        } else {
+            this.lastQueryError = err;
+        }
+    };
+    AzureMonitorQueryCtrl.prototype.migrateTimeGrains = function () {
+        if (this.target.azureMonitor.timeGrainUnit) {
+            if (this.target.azureMonitor.timeGrain !== 'auto') {
+                this.target.azureMonitor.timeGrain = _time_grain_converter2.default.createISO8601Duration(this.target.azureMonitor.timeGrain, this.target.azureMonitor.timeGrainUnit);
+            }
+            delete this.target.azureMonitor.timeGrainUnit;
+            this.onMetricNameChange();
+        }
+    };
+    AzureMonitorQueryCtrl.prototype.replace = function (variable) {
+        return this.templateSrv.replace(variable, this.panelCtrl.panel.scopedVars);
+    };
+    /* Azure Monitor Section */
+    AzureMonitorQueryCtrl.prototype.getResourceGroups = function (query) {
+        if (this.target.queryType !== 'Azure Monitor' || !this.datasource.azureMonitorDatasource.isConfigured()) {
+            return;
+        }
+        return this.datasource.getResourceGroups().catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.getMetricDefinitions = function (query) {
+        if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue) {
+            return;
+        }
+        return this.datasource.getMetricDefinitions(this.replace(this.target.azureMonitor.resourceGroup)).catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.getResourceNames = function (query) {
+        if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue) {
+            return;
+        }
+        return this.datasource.getResourceNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition)).catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.getMetricNames = function (query) {
+        if (this.target.queryType !== 'Azure Monitor' || !this.target.azureMonitor.resourceGroup || this.target.azureMonitor.resourceGroup === this.defaultDropdownValue || !this.target.azureMonitor.metricDefinition || this.target.azureMonitor.metricDefinition === this.defaultDropdownValue || !this.target.azureMonitor.resourceName || this.target.azureMonitor.resourceName === this.defaultDropdownValue) {
+            return;
+        }
+        return this.datasource.getMetricNames(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName)).catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.onResourceGroupChange = function () {
+        this.target.azureMonitor.metricDefinition = this.defaultDropdownValue;
+        this.target.azureMonitor.resourceName = this.defaultDropdownValue;
+        this.target.azureMonitor.metricName = this.defaultDropdownValue;
+        this.target.azureMonitor.dimensions = [];
+        this.target.azureMonitor.dimension = '';
+    };
+    AzureMonitorQueryCtrl.prototype.onMetricDefinitionChange = function () {
+        this.target.azureMonitor.resourceName = this.defaultDropdownValue;
+        this.target.azureMonitor.metricName = this.defaultDropdownValue;
+        this.target.azureMonitor.dimensions = [];
+        this.target.azureMonitor.dimension = '';
+    };
+    AzureMonitorQueryCtrl.prototype.onResourceNameChange = function () {
+        this.target.azureMonitor.metricName = this.defaultDropdownValue;
+        this.target.azureMonitor.dimensions = [];
+        this.target.azureMonitor.dimension = '';
+    };
+    AzureMonitorQueryCtrl.prototype.onMetricNameChange = function () {
+        var _this = this;
+        if (!this.target.azureMonitor.metricName || this.target.azureMonitor.metricName === this.defaultDropdownValue) {
+            return;
+        }
+        return this.datasource.getMetricMetadata(this.replace(this.target.azureMonitor.resourceGroup), this.replace(this.target.azureMonitor.metricDefinition), this.replace(this.target.azureMonitor.resourceName), this.replace(this.target.azureMonitor.metricName)).then(function (metadata) {
+            _this.target.azureMonitor.aggOptions = metadata.supportedAggTypes || [metadata.primaryAggType];
+            _this.target.azureMonitor.aggregation = metadata.primaryAggType;
+            _this.target.azureMonitor.timeGrains = [{ text: 'auto', value: 'auto' }].concat(metadata.supportedTimeGrains);
+            _this.target.azureMonitor.dimensions = metadata.dimensions;
+            if (metadata.dimensions.length > 0) {
+                _this.target.azureMonitor.dimension = metadata.dimensions[0].value;
+            }
+            return _this.refresh();
+        }).catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.getAutoInterval = function () {
+        if (this.target.azureMonitor.timeGrain === 'auto') {
+            return _time_grain_converter2.default.findClosestTimeGrain(this.panelCtrl.interval, _lodash2.default.map(this.target.azureMonitor.timeGrains, function (o) {
+                return _time_grain_converter2.default.createKbnUnitFromISO8601Duration(o.value);
+            }) || ['1m', '5m', '15m', '30m', '1h', '6h', '12h', '1d']);
+        }
+        return '';
+    };
+    /* Application Insights Section */
+    AzureMonitorQueryCtrl.prototype.getAppInsightsAutoInterval = function () {
+        if (this.panelCtrl.interval[this.panelCtrl.interval.length - 1] === 's') {
+            return '1m';
+        }
+        return this.panelCtrl.interval;
+    };
+    AzureMonitorQueryCtrl.prototype.getAppInsightsMetricNames = function () {
+        if (!this.datasource.appInsightsDatasource.isConfigured()) {
+            return;
+        }
+        return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.getAppInsightsColumns = function () {
+        return this.datasource.getAppInsightsColumns();
+    };
+    AzureMonitorQueryCtrl.prototype.onAppInsightsColumnChange = function () {
+        return this.refresh();
+    };
+    AzureMonitorQueryCtrl.prototype.onAppInsightsMetricNameChange = function () {
+        var _this = this;
+        if (!this.target.appInsights.metricName || this.target.appInsights.metricName === this.defaultDropdownValue) {
+            return;
+        }
+        return this.datasource.getAppInsightsMetricMetadata(this.replace(this.target.appInsights.metricName)).then(function (aggData) {
+            _this.target.appInsights.aggOptions = aggData.supportedAggTypes;
+            _this.target.appInsights.groupByOptions = aggData.supportedGroupBy;
+            _this.target.appInsights.aggregation = aggData.primaryAggType;
+            return _this.refresh();
+        }).catch(this.handleQueryCtrlError.bind(this));
+    };
+    AzureMonitorQueryCtrl.prototype.getAppInsightsGroupBySegments = function (query) {
+        return _lodash2.default.map(this.target.appInsights.groupByOptions, function (option) {
+            return { text: option, value: option };
+        });
+    };
+    AzureMonitorQueryCtrl.prototype.resetAppInsightsGroupBy = function () {
+        this.target.appInsights.groupBy = 'none';
+        this.refresh();
+    };
+    AzureMonitorQueryCtrl.prototype.updateTimeGrainType = function () {
+        if (this.target.appInsights.timeGrainType === 'specific') {
+            this.target.appInsights.timeGrain = '1';
+            this.target.appInsights.timeGrainUnit = 'minute';
+        } else {
+            this.target.appInsights.timeGrain = '';
+        }
+        this.refresh();
+    };
+    AzureMonitorQueryCtrl.prototype.toggleEditorMode = function () {
+        this.target.appInsights.rawQuery = !this.target.appInsights.rawQuery;
+    };
+    AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
+    return AzureMonitorQueryCtrl;
+}(_sdk.QueryCtrl);
+exports.AzureMonitorQueryCtrl = AzureMonitorQueryCtrl;
+
+/***/ }),
+
+/***/ "./time_grain_converter.ts":
+/*!*********************************!*\
+  !*** ./time_grain_converter.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _lodash = __webpack_require__(/*! lodash */ "lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _kbn = __webpack_require__(/*! app/core/utils/kbn */ "app/core/utils/kbn");
+
+var _kbn2 = _interopRequireDefault(_kbn);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var TimeGrainConverter = /** @class */function () {
+    function TimeGrainConverter() {}
+    TimeGrainConverter.createISO8601Duration = function (timeGrain, timeGrainUnit) {
+        var timeIntervals = ['hour', 'minute', 'h', 'm'];
+        if (_lodash2.default.includes(timeIntervals, timeGrainUnit)) {
+            return "PT" + timeGrain + timeGrainUnit[0].toUpperCase();
+        }
+        return "P" + timeGrain + timeGrainUnit[0].toUpperCase();
+    };
+    TimeGrainConverter.createISO8601DurationFromInterval = function (interval) {
+        var timeGrain = +interval.slice(0, interval.length - 1);
+        var unit = interval[interval.length - 1];
+        if (interval.indexOf('ms') > -1) {
+            return TimeGrainConverter.createISO8601Duration(1, 'm');
+        }
+        if (interval[interval.length - 1] === 's') {
+            var toMinutes = timeGrain * 60 % 60;
+            if (toMinutes < 1) {
+                toMinutes = 1;
+            }
+            return TimeGrainConverter.createISO8601Duration(toMinutes, 'm');
+        }
+        return TimeGrainConverter.createISO8601Duration(timeGrain, unit);
+    };
+    TimeGrainConverter.findClosestTimeGrain = function (interval, allowedTimeGrains) {
+        var timeGrains = _lodash2.default.filter(allowedTimeGrains, function (o) {
+            return o !== 'auto';
+        });
+        var closest = timeGrains[0];
+        var intervalMs = _kbn2.default.interval_to_ms(interval);
+        for (var i = 0; i < timeGrains.length; i++) {
+            // abs (num - val) < abs (num - curr):
+            if (intervalMs > _kbn2.default.interval_to_ms(timeGrains[i])) {
+                if (i + 1 < timeGrains.length) {
+                    closest = timeGrains[i + 1];
+                } else {
+                    closest = timeGrains[i];
+                }
+            }
+        }
+        return closest;
+    };
+    TimeGrainConverter.createTimeGrainFromISO8601Duration = function (duration) {
+        var offset = 1;
+        if (duration.substring(0, 2) === 'PT') {
+            offset = 2;
+        }
+        var value = duration.substring(offset, duration.length - 1);
+        var unit = duration.substring(duration.length - 1);
+        return value + ' ' + TimeGrainConverter.timeUnitToText(+value, unit);
+    };
+    TimeGrainConverter.timeUnitToText = function (value, unit) {
+        var text = '';
+        if (unit === 'S') {
+            text = 'second';
+        }
+        if (unit === 'M') {
+            text = 'minute';
+        }
+        if (unit === 'H') {
+            text = 'hour';
+        }
+        if (unit === 'D') {
+            text = 'day';
+        }
+        if (value > 1) {
+            return text + 's';
+        }
+        return text;
+    };
+    TimeGrainConverter.createKbnUnitFromISO8601Duration = function (duration) {
+        if (duration === 'auto') {
+            return 'auto';
+        }
+        var offset = 1;
+        if (duration.substring(0, 2) === 'PT') {
+            offset = 2;
+        }
+        var value = duration.substring(offset, duration.length - 1);
+        var unit = duration.substring(duration.length - 1);
+        return value + TimeGrainConverter.timeUnitToKbn(+value, unit);
+    };
+    TimeGrainConverter.timeUnitToKbn = function (value, unit) {
+        if (unit === 'S') {
+            return 's';
+        }
+        if (unit === 'M') {
+            return 'm';
+        }
+        if (unit === 'H') {
+            return 'h';
+        }
+        if (unit === 'D') {
+            return 'd';
+        }
+        return '';
+    };
+    return TimeGrainConverter;
+}();
+exports.default = TimeGrainConverter;
+
+/***/ }),
+
+/***/ "app/core/utils/kbn":
+/*!*************************************!*\
+  !*** external "app/core/utils/kbn" ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_app_core_utils_kbn__;
+
+/***/ }),
+
+/***/ "app/plugins/sdk":
+/*!**********************************!*\
+  !*** external "app/plugins/sdk" ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_app_plugins_sdk__;
+
+/***/ }),
+
+/***/ "lodash":
+/*!*************************!*\
+  !*** external "lodash" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_lodash__;
+
+/***/ }),
+
+/***/ "moment":
+/*!*************************!*\
+  !*** external "moment" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_moment__;
+
+/***/ })
+
+/******/ })});;
 //# sourceMappingURL=module.js.map

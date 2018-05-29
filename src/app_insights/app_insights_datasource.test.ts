@@ -1,6 +1,25 @@
-import { describe, beforeEach, it, sinon, expect, angularMocks } from '../lib/common';
-import AzureMonitorDatasource from '../../src/datasource';
-import TemplateSrvStub from '../lib/template_srv_stub';
+jest.mock('app/core/utils/kbn', () => {
+  return {
+    interval_to_ms: (interval) => {
+      if (interval.substring(interval.length-1) === 's') {
+        return interval.substring(0, interval.length-1) * 1000;
+      }
+
+      if (interval.substring(interval.length-1) === 'm') {
+        return interval.substring(0, interval.length-1) * 1000 * 60;
+      }
+
+      if (interval.substring(interval.length-1) === 'd') {
+        return interval.substring(0, interval.length-1) * 1000 * 60 * 24;
+      }
+
+      return undefined;
+    }
+  };
+});
+
+import AzureMonitorDatasource from '../datasource';
+import TemplateSrvStub from '../../specs/lib/template_srv_stub';
 import Q from 'q';
 import moment from 'moment';
 
@@ -48,7 +67,7 @@ describe('AppInsightsDatasource', function() {
 
       it('should return success status', function() {
         return ctx.ds.testDatasource().then(function(results) {
-          expect(results.status).to.equal('success');
+          expect(results.status).toEqual('success');
         });
       });
     });
@@ -73,8 +92,8 @@ describe('AppInsightsDatasource', function() {
 
       it('should return error status and a detailed error message', function() {
         return ctx.ds.testDatasource().then(function(results) {
-          expect(results.status).to.equal('error');
-          expect(results.message).to.equal(
+          expect(results.status).toEqual('error');
+          expect(results.message).toEqual(
             '1. Application Insights: Not Found: Invalid Application Id for Application Insights service. '
           );
         });
@@ -101,8 +120,8 @@ describe('AppInsightsDatasource', function() {
 
       it('should return error status and a detailed error message', function() {
         return ctx.ds.testDatasource().then(function(results) {
-          expect(results.status).to.equal('error');
-          expect(results.message).to.equal('1. Application Insights: Error: SomeOtherError. An error message. ');
+          expect(results.status).toEqual('error');
+          expect(results.message).toEqual('1. Application Insights: Error: SomeOtherError. An error message. ');
         });
       });
     });
@@ -144,18 +163,18 @@ describe('AppInsightsDatasource', function() {
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).to.contain('/metrics/exceptions/server');
+          expect(options.url).toContain('/metrics/exceptions/server');
           return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
       it('should return a single datapoint', function() {
         return ctx.ds.query(options).then(function(results) {
-          expect(results.data.length).to.be(1);
-          expect(results.data[0].datapoints.length).to.be(1);
-          expect(results.data[0].target).to.equal('exceptions/server');
-          expect(results.data[0].datapoints[0][1]).to.equal(1504713238845);
-          expect(results.data[0].datapoints[0][0]).to.equal(100);
+          expect(results.data.length).toBe(1);
+          expect(results.data[0].datapoints.length).toBe(1);
+          expect(results.data[0].target).toEqual('exceptions/server');
+          expect(results.data[0].datapoints[0][1]).toEqual(1504713238845);
+          expect(results.data[0].datapoints[0][0]).toEqual(100);
         });
       });
     });
@@ -190,21 +209,21 @@ describe('AppInsightsDatasource', function() {
         options.targets[0].appInsights.timeGrain = '30';
         options.targets[0].appInsights.timeGrainUnit = 'minute';
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).to.contain('/metrics/exceptions/server');
-          expect(options.url).to.contain('interval=PT30M');
+          expect(options.url).toContain('/metrics/exceptions/server');
+          expect(options.url).toContain('interval=PT30M');
           return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
       it('should return a list of datapoints', function() {
         return ctx.ds.query(options).then(function(results) {
-          expect(results.data.length).to.be(1);
-          expect(results.data[0].datapoints.length).to.be(2);
-          expect(results.data[0].target).to.equal('exceptions/server');
-          expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
-          expect(results.data[0].datapoints[0][0]).to.equal(3);
-          expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);
-          expect(results.data[0].datapoints[1][0]).to.equal(66);
+          expect(results.data.length).toBe(1);
+          expect(results.data[0].datapoints.length).toBe(2);
+          expect(results.data[0].target).toEqual('exceptions/server');
+          expect(results.data[0].datapoints[0][1]).toEqual(1504108800000);
+          expect(results.data[0].datapoints[0][0]).toEqual(3);
+          expect(results.data[0].datapoints[1][1]).toEqual(1504112400000);
+          expect(results.data[0].datapoints[1][0]).toEqual(66);
         });
       });
     });
@@ -261,21 +280,21 @@ describe('AppInsightsDatasource', function() {
           options.targets[0].appInsights.groupBy = 'client/city';
 
           ctx.backendSrv.datasourceRequest = function(options) {
-            expect(options.url).to.contain('/metrics/exceptions/server');
-            expect(options.url).to.contain('segment=client/city');
+            expect(options.url).toContain('/metrics/exceptions/server');
+            expect(options.url).toContain('segment=client/city');
             return ctx.$q.when({ data: response, status: 200 });
           };
         });
 
         it('should return a list of datapoints', function() {
           return ctx.ds.query(options).then(function(results) {
-            expect(results.data.length).to.be(3);
-            expect(results.data[0].datapoints.length).to.be(2);
-            expect(results.data[0].target).to.equal('exceptions/server{client/city="Miami"}');
-            expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
-            expect(results.data[0].datapoints[0][0]).to.equal(10);
-            expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);
-            expect(results.data[0].datapoints[1][0]).to.equal(20);
+            expect(results.data.length).toBe(3);
+            expect(results.data[0].datapoints.length).toBe(2);
+            expect(results.data[0].target).toEqual('exceptions/server{client/city="Miami"}');
+            expect(results.data[0].datapoints[0][1]).toEqual(1504108800000);
+            expect(results.data[0].datapoints[0][0]).toEqual(10);
+            expect(results.data[0].datapoints[1][1]).toEqual(1504112400000);
+            expect(results.data[0].datapoints[1][0]).toEqual(20);
           });
         });
       });
@@ -286,21 +305,21 @@ describe('AppInsightsDatasource', function() {
           options.targets[0].appInsights.alias = '{{metric}} + {{groupbyname}} + {{groupbyvalue}}';
 
           ctx.backendSrv.datasourceRequest = function(options) {
-            expect(options.url).to.contain('/metrics/exceptions/server');
-            expect(options.url).to.contain('segment=client/city');
+            expect(options.url).toContain('/metrics/exceptions/server');
+            expect(options.url).toContain('segment=client/city');
             return ctx.$q.when({ data: response, status: 200 });
           };
         });
 
         it('should return a list of datapoints', function() {
           return ctx.ds.query(options).then(function(results) {
-            expect(results.data.length).to.be(3);
-            expect(results.data[0].datapoints.length).to.be(2);
-            expect(results.data[0].target).to.equal('exceptions/server + client/city + Miami');
-            expect(results.data[0].datapoints[0][1]).to.equal(1504108800000);
-            expect(results.data[0].datapoints[0][0]).to.equal(10);
-            expect(results.data[0].datapoints[1][1]).to.equal(1504112400000);
-            expect(results.data[0].datapoints[1][0]).to.equal(20);
+            expect(results.data.length).toBe(3);
+            expect(results.data[0].datapoints.length).toBe(2);
+            expect(results.data[0].target).toEqual('exceptions/server + client/city + Miami');
+            expect(results.data[0].datapoints[0][1]).toEqual(1504108800000);
+            expect(results.data[0].datapoints[0][0]).toEqual(10);
+            expect(results.data[0].datapoints[1][1]).toEqual(1504112400000);
+            expect(results.data[0].datapoints[1][0]).toEqual(20);
           });
         });
       });
@@ -318,18 +337,18 @@ describe('AppInsightsDatasource', function() {
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).to.contain('/metrics/metadata');
+          expect(options.url).toContain('/metrics/metadata');
           return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
       it('should return a list of metric names', function() {
         return ctx.ds.metricFindQuery('appInsightsMetricNames()').then(function(results) {
-          expect(results.length).to.be(2);
-          expect(results[0].text).to.be('exceptions/server');
-          expect(results[0].value).to.be('exceptions/server');
-          expect(results[1].text).to.be('requests/count');
-          expect(results[1].value).to.be('requests/count');
+          expect(results.length).toBe(2);
+          expect(results[0].text).toBe('exceptions/server');
+          expect(results[0].value).toBe('exceptions/server');
+          expect(results[1].text).toBe('requests/count');
+          expect(results[1].value).toBe('requests/count');
         });
       });
     });
@@ -356,19 +375,19 @@ describe('AppInsightsDatasource', function() {
 
       beforeEach(() => {
         ctx.backendSrv.datasourceRequest = options => {
-          expect(options.url).to.contain('/metrics/metadata');
+          expect(options.url).toContain('/metrics/metadata');
           return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
       it('should return a list of group bys', () => {
         return ctx.ds.metricFindQuery('appInsightsGroupBys(requests/count)').then(results => {
-          expect(results[0].text).to.contain('client/os');
-          expect(results[0].value).to.contain('client/os');
-          expect(results[1].text).to.contain('client/city');
-          expect(results[1].value).to.contain('client/city');
-          expect(results[2].text).to.contain('client/browser');
-          expect(results[2].value).to.contain('client/browser');
+          expect(results[0].text).toContain('client/os');
+          expect(results[0].value).toContain('client/os');
+          expect(results[1].text).toContain('client/city');
+          expect(results[1].value).toContain('client/city');
+          expect(results[2].text).toContain('client/browser');
+          expect(results[2].value).toContain('client/browser');
         });
       });
     });
@@ -384,18 +403,18 @@ describe('AppInsightsDatasource', function() {
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
-        expect(options.url).to.contain('/metrics/metadata');
+        expect(options.url).toContain('/metrics/metadata');
         return ctx.$q.when({ data: response, status: 200 });
       };
     });
 
     it('should return a list of metric names', function() {
       return ctx.ds.getAppInsightsMetricNames().then(function(results) {
-        expect(results.length).to.be(2);
-        expect(results[0].text).to.be('exceptions/server');
-        expect(results[0].value).to.be('exceptions/server');
-        expect(results[1].text).to.be('requests/count');
-        expect(results[1].value).to.be('requests/count');
+        expect(results.length).toBe(2);
+        expect(results[0].text).toBe('exceptions/server');
+        expect(results[0].value).toBe('exceptions/server');
+        expect(results[1].text).toBe('requests/count');
+        expect(results[1].value).toBe('requests/count');
       });
     });
   });
@@ -422,20 +441,20 @@ describe('AppInsightsDatasource', function() {
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
-        expect(options.url).to.contain('/metrics/metadata');
+        expect(options.url).toContain('/metrics/metadata');
         return ctx.$q.when({ data: response, status: 200 });
       };
     });
 
     it('should return a list of group bys', function() {
       return ctx.ds.getAppInsightsMetricMetadata('requests/count').then(function(results) {
-        expect(results.primaryAggType).to.equal('avg');
-        expect(results.supportedAggTypes).to.contain('avg');
-        expect(results.supportedAggTypes).to.contain('sum');
-        expect(results.supportedAggTypes).to.contain('total');
-        expect(results.supportedGroupBy).to.contain('client/os');
-        expect(results.supportedGroupBy).to.contain('client/city');
-        expect(results.supportedGroupBy).to.contain('client/browser');
+        expect(results.primaryAggType).toEqual('avg');
+        expect(results.supportedAggTypes).toContain('avg');
+        expect(results.supportedAggTypes).toContain('sum');
+        expect(results.supportedAggTypes).toContain('total');
+        expect(results.supportedGroupBy).toContain('client/os');
+        expect(results.supportedGroupBy).toContain('client/city');
+        expect(results.supportedGroupBy).toContain('client/browser');
       });
     });
   });

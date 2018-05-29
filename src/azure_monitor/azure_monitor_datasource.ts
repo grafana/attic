@@ -57,7 +57,6 @@ export default class AzureMonitorDatasource {
       const resourceGroup = this.templateSrv.replace(item.resourceGroup, options.scopedVars);
       const resourceName = this.templateSrv.replace(item.resourceName, options.scopedVars);
       const metricDefinition = this.templateSrv.replace(item.metricDefinition, options.scopedVars);
-      const metricName = this.templateSrv.replace(item.metricName, options.scopedVars);
       const timeGrain = this.templateSrv.replace((item.timeGrain || '').toString(), options.scopedVars);
 
       const filterBuilder = new AzureMonitorFilterBuilder(
@@ -133,6 +132,7 @@ export default class AzureMonitorDatasource {
   annotationQuery(options) {}
 
   metricFindQuery(query: string) {
+    console.log(query);
     const resourceGroupsQuery = query.match(/^ResourceGroups\(\)/i);
     if (resourceGroupsQuery) {
       return this.getResourceGroups();
@@ -158,6 +158,8 @@ export default class AzureMonitorDatasource {
       const resourceName = this.toVariable(metricNamesQuery[3]);
       return this.getMetricNames(resourceGroup, metricDefinition, resourceName);
     }
+
+    return Promise.resolve([]);
   }
 
   toVariable(metric: string) {
@@ -291,6 +293,11 @@ export default class AzureMonitorDatasource {
             title: 'Success',
           };
         }
+
+        return {
+          status: 'error',
+          message: 'Returned http status code ' + response.status,
+        };
       })
       .catch(error => {
         let message = 'Azure Monitor: ';

@@ -1,5 +1,23 @@
-import {describe, beforeEach, it, sinon, expect, angularMocks} from '../lib/common';
-import AzureMonitorFilterBuilder from '../../src/azure_monitor/azure_monitor_filter_builder';
+jest.mock('app/core/utils/kbn', () => {
+  return {
+    interval_to_ms: (interval) => {
+      if (interval.substring(interval.length-1) === 's') {
+        return interval.substring(0, interval.length-1) * 1000;
+      }
+
+      if (interval.substring(interval.length-1) === 'm') {
+        return interval.substring(0, interval.length-1) * 1000 * 60;
+      }
+
+      if (interval.substring(interval.length-1) === 'd') {
+        return interval.substring(0, interval.length-1) * 1000 * 60 * 24;
+      }
+
+      return undefined;
+    }
+  };
+});
+import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
 import moment from 'moment';
 
 describe('AzureMonitorFilterBuilder', function() {
@@ -25,7 +43,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
     it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
       const filter = timefilter + '&interval=PT5M&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
@@ -37,7 +55,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
       const filter = timefilter + '&interval=PT1M&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
@@ -49,7 +67,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
     it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
       const filter = timefilter + '&interval=PT15M&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
@@ -61,14 +79,14 @@ describe('AzureMonitorFilterBuilder', function() {
 
     it('should always add datetime filtering and a time grain rounded to the closest allowed value to the filter', function() {
       const filter = timefilter + '&interval=P1D&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
   describe('with a metric name and 1 hour time grain', function() {
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
       const filter = timefilter + '&interval=PT1H&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
@@ -79,7 +97,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
     it('should always add datetime filtering and a time grain in ISO_8601 format to the filter', function() {
       const filter = timefilter + '&interval=PT1M&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
@@ -91,7 +109,7 @@ describe('AzureMonitorFilterBuilder', function() {
 
     it('should add time grain to the filter in ISO_8601 format', function() {
       const filter = timefilter + '&interval=P1D&aggregation=Maximum&' + metricFilter;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 
@@ -103,7 +121,7 @@ describe('AzureMonitorFilterBuilder', function() {
     it('should add dimension to the filter', function() {
       const filter = timefilter + '&interval=PT1H&' + metricFilter
         + `&$filter=aDimension eq 'aFilterValue'`;
-      expect(builder.generateFilter()).to.equal(filter);
+      expect(builder.generateFilter()).toEqual(filter);
     });
   });
 });

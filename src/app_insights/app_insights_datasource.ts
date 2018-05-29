@@ -125,6 +125,8 @@ export default class AppInsightsDatasource {
       const metricName = appInsightsGroupByQuery[1];
       return this.getGroupBys(this.templateSrv.replace(metricName));
     }
+
+    return undefined;
   }
 
   testDatasource() {
@@ -138,6 +140,11 @@ export default class AppInsightsDatasource {
             title: 'Success',
           };
         }
+
+        return {
+          status: 'error',
+          message: 'Returned http status code ' + response.status,
+        };
       })
       .catch(error => {
         let message = 'Application Insights: ';
