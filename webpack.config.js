@@ -6,13 +6,21 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
   target: 'node',
   context: path.join(__dirname, 'src'),
-  entry: './module.ts',
-  devtool: "source-map",
+  entry: {
+    'module': './module.ts',
+    // 'lib/monaco.min': './lib/monaco.min.js'
+	},
+  devtool: 'source-map',
   output: {
-    filename: 'module.js',
+    filename: '[name].js',
     path: path.join(__dirname, 'dist'),
     libraryTarget: 'amd'
   },
+  // optimization: {
+  //   splitChunks: {
+  //     chunks: 'all'
+  //   }
+  // },
   externals: [
     'lodash', 'moment',
     function(context, request, callback) {
@@ -36,7 +44,7 @@ module.exports = {
     ]),
   ],
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: ['.ts', '.js']
   },
   module: {
     rules: [
@@ -44,13 +52,12 @@ module.exports = {
         test: /\.tsx?$/,
         loaders: [
           {
-            loader: "babel-loader",
+            loader: 'babel-loader',
             options: { presets: ['env'] }
           },
-          "ts-loader"
+          'ts-loader'
         ],
-        // include: "/node_modules/grafana-sdk-mocks/app/headers/common.d.ts",
-        exclude: /node_modules/,
+        exclude: /(node_modules)/,
       },
       {
         test: /\.css$/,
@@ -59,7 +66,7 @@ module.exports = {
             loader: 'style-loader'
           },
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               importLoaders: 1,
               sourceMap: true

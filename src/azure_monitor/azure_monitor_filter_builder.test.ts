@@ -17,6 +17,7 @@ jest.mock('app/core/utils/kbn', () => {
     }
   };
 });
+
 import AzureMonitorFilterBuilder from './azure_monitor_filter_builder';
 import moment from 'moment';
 
