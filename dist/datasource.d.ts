@@ -8,9 +8,15 @@ export default class Datasource {
     name: string;
     azureMonitorDatasource: AzureMonitorDatasource;
     appInsightsDatasource: AppInsightsDatasource;
+    columns: {
+        text: string;
+        value: string;
+    }[];
     /** @ngInject */
     constructor(instanceSettings: any, backendSrv: any, templateSrv: any, $q: any);
-    query(options: any): any;
+    query(options: any): Promise<{
+        data: any;
+    }>;
     annotationQuery(options: any): void;
     metricFindQuery(query: string): any;
     testDatasource(): any;
@@ -21,4 +27,8 @@ export default class Datasource {
     getMetricMetadata(resourceGroup: string, metricDefinition: string, resourceName: string, metricName: string): any;
     getAppInsightsMetricNames(): any;
     getAppInsightsMetricMetadata(metricName: any): any;
+    getAppInsightsColumns(): {
+        text: string;
+        value: string;
+    }[];
 }

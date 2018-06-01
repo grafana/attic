@@ -21,6 +21,10 @@ describe('AzureMonitorQueryCtrl', function() {
       expect(queryCtrl.target.queryType).to.be('Azure Monitor');
     });
 
+    it('should set default App Insights editor to be builder', function() {
+      expect(queryCtrl.target.appInsights.rawQuery).to.be(false);
+    });
+
     it('should set query parts to select', function() {
       expect(queryCtrl.target.azureMonitor.resourceGroup).to.be('select');
       expect(queryCtrl.target.azureMonitor.metricDefinition).to.be('select');
@@ -30,9 +34,8 @@ describe('AzureMonitorQueryCtrl', function() {
     });
   });
 
-  describe('and the query type is Azure Monitor', function() {
-
-    describe('when getOptions for the Resource Group dropdown is called', function() {
+  describe('when the query type is Azure Monitor', function() {
+    describe('and getOptions for the Resource Group dropdown is called', function() {
       const response = [
         {text: 'nodeapp', value: 'nodeapp'},
         {text: 'otherapp', value: 'otherapp'},

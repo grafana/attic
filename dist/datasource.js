@@ -28,6 +28,7 @@ System.register(['lodash', './azure_monitor/azure_monitor_datasource', './app_in
                     var promises = [];
                     var azureMonitorOptions = lodash_1.default.cloneDeep(options);
                     var appInsightsTargets = lodash_1.default.cloneDeep(options);
+                    var that = this;
                     azureMonitorOptions.targets = lodash_1.default.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
                     appInsightsTargets.targets = lodash_1.default.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
                     if (azureMonitorOptions.targets.length > 0) {
@@ -36,8 +37,14 @@ System.register(['lodash', './azure_monitor/azure_monitor_datasource', './app_in
                     if (appInsightsTargets.targets.length > 0) {
                         promises.push(this.appInsightsDatasource.query(appInsightsTargets));
                     }
-                    return this.$q.all(promises).then(function (results) {
-                        return { data: lodash_1.default.flatten(results) };
+                    return Promise.all(promises).then(function (results) {
+                        if (results[0].data) {
+                            that.columns = results[0].columns;
+                            return { data: lodash_1.default.flatten(results[0].data) };
+                        }
+                        else {
+                            return { data: lodash_1.default.flatten(results) };
+                        }
                     });
                 };
                 Datasource.prototype.annotationQuery = function (options) {
@@ -110,6 +117,9 @@ System.register(['lodash', './azure_monitor/azure_monitor_datasource', './app_in
                 };
                 Datasource.prototype.getAppInsightsMetricMetadata = function (metricName) {
                     return this.appInsightsDatasource.getMetricMetadata(metricName);
+                };
+                Datasource.prototype.getAppInsightsColumns = function () {
+                    return this.columns;
                 };
                 return Datasource;
             })();

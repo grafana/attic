@@ -99,6 +99,7 @@ export default class AzureMonitorDatasource {
         url: url,
         format: options.format,
         alias: item.alias,
+        raw: false,
       };
     });
 

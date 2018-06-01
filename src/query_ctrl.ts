@@ -21,8 +21,13 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     },
     appInsights: {
       metricName: this.defaultDropdownValue,
+      rawQuery: false,
+      rawQueryString: '',
       groupBy: 'none',
-      timeGrainType: 'auto'
+      timeGrainType: 'auto',
+      xaxis: 'timestamp',
+      yaxis: '',
+      spliton: ''
     }
   };
 
@@ -200,6 +205,15 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
   }
 
+  getAppInsightsColumns() {
+    return this.datasource.getAppInsightsColumns();
+  }
+
+  onAppInsightsColumnChange() {
+    return this.refresh();
+  }
+
+
   onAppInsightsMetricNameChange() {
     if (!this.target.appInsights.metricName || this.target.appInsights.metricName === this.defaultDropdownValue) {
       return;
@@ -233,5 +247,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       this.target.appInsights.timeGrain = '';
     }
     this.refresh();
+  }
+
+  toggleEditorMode() {
+    this.target.appInsights.rawQuery = !this.target.appInsights.rawQuery;
   }
 }

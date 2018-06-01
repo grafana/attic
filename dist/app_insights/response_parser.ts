@@ -4,18 +4,55 @@ import moment from 'moment';
 import _ from 'lodash';
 
 export default class ResponseParser {
+  columns: Array<string>;
   constructor(private results) {}
 
   parseQueryResult() {
     let data = [];
+    let columns = [];
     for (let i = 0; i < this.results.length; i++) {
-      const value = this.results[i].result.data.value;
-      const alias = this.results[i].query.alias;
-      data = _.concat(data, this.parseQueryResultRow(value, alias));
+      if(this.results[i].query.raw) {
+        const xaxis = this.results[i].query.xaxis;
+        const yaxises = this.results[i].query.yaxis;
+        const spliton = this.results[i].query.spliton;
+        columns = this.results[i].result.data.Tables[0].Columns;
+        const rows = this.results[i].result.data.Tables[0].Rows;
+        const alias = this.results[i].query.alias;
+        data = _.concat(data, this.parseRawQueryResultRow(columns, rows, alias, xaxis, yaxises, spliton));
+      } else {
+        const value = this.results[i].result.data.value;
+        const alias = this.results[i].query.alias;
+        data = _.concat(data, this.parseQueryResultRow(value, alias));
+      }
     }
+
+    const columns_for_dropdowns = _.map(columns, column => { return {text: column.ColumnName, value: column.ColumnName}});
+
+    return {data: data, columns: columns_for_dropdowns};;
+  }
+
+  parseRawQueryResultRow(columns, rows, alias: string, xaxis: string, yaxises: string, spliton: string) {
+    const data = [];
+    const xaxis_column = columns.findIndex((column) => {return column.ColumnName === xaxis});
+    const yaxises_split = yaxises.split(',');
+    const yaxis_columns = {};
+    _.forEach(yaxises_split, (yaxis) => {
+      yaxis_columns[yaxis] = columns.findIndex((column) => {return column.ColumnName === yaxis});
+    })
+    const spliton_column = columns.findIndex((column) => {return column.ColumnName === spliton});
+    const convert_timestamp = xaxis === "timestamp";
+
+    _.forEach(rows, function(row) {
+      _.forEach(yaxis_columns, (yaxis_column, yaxis_name) => {
+        let bucket = spliton_column === -1 ? ResponseParser.findOrCreateBucket(data, yaxis_name) : ResponseParser.findOrCreateBucket(data, row[spliton_column]);
+        let epoch = convert_timestamp ? ResponseParser.dateTimeToEpoch(row[xaxis_column]) : row[xaxis_column];
+        bucket.datapoints.push([row[yaxis_column], epoch]);
+      });
+    });
 
     return data;
   }
+
 
   parseQueryResultRow(value, alias: string) {
     const data = [];

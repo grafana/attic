@@ -38,8 +38,13 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                         },
                         appInsights: {
                             metricName: this.defaultDropdownValue,
+                            rawQuery: false,
+                            rawQueryString: '',
                             groupBy: 'none',
-                            timeGrainType: 'auto'
+                            timeGrainType: 'auto',
+                            xaxis: 'timestamp',
+                            yaxis: '',
+                            spliton: ''
                         }
                     };
                     lodash_1.default.defaultsDeep(this.target, this.defaults);
@@ -173,6 +178,12 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                     }
                     return this.datasource.getAppInsightsMetricNames().catch(this.handleQueryCtrlError.bind(this));
                 };
+                AzureMonitorQueryCtrl.prototype.getAppInsightsColumns = function () {
+                    return this.datasource.getAppInsightsColumns();
+                };
+                AzureMonitorQueryCtrl.prototype.onAppInsightsColumnChange = function () {
+                    return this.refresh();
+                };
                 AzureMonitorQueryCtrl.prototype.onAppInsightsMetricNameChange = function () {
                     var _this = this;
                     if (!this.target.appInsights.metricName || this.target.appInsights.metricName === this.defaultDropdownValue) {
@@ -204,6 +215,9 @@ System.register(['lodash', 'app/plugins/sdk', './css/query_editor.css!', './time
                         this.target.appInsights.timeGrain = '';
                     }
                     this.refresh();
+                };
+                AzureMonitorQueryCtrl.prototype.toggleEditorMode = function () {
+                    this.target.appInsights.rawQuery = !this.target.appInsights.rawQuery;
                 };
                 AzureMonitorQueryCtrl.templateUrl = 'partials/query.editor.html';
                 return AzureMonitorQueryCtrl;
