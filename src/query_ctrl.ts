@@ -4,12 +4,11 @@ import _ from 'lodash';
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
-import './lib/monaco.min.js';
+import './monaco_editor';
 
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
   lastQueryError?: string;
-  monacoEditor?: monaco.editor.IStandaloneCodeEditor;
 
   defaultDropdownValue = 'select';
 
@@ -22,6 +21,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       metricName: this.defaultDropdownValue,
       dimensionFilter: '*',
       timeGrain: 'auto'
+    },
+    azureMonitorLogAnalytics: {
+      query: 'Write your query here',
     },
     appInsights: {
       metricName: this.defaultDropdownValue,
@@ -47,19 +49,6 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   onDataReceived(dataList) {
-    if (!this.monacoEditor) {
-      const containerDiv: HTMLElement = document.getElementById('container')!;
-      this.monacoEditor = monaco.editor.create(containerDiv, {
-        value: [
-          'function x() {',
-          '\tconsole.log("Hello world!");',
-          '}'
-        ].join('\n'),
-        language: 'javascript'
-      });
-
-    }
-
     this.lastQueryError = undefined;
   }
 

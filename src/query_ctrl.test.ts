@@ -7,6 +7,7 @@ jest.mock('app/core/utils/kbn', () => {
   };
 });
 
+jest.mock('./monaco_editor');
 
 import {AzureMonitorQueryCtrl} from '../src/query_ctrl';
 import TemplateSrvStub from '../specs/lib/template_srv_stub';

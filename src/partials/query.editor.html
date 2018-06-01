@@ -1,12 +1,9 @@
 <query-editor-row query-ctrl="ctrl" can-collapse="false" has-text-edit-mode="ctrl.target.queryType === 'Application Insights'">
-  <div id="container" style="width: 944px; height: 674px;">
-  </div>
-
   <div class="gf-form-inline">
     <div class="gf-form">
       <label class="gf-form-label query-keyword width-9">Service</label>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.queryType" ng-options="f as f for f in ['Application Insights', 'Azure Monitor']"></select>
+        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.queryType" ng-options="f as f for f in ['Application Insights', 'Azure Monitor', 'Azure Monitor Log Analytics']"></select>
       </div>
     </div>
     <div class="gf-form gf-form--grow">
@@ -106,6 +103,10 @@
         <div class="gf-form-label gf-form-label--grow"></div>
       </div>
     </div>
+  </div>
+
+  <div ng-show="ctrl.target.queryType === 'Azure Monitor Log Analytics'">
+    <monaco-editor content="ctrl.target.azureMonitorLogAnalytics.query"></monaco-editor>
   </div>
 
   <div ng-show="ctrl.target.queryType === 'Application Insights'">
