@@ -6,7 +6,7 @@ module.exports = {
     }
   },
   "moduleNameMapper": {
-    'app/core/utils/kbn': '<rootDir>/node_modules/grafana-sdk-mocks/app/core/utils/kbn.js',
+    'app/core/utils/kbn': '<rootDir>/src/__mocks__/kbn.ts',
     'app/plugins/sdk': '<rootDir>/node_modules/grafana-sdk-mocks/app/plugins/sdk.ts',
   },
   "transformIgnorePatterns": [

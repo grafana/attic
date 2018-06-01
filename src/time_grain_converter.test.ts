@@ -1,9 +1,3 @@
-jest.mock('app/core/utils/kbn', () => {
-  return {
-    interval_to_ms: jest.fn(),
-  };
-});
-
 import TimeGrainConverter from '../src/time_grain_converter';
 
 describe('TimeGrainConverter', () => {

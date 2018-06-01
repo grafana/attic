@@ -1,11 +1,6 @@
 jest.mock('./css/query_editor.css', () => {
   return {};
 });
-jest.mock('app/core/utils/kbn', () => {
-  return {
-    interval_to_ms: jest.fn(),
-  };
-});
 
 jest.mock('./monaco_editor');
 
