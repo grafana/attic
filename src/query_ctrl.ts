@@ -50,6 +50,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   resultFormats: ResultFormat[];
   workspaces: string[];
+  showHelp: boolean;
 
   /** @ngInject **/
   constructor($scope, $injector, private templateSrv) {

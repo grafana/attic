@@ -59,7 +59,8 @@ export default class ResponseParser {
 
     _.forEach(rows, function(row) {
       const epoch =  ResponseParser.dateTimeToEpoch(row[timeIndex]);
-      const bucket = ResponseParser.findOrCreateBucket(data, row[metricIndex]);
+      const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].name;
+      const bucket = ResponseParser.findOrCreateBucket(data, metricName);
       bucket.datapoints.push([row[valueIndex], epoch]);
     });
 
