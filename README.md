@@ -10,6 +10,7 @@ The Azure Monitor Data Source plugin supports both Azure Monitor and Application
   - includes support for the latest API version that allows multi-dimensional filtering for the Storage and SQL metrics.
   - Automatic time grain mode which will group the metrics by the most appropriate time grain value depending on whether you have zoomed in to look at fine-grained metrics or zoomed out to look at an overview.
 - Application Insights metrics
+  - Write raw [log analytics queries](https://docs.loganalytics.io/docs/Language-Reference), and select x-axis, y-axis, and grouped values manually.
   - Automatic time grain support
 - You can combine metrics from both services in the same graph.
 
@@ -113,6 +114,20 @@ Alternatively on step 4 if creating a new Azure Active Directory App, use the [A
 az ad sp create-for-rbac -n "http://localhost:3000"
 ```
 
+### Writing Analytics Queries
+
+If you change the service type to "Application Insights", the menu icon to the right adds another option, "Toggle Edit Mode". Once clicked, the query edit mode changes to give you a full text area in which to write log analytics queries. (This is identical to how the InfluxDB datasource lets you write raw queries.)
+
+Once a query is written, the column names are automatically parsed out of the response data. You can then select them in the "X-axis", "Y-axis", and "Split On" dropdown menus, or just type them out.
+
+There are some important caveats to remember:
+
+- You'll want to order your y-axis in the query, eg. `order by timestamp asc`. The graph may come out looking bizarre otherwise. It's better to have Microsoft sort it on their side where it's faster, than to implement this in the plugin.
+- If you copy a log analytics query, typically they'll end with a render instruction, like `render barchart`. This is unnecessary, but harmless.
+- Currently, four default dashboard variables are supported: `$timeFilter`, `$from`, `$until`, and `$__interval`. If you're searching in timestamped data, replace the beginning of your where clause to `where $timeFilter`. Dashboard changes by time region are handled as you'd expect, as long as you leave the name of the `timestamp` column alone. Likewise, `$__interval` will automatically change based on the dashboard's time region _and_ the width of the chart being displayed. Use it in bins, so `bin(timestamp,$__interval)` changes into something like `bin(timestamp,1s)`. Use `$from` and `$until` if you just want the formatted dates to be inserted.
+- Templated dashboard variables are not yet supported! They will come in a future version.
+
+
 ### Formatting Legend Keys with Aliases
 
 The default legend formatting for the Azure Monitor API is:
@@ -212,6 +227,10 @@ To install and build the plugin:
 The plugin is written in TypeScript and changes should be made in the `src` directory. The build task transpiles the TypeScript code into JavaScript and copies it to the `dist` directory. Grafana will load the JavaScript from the `dist` directory and ignore the `src` directory.
 
 ### CHANGELOG
+
+#### v0.2.0
+
+Added raw query support for Application Insights.
 
 #### v0.1.1
 
