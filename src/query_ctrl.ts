@@ -6,6 +6,11 @@ import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
 import './monaco_editor';
 
+export interface ResultFormat {
+  text: string;
+  value: string;
+}
+
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
   lastQueryError?: string;
@@ -22,8 +27,14 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       dimensionFilter: '*',
       timeGrain: 'auto'
     },
-    azureMonitorLogAnalytics: {
-      query: 'Write your query here',
+    azureLogAnalytics: {
+      query: [
+        'AzureActivity',
+        '| where $__timeFilter()',
+        '| summarize count() by Category, bin(TimeGenerated, $__interval)',
+        '| order by TimeGenerated asc'].join('\n'),
+      resultFormat: 'time_series',
+      workspace: ''
     },
     appInsights: {
       metricName: this.defaultDropdownValue,
@@ -37,6 +48,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     }
   };
 
+  resultFormats: ResultFormat[];
+  workspaces: string[];
+
   /** @ngInject **/
   constructor($scope, $injector, private templateSrv) {
     super($scope, $injector);
@@ -46,6 +60,11 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
+    this.resultFormats = [{ text: 'Time series', value: 'time_series' }, { text: 'Table', value: 'table' }];
+
+    if (this.target.queryType === 'Azure Log Analytics') {
+      this.getWorkspaces();
+    }
   }
 
   onDataReceived(dataList) {
@@ -61,7 +80,13 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
       return;
     }
 
-    if (err.error && err.error.data && err.error.data.error) {
+    if (err.error && err.error.data && err.error.data.error && err.error.data.error.innererror) {
+      if (err.error.data.error.innererror.innererror) {
+        this.lastQueryError = err.error.data.error.innererror.innererror.message;
+      } else {
+        this.lastQueryError = err.error.data.error.innererror.message;
+      }
+    } else if (err.error && err.error.data && err.error.data.error) {
       this.lastQueryError = err.error.data.error.message;
     } else if (err.error && err.error.data) {
       this.lastQueryError = err.error.data.message;
@@ -89,6 +114,12 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   replace(variable: string) {
     return this.templateSrv.replace(variable, this.panelCtrl.panel.scopedVars);
+  }
+
+  onQueryTypeChange() {
+    if (this.target.queryType === 'Azure Log Analytics') {
+      this.getWorkspaces();
+    }
   }
 
   /* Azure Monitor Section */
@@ -191,6 +222,17 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     }
 
     return '';
+  }
+
+  /* Azure Log Analytics */
+
+  getWorkspaces() {
+    return this.datasource.azureLogAnalyticsDatasource.getWorkspaces().then(list => {
+      this.workspaces = list;
+      if (list.length > 0 && !this.target.azureLogAnalytics.workspace) {
+        this.target.azureLogAnalytics.workspace = list[0];
+      }
+    }).catch(this.handleQueryCtrlError.bind(this));
   }
 
   /* Application Insights Section */

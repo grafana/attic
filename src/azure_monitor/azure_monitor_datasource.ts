@@ -132,7 +132,6 @@ export default class AzureMonitorDatasource {
   annotationQuery(options) {}
 
   metricFindQuery(query: string) {
-    console.log(query);
     const resourceGroupsQuery = query.match(/^ResourceGroups\(\)/i);
     if (resourceGroupsQuery) {
       return this.getResourceGroups();

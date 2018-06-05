@@ -91,6 +91,14 @@
       "headers": [
         {"name": "X-API-Key", "content": "{{.SecureJsonData.appInsightsApiKey}}"}
       ]
+    },
+    {
+      "path": "azureloganalytics",
+      "method": "GET",
+      "url": "https://api.loganalytics.io/v1/workspaces",
+      "headers": [
+        {"name": "X-API-Key", "content": "DEMO_KEY"}
+      ]
     }
   ],
 

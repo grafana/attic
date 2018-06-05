@@ -1,12 +1,14 @@
 import _ from 'lodash';
 import AzureMonitorDatasource from './azure_monitor/azure_monitor_datasource';
 import AppInsightsDatasource from './app_insights/app_insights_datasource';
+import AzureLogAnalyticsDatasource from './azure_log_analytics/azure_log_analytics_datasource';
 
 export default class Datasource {
   id: number;
   name: string;
   azureMonitorDatasource: AzureMonitorDatasource;
   appInsightsDatasource: AppInsightsDatasource;
+  azureLogAnalyticsDatasource: AzureLogAnalyticsDatasource;
   columns: { text: string, value: string }[];
 
   /** @ngInject */
@@ -25,16 +27,26 @@ export default class Datasource {
       this.templateSrv,
       this.$q
     );
+
+    this.azureLogAnalyticsDatasource = new AzureLogAnalyticsDatasource(
+      instanceSettings,
+      this.backendSrv,
+      this.templateSrv,
+      this.$q
+    );
+
   }
 
   query(options) {
     const promises: any[] = [];
     const azureMonitorOptions = _.cloneDeep(options);
     const appInsightsTargets = _.cloneDeep(options);
+    const azureLogAnalyticsTargets = _.cloneDeep(options);
     var that = this;
 
     azureMonitorOptions.targets = _.filter(azureMonitorOptions.targets, ['queryType', 'Azure Monitor']);
     appInsightsTargets.targets = _.filter(appInsightsTargets.targets, ['queryType', 'Application Insights']);
+    azureLogAnalyticsTargets.targets = _.filter(azureLogAnalyticsTargets.targets, ['queryType', 'Azure Log Analytics']);
 
     if (azureMonitorOptions.targets.length > 0) {
       promises.push(this.azureMonitorDatasource.query(azureMonitorOptions));
@@ -44,9 +56,13 @@ export default class Datasource {
       promises.push(this.appInsightsDatasource.query(appInsightsTargets));
     }
 
+    if (azureLogAnalyticsTargets.targets.length > 0) {
+      promises.push(this.azureLogAnalyticsDatasource.query(azureLogAnalyticsTargets));
+    }
+
     return Promise.all(promises).then(results => {
-      if(results[0].data) {
-        that.columns = results[0].columns
+      if (results[0].data) {
+        that.columns = results[0].columns;
         return { data: _.flatten(results[0].data) };
       } else {
         return { data: _.flatten(results) };

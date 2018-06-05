@@ -3,7 +3,7 @@
     <div class="gf-form">
       <label class="gf-form-label query-keyword width-9">Service</label>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.queryType" ng-options="f as f for f in ['Application Insights', 'Azure Monitor', 'Azure Monitor Log Analytics']"></select>
+        <select class="gf-form-input service-dropdown" ng-model="ctrl.target.queryType" ng-options="f as f for f in ['Application Insights', 'Azure Monitor', 'Azure Log Analytics']" ng-change="onQueryTypeChange()"></select>
       </div>
     </div>
     <div class="gf-form gf-form--grow">
@@ -105,8 +105,38 @@
     </div>
   </div>
 
-  <div ng-show="ctrl.target.queryType === 'Azure Monitor Log Analytics'">
-    <monaco-editor content="ctrl.target.azureMonitorLogAnalytics.query"></monaco-editor>
+  <div ng-if="ctrl.target.queryType === 'Azure Log Analytics'">
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-9">Workspace</label>
+        <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+            <select class="gf-form-input min-width-12" ng-model="ctrl.target.azureLogAnalytics.workspace" ng-options="f as f for f in ctrl.workspaces"></select>
+          </div>
+      </div>
+      <div class="gf-form">
+          <div class="width-1"></div>
+        </div>
+      <div class="gf-form">
+        <button class="btn btn-primary width-10" ng-click="ctrl.refresh()">Run</button>
+      </div>
+      <div class="gf-form gf-form--grow">
+          <div class="gf-form-label gf-form-label--grow"></div>
+        </div>
+    </div>
+
+    <monaco-editor content="ctrl.target.azureLogAnalytics.query" on-change="ctrl.refresh()"></monaco-editor>
+
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7">Format As</label>
+        <div class="gf-form-select-wrapper">
+          <select class="gf-form-input gf-size-auto" ng-model="ctrl.target.azureLogAnalytics.resultFormat" ng-options="f.value as f.text for f in ctrl.resultFormats" ng-change="ctrl.refresh()"></select>
+        </div>
+      </div>
+      <div class="gf-form gf-form--grow">
+        <div class="gf-form-label gf-form-label--grow"></div>
+      </div>
+    </div>
   </div>
 
   <div ng-show="ctrl.target.queryType === 'Application Insights'">
