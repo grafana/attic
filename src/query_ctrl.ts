@@ -51,6 +51,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   resultFormats: ResultFormat[];
   workspaces: string[];
   showHelp: boolean;
+  showLastQuery: boolean;
+  lastQuery: string;
 
   /** @ngInject **/
   constructor($scope, $injector, private templateSrv) {
@@ -62,14 +64,16 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
     this.resultFormats = [{ text: 'Time series', value: 'time_series' }, { text: 'Table', value: 'table' }];
-
-    if (this.target.queryType === 'Azure Log Analytics') {
-      this.getWorkspaces();
-    }
   }
 
   onDataReceived(dataList) {
     this.lastQueryError = undefined;
+    this.lastQuery = '';
+
+    let anySeriesFromQuery = _.find(dataList, { refId: this.target.refId });
+    if (anySeriesFromQuery) {
+      this.lastQuery = anySeriesFromQuery.query;
+    }
   }
 
   onDataError(err) {
@@ -119,7 +123,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
 
   onQueryTypeChange() {
     if (this.target.queryType === 'Azure Log Analytics') {
-      this.getWorkspaces();
+      return this.getWorkspaces();
     }
   }
 

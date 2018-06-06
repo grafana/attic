@@ -34,10 +34,12 @@ export default class AzureLogAnalyticsDatasource {
       return item.hide !== true;
     }).map(target => {
       const item = target.azureLogAnalytics;
+
       const querystringBuilder = new AzureLogAnalyticsQuerystringBuilder(item.query, options);
-      const querystring = this.templateSrv.replace(querystringBuilder.generate(), options.scopedVars);
+      const generated = querystringBuilder.generate();
+      const querystring = this.templateSrv.replace(generated.uriString, options.scopedVars);
+
       const url = `${this.baseUrl}/${item.workspace}/query?${querystring}`;
-      // const url = `${this.baseUrl}/DEMO_WORKSPACE/query?${querystring}`;
 
       return {
         refId: target.refId,
@@ -45,6 +47,7 @@ export default class AzureLogAnalyticsDatasource {
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
         url: url,
+        query: generated.rawQuery,
         format: options.format,
         resultFormat: item.resultFormat
       };

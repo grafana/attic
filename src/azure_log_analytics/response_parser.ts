@@ -24,16 +24,18 @@ export default class ResponseParser {
       const rows = this.results[i].result.data.tables[0].rows;
 
       if (this.results[i].query.resultFormat === 'time_series') {
-        data = _.concat(data, this.parseTimeSeriesResult(columns, rows));
+        data = _.concat(data, this.parseTimeSeriesResult(this.results[i].query, columns, rows));
       } else {
-        data = _.concat(data, this.parseTableResult(columns, rows));
+        data = _.concat(data, this.parseTableResult(this.results[i].query, columns, rows));
       }
     }
 
-    return {data: data};
+    return {
+      data:  data
+    };
   }
 
-  parseTimeSeriesResult(columns, rows) {
+  parseTimeSeriesResult(query, columns, rows) {
     const data: any[] = [];
     let timeIndex = -1;
     let metricIndex = -1;
@@ -62,12 +64,14 @@ export default class ResponseParser {
       const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].name;
       const bucket = ResponseParser.findOrCreateBucket(data, metricName);
       bucket.datapoints.push([row[valueIndex], epoch]);
+      bucket.refId = query.refId;
+      bucket.query = query.query;
     });
 
     return data;
   }
 
-  parseTableResult(columns, rows) {
+  parseTableResult(query, columns, rows) {
     const tableResult: TableResult = {
       type: 'table',
       columns: _.map(columns, (col) => { return {text: col.name, type: col.type}; }),
@@ -80,7 +84,7 @@ export default class ResponseParser {
   static findOrCreateBucket(data, target) {
     let dataTarget = _.find(data, ['target', target]);
     if (!dataTarget) {
-      dataTarget = { target: target, datapoints: [] };
+      dataTarget = { target: target, datapoints: [], refId: '', query: '' };
       data.push(dataTarget);
     }
 

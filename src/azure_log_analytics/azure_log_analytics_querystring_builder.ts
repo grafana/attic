@@ -14,10 +14,11 @@ export default class AzureLogAnalyticsQuerystringBuilder {
     queryString = queryString.replace(/\$__interval/gi, this.options.interval);
     queryString = queryString.replace(/\$__from/gi, this.getFrom(this.options));
     queryString = queryString.replace(/\$__to/gi, this.getUntil(this.options));
+    const rawQuery = queryString;
     queryString = encodeURIComponent(queryString);
     let uriString = `query=${queryString}`;
 
-    return uriString;
+    return { uriString, rawQuery};
   }
 
   getFrom(options) {

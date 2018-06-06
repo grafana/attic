@@ -20,7 +20,7 @@ describe('AzureLogAnalyticsDatasource', () => {
 
   describe('when $__timeFilter has no column parameter', () => {
     it('should generate a time filter condition with TimeGenerated as the datetime field', () => {
-      const query = builder.generate();
+      const query = builder.generate().uriString;
 
       expect(query).toContain('where%20TimeGenerated%20%3E%3D%20datetime(');
     });
@@ -32,7 +32,7 @@ describe('AzureLogAnalyticsDatasource', () => {
     });
 
     it('should generate a time filter condition with myTime as the datetime field', () => {
-      const query = builder.generate();
+      const query = builder.generate().uriString;
 
       expect(query).toContain('where%20myTime%20%3E%3D%20datetime(');
     });
@@ -44,7 +44,7 @@ describe('AzureLogAnalyticsDatasource', () => {
     });
 
     it('should replace $__interval with the inbuilt interval option', () => {
-      const query = builder.generate();
+      const query = builder.generate().uriString;
 
       expect(query).toContain('bin(TimeGenerated%2C%205m');
     });
@@ -56,7 +56,7 @@ describe('AzureLogAnalyticsDatasource', () => {
     });
 
     it('should replace $__from and $__to with a datetime and the now() function', () => {
-      const query = builder.generate();
+      const query = builder.generate().uriString;
 
       expect(query).toContain('where%20myTime%20%3E%3D%20datetime(');
       expect(query).toContain('myTime%20%3C%3D%20now()');
@@ -71,7 +71,7 @@ describe('AzureLogAnalyticsDatasource', () => {
     });
 
     it('should replace $__from and $__to with datetimes', () => {
-      const query = builder.generate();
+      const query = builder.generate().uriString;
 
       expect(query).toContain('where%20myTime%20%3E%3D%20datetime(');
       expect(query).toContain('myTime%20%3C%3D%20datetime(');
