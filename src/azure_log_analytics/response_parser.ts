@@ -40,6 +40,9 @@ export default class ResponseParser {
     let data: any[] = [];
     let columns: any[] = [];
     for (let i = 0; i < this.results.length; i++) {
+      if (this.results[i].result.data.Tables.length === 0) {
+        continue;
+      }
       columns = this.results[i].result.data.Tables[0].Columns;
       const rows = this.results[i].result.data.Tables[0].Rows;
 
