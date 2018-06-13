@@ -93,12 +93,18 @@
       ]
     },
     {
-      "path": "azureloganalytics",
+      "path": "loganalyticsazure",
       "method": "GET",
-      "url": "https://api.loganalytics.io/v1/workspaces",
-      "headers": [
-        {"name": "X-API-Key", "content": "DEMO_KEY"}
-      ]
+      "url": "https://api.loganalytics.io/beta/workspaces",
+      "tokenAuth": {
+        "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type":  "client_credentials",
+          "client_id": "{{.JsonData.logAnalyticsClientId}}",
+          "client_secret": "{{.SecureJsonData.logAnalyticsClientSecret}}",
+          "resource": "https://api.loganalytics.io"
+        }
+      }
     }
   ],
 

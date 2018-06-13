@@ -49,7 +49,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   };
 
   resultFormats: ResultFormat[];
-  workspaces: string[];
+  workspaces: any[];
   showHelp: boolean;
   showLastQuery: boolean;
   lastQuery: string;
@@ -64,6 +64,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
     this.resultFormats = [{ text: 'Time series', value: 'time_series' }, { text: 'Table', value: 'table' }];
+    if (this.target.queryType === 'Azure Log Analytics') {
+      this.getWorkspaces();
+    }
   }
 
   onDataReceived(dataList) {
@@ -235,9 +238,14 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     return this.datasource.azureLogAnalyticsDatasource.getWorkspaces().then(list => {
       this.workspaces = list;
       if (list.length > 0 && !this.target.azureLogAnalytics.workspace) {
-        this.target.azureLogAnalytics.workspace = list[0];
+        this.target.azureLogAnalytics.workspace = list[0].value;
       }
     }).catch(this.handleQueryCtrlError.bind(this));
+  }
+
+  getAzureLogAnalyticsSchema() {
+    return this.datasource.azureLogAnalyticsDatasource.getSchema(this.target.azureLogAnalytics.workspace)
+      .catch(this.handleQueryCtrlError.bind(this));
   }
 
   /* Application Insights Section */

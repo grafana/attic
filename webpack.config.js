@@ -4,7 +4,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
-  target: 'node',
+  node: {
+		fs: 'empty'
+	},
   context: path.join(__dirname, 'src'),
   entry: {
     'module': './module.ts',

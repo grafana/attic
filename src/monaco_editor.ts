@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './lib/bridge.js';
 import './lib/monaco.min.js';
 
 let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height: 250px"></div>`;
@@ -6,7 +7,9 @@ let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height:
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
   let codeEditor: monaco.editor.IStandaloneCodeEditor;
-  setTimeout(() => { codeEditor = initMonaco(containerDiv); }, 1);
+  setTimeout(() => {
+    codeEditor = initMonaco(containerDiv);
+  }, 1);
 
   containerDiv.onblur = () => {
     scope.onChange();
@@ -15,9 +18,27 @@ function link(scope, elem, attrs) {
   function initMonaco(containerDiv) {
     const codeEditor = monaco.editor.create(containerDiv, {
       value: scope.content || 'Write your query here',
-      language: 'plaintext'
+      language: 'kusto',
+      selectionHighlight: false,
+      theme: 'kusto-light',
+      folding: true,
     });
     codeEditor.layout();
+
+    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
+      includeControlCommands: true,
+      newlineAfterPipe: true,
+      useIntellisenseV2: false,
+    });
+
+    scope.getSchema().then(schema => {
+      monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
+        const model = codeEditor.getModel();
+        workerAccessor(model.uri).then(worker => {
+          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', 'LogManagement');
+        });
+      });
+    });
 
     // Sync with outer scope - update editor content if model has been changed from outside of directive.
     scope.$watch('content', (newValue, oldValue) => {
@@ -39,7 +60,7 @@ function link(scope, elem, attrs) {
     scope.$on('$destroy', () => {
       if (codeEditor) {
         try {
-        codeEditor.dispose();
+          codeEditor.dispose();
         } catch (e) {
           console.error('Failed to dispose the editor component.', e);
         }
@@ -62,6 +83,7 @@ export function monacoEditorDirective() {
       content: '=',
       datasource: '=',
       onChange: '&',
+      getSchema: '&',
     },
     link: link,
   };

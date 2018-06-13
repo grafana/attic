@@ -1,5 +1,6 @@
 import AzureMonitorDatasource from '../datasource';
 import TemplateSrvStub from '../../specs/lib/template_srv_stub';
+import FakeSchemaData from './__mocks__/schema';
 import Q from 'q';
 import moment from 'moment';
 
@@ -168,6 +169,23 @@ describe('AzureLogAnalyticsDatasource', () => {
           expect(results.data[0].rows[0][1]).toEqual('Administrative');
           expect(results.data[0].rows[0][2]).toEqual(2);
         });
+      });
+    });
+  });
+
+  describe('When performing getSchema', () => {
+    beforeEach(() => {
+      ctx.backendSrv.datasourceRequest = options => {
+        expect(options.url).toContain('query/schema');
+        return ctx.$q.when({ data: FakeSchemaData.getLogAnalyticsFakeSchema(), status: 200 });
+      };
+    });
+
+    it('should return a schema with a table and rows', () => {
+      return ctx.ds.azureLogAnalyticsDatasource.getSchema('myWorkspace').then(result => {
+        expect(Object.keys(result.Databases.LogManagement.Tables).length).toBe(1);
+        expect(result.Databases.LogManagement.Tables.AzureNetworkAnalytics_CL.Name).toBe('AzureNetworkAnalytics_CL');
+        expect(result.Databases.LogManagement.Tables.AzureNetworkAnalytics_CL.OrderedColumns.length).toBe(114);
       });
     });
   });

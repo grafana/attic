@@ -13,7 +13,7 @@ export default class AzureLogAnalyticsDatasource {
 
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
-    this.baseUrl = `/azureloganalytics`;
+    this.baseUrl = `/loganalyticsazure`;
     this.url = instanceSettings.url;
 
     const azureSubscription = instanceSettings.jsonData.subscriptionId;
@@ -22,10 +22,22 @@ export default class AzureLogAnalyticsDatasource {
   }
 
   getWorkspaces() {
-    const workspaceListUrl = this.azureMonitorUrl + '/providers/Microsoft.OperationalInsights/workspaces?api-version=2017-04-26-preview';
+    const workspaceListUrl =
+      this.azureMonitorUrl + '/providers/Microsoft.OperationalInsights/workspaces?api-version=2017-04-26-preview';
     return this.doRequest(workspaceListUrl).then(response => {
-      // return _.map(response.data.value, 'name') || [];
-      return ['DEMO_WORKSPACE'];
+      return (
+        _.map(response.data.value, val => {
+          return { text: val.name, value: val.properties.customerId };
+        }) || []
+      );
+    });
+  }
+
+  getSchema(workspace) {
+    const url = `${this.baseUrl}/${workspace}/query/schema`;
+
+    return this.doRequest(url).then(response => {
+      return new ResponseParser(response.data).parseSchemaResult();
     });
   }
 
@@ -49,7 +61,7 @@ export default class AzureLogAnalyticsDatasource {
         url: url,
         query: generated.rawQuery,
         format: options.format,
-        resultFormat: item.resultFormat
+        resultFormat: item.resultFormat,
       };
     });
 
@@ -62,22 +74,23 @@ export default class AzureLogAnalyticsDatasource {
     return this.$q.all(promises).then(results => {
       return new ResponseParser(results).parseQueryResult();
     });
-
   }
 
   doQueries(queries) {
     return _.map(queries, query => {
-      return this.doRequest(query.url).then(result => {
-        return {
-          result: result,
-          query: query,
-        };
-      }).catch(err => {
-        throw {
-          error: err,
-          query: query
-        };
-      });
+      return this.doRequest(query.url)
+        .then(result => {
+          return {
+            result: result,
+            query: query,
+          };
+        })
+        .catch(err => {
+          throw {
+            error: err,
+            query: query,
+          };
+        });
     });
   }
 

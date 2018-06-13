@@ -12,6 +12,26 @@ export interface TableColumn {
   type: string;
 }
 
+export interface KustoSchema {
+  Databases: { [key: string]: KustoDatabase; };
+  Plugins: any[];
+}
+export interface KustoDatabase {
+  Name: string;
+  Tables: { [key: string]: KustoTable; };
+  Functions: any;
+}
+
+export interface KustoTable {
+  Name: string;
+  OrderedColumns: KustoColumn[];
+}
+
+export interface KustoColumn {
+  Name: string;
+  Type: string;
+}
+
 export default class ResponseParser {
   columns: Array<string>;
   constructor(private results) {}
@@ -20,8 +40,8 @@ export default class ResponseParser {
     let data: any[] = [];
     let columns: any[] = [];
     for (let i = 0; i < this.results.length; i++) {
-      columns = this.results[i].result.data.tables[0].columns;
-      const rows = this.results[i].result.data.tables[0].rows;
+      columns = this.results[i].result.data.Tables[0].Columns;
+      const rows = this.results[i].result.data.Tables[0].Rows;
 
       if (this.results[i].query.resultFormat === 'time_series') {
         data = _.concat(data, this.parseTimeSeriesResult(this.results[i].query, columns, rows));
@@ -31,7 +51,7 @@ export default class ResponseParser {
     }
 
     return {
-      data:  data
+      data: data,
     };
   }
 
@@ -42,15 +62,15 @@ export default class ResponseParser {
     let valueIndex = -1;
 
     for (let i = 0; i < columns.length; i++) {
-      if (timeIndex === -1 && columns[i].type === 'datetime') {
+      if (timeIndex === -1 && columns[i].ColumnType === 'datetime') {
         timeIndex = i;
       }
 
-      if (metricIndex === -1 && columns[i].type === 'string') {
+      if (metricIndex === -1 && columns[i].ColumnType === 'string') {
         metricIndex = i;
       }
 
-      if (valueIndex === -1 && ['int', 'long', 'real', 'double'].includes(columns[i].type)) {
+      if (valueIndex === -1 && ['int', 'long', 'real', 'double'].includes(columns[i].ColumnType)) {
         valueIndex = i;
       }
     }
@@ -60,8 +80,8 @@ export default class ResponseParser {
     }
 
     _.forEach(rows, function(row) {
-      const epoch =  ResponseParser.dateTimeToEpoch(row[timeIndex]);
-      const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].name;
+      const epoch = ResponseParser.dateTimeToEpoch(row[timeIndex]);
+      const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].ColumnName;
       const bucket = ResponseParser.findOrCreateBucket(data, metricName);
       bucket.datapoints.push([row[valueIndex], epoch]);
       bucket.refId = query.refId;
@@ -74,11 +94,75 @@ export default class ResponseParser {
   parseTableResult(query, columns, rows) {
     const tableResult: TableResult = {
       type: 'table',
-      columns: _.map(columns, (col) => { return {text: col.name, type: col.type}; }),
-      rows: rows
+      columns: _.map(columns, col => {
+        return { text: col.ColumnName, type: col.DataType };
+      }),
+      rows: rows,
     };
 
     return tableResult;
+  }
+
+  parseSchemaResult(): KustoSchema {
+    const databases: { [key: string]: KustoDatabase; }  = {};
+
+    this.createSchemaTableBuckets(databases);
+
+    this.createSchemaTableColumns(databases);
+
+    return {
+      Plugins: [
+        {
+          Name: 'pivot',
+        },
+      ],
+      Databases: databases,
+    };
+  }
+
+  createSchemaTableBuckets(databases: { [key: string]: KustoDatabase; }) {
+    _.forEach(this.results.Tables[1].Rows, row => {
+      const db = this.findOrCreateSchemaDatabaseBucket(row[3], databases);
+      db.Tables[row[1]] = {
+        Name: row[1],
+        OrderedColumns: [],
+      };
+    });
+  }
+
+  createSchemaTableColumns(databases: { [key: string]: KustoDatabase; }) {
+    _.forEach(this.results.Tables[0].Rows, row => {
+      const table = this.findTable(row[0], databases);
+      table.OrderedColumns.push({
+        Name: row[1],
+        Type: row[2],
+      });
+    });
+  }
+
+  findTable(tableName: string, databases: { [key: string]: KustoDatabase; }): KustoTable {
+    for (let db in databases) {
+      const key = _.find(Object.keys(databases[db].Tables), tbl => {
+        return tbl === tableName;
+      });
+      if (key.length > 0) {
+        return databases[db].Tables[key];
+      }
+    }
+
+    throw Error('Error parsing database schema for Log Analytics tables. Table not found.');
+  }
+
+  findOrCreateSchemaDatabaseBucket(dbName: string, databases: { [key: string]: KustoDatabase; }) {
+    if (databases[dbName]) {
+      return databases[dbName];
+    }
+
+    return (databases[dbName] = {
+      Name: dbName,
+      Tables: {},
+      Functions: {}
+    });
   }
 
   static findOrCreateBucket(data, target) {
@@ -94,5 +178,4 @@ export default class ResponseParser {
   static dateTimeToEpoch(dateTime) {
     return moment(dateTime).valueOf();
   }
-
 }
