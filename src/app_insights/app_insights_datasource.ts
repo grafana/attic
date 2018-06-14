@@ -12,6 +12,7 @@ export default class AppInsightsDatasource {
   version = 'beta';
   applicationId: string;
 
+  /** @ngInject **/
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.applicationId = instanceSettings.jsonData.appInsightsAppId;

@@ -22,6 +22,16 @@ function link(scope, elem, attrs) {
       selectionHighlight: false,
       theme: 'kusto-light',
       folding: true,
+      lineNumbers: 'off',
+      lineHeight: 16,
+      suggestFontSize: 13,
+      dragAndDrop: false,
+      occurrencesHighlight: false,
+      minimap: {
+          enabled: false
+      },
+      renderIndentGuides: false,
+      wordWrap: 'on',
     });
     codeEditor.layout();
 

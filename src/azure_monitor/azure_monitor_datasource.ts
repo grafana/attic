@@ -17,6 +17,7 @@ export default class AzureMonitorDatasource {
   cloudName: string;
   supportedMetricNamespaces: any[] = [];
 
+  /** @ngInject **/
   constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.subscriptionId = instanceSettings.jsonData.subscriptionId;

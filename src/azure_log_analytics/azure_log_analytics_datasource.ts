@@ -11,6 +11,7 @@ export default class AzureLogAnalyticsDatasource {
   applicationId: string;
   azureMonitorUrl: string;
 
+  /** @ngInject **/
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.baseUrl = `/loganalyticsazure`;
