@@ -1,7 +1,7 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import _ from 'lodash';
-import AzureLogAnalyticsQuerystringBuilder from './azure_log_analytics_querystring_builder';
+import LogAnalyticsQuerystringBuilder from '../log_analytics/querystring_builder';
 import ResponseParser from './response_parser';
 
 export default class AzureLogAnalyticsDatasource {
@@ -35,6 +35,9 @@ export default class AzureLogAnalyticsDatasource {
   }
 
   getSchema(workspace) {
+    if (!workspace) {
+      return Promise.resolve();
+    }
     const url = `${this.baseUrl}/${workspace}/query/schema`;
 
     return this.doRequest(url).then(response => {
@@ -48,7 +51,7 @@ export default class AzureLogAnalyticsDatasource {
     }).map(target => {
       const item = target.azureLogAnalytics;
 
-      const querystringBuilder = new AzureLogAnalyticsQuerystringBuilder(item.query, options);
+      const querystringBuilder = new LogAnalyticsQuerystringBuilder(item.query, options, 'TimeGenerated');
       const generated = querystringBuilder.generate();
       const querystring = this.templateSrv.replace(generated.uriString, options.scopedVars);
 

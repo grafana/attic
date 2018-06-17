@@ -1,5 +1,5 @@
-export default class AzureLogAnalyticsQuerystringBuilder {
-  constructor(public rawQueryString, public options) {}
+export default class LogAnalyticsQuerystringBuilder {
+  constructor(public rawQueryString, public options, public defaultTimeField) {}
 
   generate() {
     var queryString = this.rawQueryString;
@@ -36,7 +36,7 @@ export default class AzureLogAnalyticsQuerystringBuilder {
   }
 
   getTimeFilter(timeFieldArg, options) {
-    const timeField = timeFieldArg || 'TimeGenerated';
+    const timeField = timeFieldArg || this.defaultTimeField;
     if (options.rangeRaw.to === 'now') {
       return `${timeField} >= ${this.getFrom(options)}`;
     } else {

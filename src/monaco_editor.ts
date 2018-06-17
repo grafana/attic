@@ -42,6 +42,10 @@ function link(scope, elem, attrs) {
     });
 
     scope.getSchema().then(schema => {
+      if (!schema) {
+        return;
+      }
+
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
         const model = codeEditor.getModel();
         workerAccessor(model.uri).then(worker => {

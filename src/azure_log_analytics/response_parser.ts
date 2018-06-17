@@ -5,6 +5,8 @@ export interface TableResult {
   columns: TableColumn[];
   rows: any[];
   type: string;
+  refId: string;
+  query: string;
 }
 
 export interface TableColumn {
@@ -53,9 +55,7 @@ export default class ResponseParser {
       }
     }
 
-    return {
-      data: data,
-    };
+    return data;
   }
 
   parseTimeSeriesResult(query, columns, rows) {
@@ -94,13 +94,15 @@ export default class ResponseParser {
     return data;
   }
 
-  parseTableResult(query, columns, rows) {
+  parseTableResult(query, columns, rows): TableResult {
     const tableResult: TableResult = {
       type: 'table',
       columns: _.map(columns, col => {
-        return { text: col.ColumnName, type: col.DataType };
+        return { text: col.ColumnName, type: col.ColumnType };
       }),
       rows: rows,
+      refId: query.refId,
+      query: query.query
     };
 
     return tableResult;

@@ -29,8 +29,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     },
     azureLogAnalytics: {
       query: [
-        'AzureActivity',
-        '| where $__timeFilter()',
+        '<table name>',
+        '| where $__timeFilter(TimeGenerated)',
         '| summarize count() by Category, bin(TimeGenerated, $__interval)',
         '| order by TimeGenerated asc'].join('\n'),
       resultFormat: 'time_series',
@@ -244,8 +244,9 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAzureLogAnalyticsSchema() {
-    return this.datasource.azureLogAnalyticsDatasource.getSchema(this.target.azureLogAnalytics.workspace)
-      .catch(this.handleQueryCtrlError.bind(this));
+    return this.getWorkspaces().then(() => {
+      return this.datasource.azureLogAnalyticsDatasource.getSchema(this.target.azureLogAnalytics.workspace);
+    }).catch(this.handleQueryCtrlError.bind(this));
   }
 
   /* Application Insights Section */
@@ -265,7 +266,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   getAppInsightsColumns() {
-    return this.datasource.getAppInsightsColumns();
+    return this.datasource.getAppInsightsColumns(this.target.refId);
   }
 
   onAppInsightsColumnChange() {

@@ -46,24 +46,24 @@ describe('AzureLogAnalyticsDatasource', () => {
     };
 
     const response = {
-      tables: [
+      Tables: [
         {
-          name: 'PrimaryResult',
-          columns: [
+          TableName: 'PrimaryResult',
+          Columns: [
             {
-              name: 'TimeGenerated',
-              type: 'datetime'
+              ColumnName: 'TimeGenerated',
+              ColumnType: 'datetime'
             },
             {
-              name: 'Category',
-              type: 'string'
+              ColumnName: 'Category',
+              ColumnType: 'string'
             },
             {
-              name: 'count_',
-              type: 'long'
+              ColumnName: 'count_',
+              ColumnType: 'long'
             }
           ],
-          rows: [
+          Rows: [
             [
               '2018-06-02T20:20:00Z',
               'Administrative',
@@ -109,20 +109,20 @@ describe('AzureLogAnalyticsDatasource', () => {
       describe('and the data has no time column)', () => {
         beforeEach(() => {
           const invalidResponse = {
-            tables: [
+            Tables: [
               {
-                name: 'PrimaryResult',
-                columns: [
+                TableName: 'PrimaryResult',
+                Columns: [
                   {
-                    name: 'Category',
-                    type: 'string'
+                    ColumnName: 'Category',
+                    ColumnType: 'string'
                   },
                   {
-                    name: 'count_',
-                    type: 'long'
+                    ColumnName: 'count_',
+                    ColumnType: 'long'
                   }
                 ],
-                rows: [
+                Rows: [
                   [
                     'Administrative',
                     2

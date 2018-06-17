@@ -2,15 +2,21 @@
 
 import _ from 'lodash';
 import AppInsightsQuerystringBuilder from './app_insights_querystring_builder';
-import AppInsightsRawQuerystringBuilder from './app_insights_rawquerystring_builder';
+import LogAnalyticsQuerystringBuilder from '../log_analytics/querystring_builder';
 import ResponseParser from './response_parser';
 
+export interface LogAnalyticsColumn {
+    text: string;
+    value: string;
+}
 export default class AppInsightsDatasource {
   id: number;
   url: string;
   baseUrl: string;
   version = 'beta';
   applicationId: string;
+  logAnalyticsColumns: {[key: string]: LogAnalyticsColumn[]} = {};
+
 
   /** @ngInject **/
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
@@ -30,8 +36,11 @@ export default class AppInsightsDatasource {
     }).map(target => {
       const item = target.appInsights;
       if (item.rawQuery) {
-        const querystringBuilder = new AppInsightsRawQuerystringBuilder(item.rawQueryString, options);
-        const url = `${this.baseUrl}/query?${querystringBuilder.generate()}`;
+        const querystringBuilder = new LogAnalyticsQuerystringBuilder(item.rawQueryString, options, 'timestamp');
+        const generated = querystringBuilder.generate();
+        const querystring = this.templateSrv.replace(generated.uriString, options.scopedVars);
+
+        const url = `${this.baseUrl}/query?${querystring}`;
 
         return {
           refId: target.refId,
@@ -41,6 +50,7 @@ export default class AppInsightsDatasource {
           url: url,
           format: options.format,
           alias: item.alias,
+          query: generated.rawQuery,
           xaxis: item.xaxis,
           yaxis: item.yaxis,
           spliton: item.spliton,
@@ -94,6 +104,17 @@ export default class AppInsightsDatasource {
 
     return this.$q.all(promises).then(results => {
       return new ResponseParser(results).parseQueryResult();
+    }).then(results => {
+      const flattened: any[] = [];
+
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].columnsForDropdown) {
+          this.logAnalyticsColumns[results[i].refId] = results[i].columnsForDropdown;
+        }
+        flattened.push(results[i]);
+      }
+
+      return flattened;
     });
   }
 

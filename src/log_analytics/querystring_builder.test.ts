@@ -1,21 +1,25 @@
-import AzureLogAnalyticsQuerystringBuilder from './azure_log_analytics_querystring_builder';
+import LogAnalyticsQuerystringBuilder from './querystring_builder';
 import moment from 'moment';
 
-describe('AzureLogAnalyticsDatasource', () => {
-  let builder: AzureLogAnalyticsQuerystringBuilder;
+describe('LogAnalyticsDatasource', () => {
+  let builder: LogAnalyticsQuerystringBuilder;
 
   beforeEach(function() {
-    builder = new AzureLogAnalyticsQuerystringBuilder('query=Tablename | where $__timeFilter()', {
-      interval: '5m',
-      range: {
-        from: moment().subtract(24, 'hours'),
-        to: moment()
+    builder = new LogAnalyticsQuerystringBuilder(
+      'query=Tablename | where $__timeFilter()',
+      {
+        interval: '5m',
+        range: {
+          from: moment().subtract(24, 'hours'),
+          to: moment()
+        },
+        rangeRaw: {
+          from: 'now-24h',
+          to: 'now'
+        }
       },
-      rangeRaw: {
-        from: 'now-24h',
-        to: 'now'
-      }
-    });
+      'TimeGenerated'
+    );
   });
 
   describe('when $__timeFilter has no column parameter', () => {

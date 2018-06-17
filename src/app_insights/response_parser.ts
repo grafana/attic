@@ -2,7 +2,6 @@ import moment from 'moment';
 import _ from 'lodash';
 
 export default class ResponseParser {
-  columns: Array<string>;
   constructor(private results) {}
 
   parseQueryResult() {
@@ -15,22 +14,20 @@ export default class ResponseParser {
         const spliton = this.results[i].query.spliton;
         columns = this.results[i].result.data.Tables[0].Columns;
         const rows = this.results[i].result.data.Tables[0].Rows;
-        const alias = this.results[i].query.alias;
-        data = _.concat(data, this.parseRawQueryResultRow(columns, rows, alias, xaxis, yaxises, spliton));
+        data = _.concat(data, this.parseRawQueryResultRow(this.results[i].query, columns, rows, xaxis, yaxises, spliton));
       } else {
         const value = this.results[i].result.data.value;
         const alias = this.results[i].query.alias;
-        data = _.concat(data, this.parseQueryResultRow(value, alias));
+        data = _.concat(data, this.parseQueryResultRow(this.results[i].query, value, alias));
       }
     }
-
-    const columns_for_dropdowns = _.map(columns, column => { return {text: column.ColumnName, value: column.ColumnName}});
-
-    return {data: data, columns: columns_for_dropdowns};;
+    return data;
   }
 
-  parseRawQueryResultRow(columns, rows, alias: string, xaxis: string, yaxises: string, spliton: string) {
+  parseRawQueryResultRow(query: any, columns, rows, xaxis: string, yaxises: string, spliton: string) {
     const data: any[] = [];
+    const columnsForDropdown = _.map(columns, column => { return {text: column.ColumnName, value: column.ColumnName}; });
+
     const xaxis_column = columns.findIndex((column) => { return column.ColumnName === xaxis; });
     const yaxises_split = yaxises.split(',');
     const yaxis_columns = {};
@@ -46,6 +43,9 @@ export default class ResponseParser {
           ResponseParser.findOrCreateBucket(data, yaxis_name) : ResponseParser.findOrCreateBucket(data, row[spliton_column]);
         let epoch = convert_timestamp ? ResponseParser.dateTimeToEpoch(row[xaxis_column]) : row[xaxis_column];
         bucket.datapoints.push([row[yaxis_column], epoch]);
+        bucket.refId = query.refId;
+        bucket.query = query.query;
+        bucket.columnsForDropdown = columnsForDropdown;
       });
     });
 
@@ -53,14 +53,19 @@ export default class ResponseParser {
   }
 
 
-  parseQueryResultRow(value, alias: string) {
+  parseQueryResultRow(query: any, value, alias: string) {
     const data: any[] = [];
 
     if (ResponseParser.isSingleValue(value)) {
       const metricName = ResponseParser.getMetricFieldKey(value);
       const aggField = ResponseParser.getKeyForAggregationField(value[metricName]);
       const epoch = ResponseParser.dateTimeToEpoch(value.end);
-      data.push({ target: metricName, datapoints: [[value[metricName][aggField], epoch]] });
+      data.push({
+        target: metricName,
+        datapoints: [[value[metricName][aggField], epoch]],
+        refId: query.refId,
+        query: query.query,
+      });
       return data;
     }
 
@@ -75,6 +80,8 @@ export default class ResponseParser {
 
         dataTarget.datapoints.push([value.segments[i][metricName][aggField], epoch]);
       }
+      dataTarget.refId = query.refId;
+      dataTarget.query = query.query;
     } else {
       for (let i = 0; i < value.segments.length; i++) {
         const epoch = ResponseParser.dateTimeToEpoch(value.segments[i].end);
@@ -86,6 +93,8 @@ export default class ResponseParser {
 
           const bucket = ResponseParser.findOrCreateBucket(data, target);
           bucket.datapoints.push([value.segments[i].segments[j][metricName][aggField], epoch]);
+          bucket.refId = query.refId;
+          bucket.query = query.query;
         }
       }
     }
