@@ -1,14 +1,15 @@
 import angular from 'angular';
 import './lib/bridge.js';
 import './lib/monaco.min.js';
+import KustoCodeEditor from './kusto_code_editor';
+import config from 'app/core/config';
 
 let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height: 250px"></div>`;
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
-  let codeEditor: monaco.editor.IStandaloneCodeEditor;
   setTimeout(() => {
-    codeEditor = initMonaco(containerDiv);
+    initMonaco(containerDiv);
   }, 1);
 
   containerDiv.onblur = () => {
@@ -16,11 +17,39 @@ function link(scope, elem, attrs) {
   };
 
   function initMonaco(containerDiv) {
+    const themeName = config.bootData.user.lightTheme ? 'grafana-light': 'vs-dark';
+
+    monaco.editor.defineTheme('grafana-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+          { token: 'comment', foreground: '008000' },
+          { token: 'variable.predefined', foreground: '800080' },
+          { token: 'function', foreground: '0000FF' },
+          { token: 'operator.sql', foreground: 'FF4500' },
+          { token: 'string', foreground: 'B22222' },
+          { token: 'operator.scss', foreground: '0000FF' },
+          { token: 'variable', foreground: 'C71585' },
+          { token: 'variable.parameter', foreground: '9932CC' },
+          { token: '', foreground: '000000' },
+          { token: 'type', foreground: '0000FF' },
+          { token: 'tag', foreground: '0000FF' },
+          { token: 'annotation', foreground: '2B91AF' },
+          { token: 'keyword', foreground: '0000FF' },
+          { token: 'number', foreground: '191970' },
+          { token: 'annotation', foreground: '9400D3' },
+          { token: 'invalid', background: 'cd3131' },
+      ],
+      colors: {
+        'textCodeBlock.background': '#FFFFFF',
+      }
+    });
+
     const codeEditor = monaco.editor.create(containerDiv, {
       value: scope.content || 'Write your query here',
       language: 'kusto',
       selectionHighlight: false,
-      theme: 'kusto-light',
+      theme: themeName,
       folding: true,
       lineNumbers: 'off',
       lineHeight: 16,
@@ -35,10 +64,32 @@ function link(scope, elem, attrs) {
     });
     codeEditor.layout();
 
+    const kustoCodeEditor = new KustoCodeEditor(codeEditor);
+
     monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
       includeControlCommands: true,
       newlineAfterPipe: true,
       useIntellisenseV2: false,
+    });
+
+    const completionItems = kustoCodeEditor.getCompletionItems();
+    monaco.languages.registerCompletionItemProvider('kusto', {
+      provideCompletionItems: () => {
+        return completionItems;
+      }
+    });
+
+    codeEditor.createContextKey('readyToExecute', true);
+    /* tslint:disable:no-bitwise */
+    codeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
+      const newValue = codeEditor.getValue();
+      scope.content = newValue;
+      scope.onChange();
+    }, 'readyToExecute');
+    /* tslint:enable:no-bitwise */
+
+    codeEditor.onDidChangeCursorSelection(event => {
+      kustoCodeEditor.onDidChangeCursorSelection(event);
     });
 
     scope.getSchema().then(schema => {
@@ -59,7 +110,7 @@ function link(scope, elem, attrs) {
       let editorValue = codeEditor.getValue();
       if (newValue !== editorValue && newValue !== oldValue) {
         scope.$$postDigest(function() {
-          setEditorContent(newValue);
+          kustoCodeEditor.setEditorContent(newValue);
         });
       }
     });
@@ -83,12 +134,9 @@ function link(scope, elem, attrs) {
 
     return codeEditor;
   }
-
-  function setEditorContent(value) {
-    codeEditor.setValue(value);
-  }
 }
 
+/** @ngInject */
 export function monacoEditorDirective() {
   return {
     restrict: 'E',
