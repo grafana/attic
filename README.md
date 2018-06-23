@@ -6,7 +6,7 @@ The Azure Monitor Data Source plugin supports both Azure Monitor and Application
 
 ## Features
 
-- Support for all the Azure APIAzure Monitor metrics
+- Support for all the Azure Monitor metrics
   - includes support for the latest API version that allows multi-dimensional filtering for the Storage and SQL metrics.
   - Automatic time grain mode which will group the metrics by the most appropriate time grain value depending on whether you have zoomed in to look at fine-grained metrics or zoomed out to look at an overview.
 - Application Insights metrics
@@ -90,10 +90,10 @@ The plugin can access metrics from both the Azure Monitor service and the Applic
 3. In the name field, fill in a name for the data source. It can be anything. Some suggestions are Azure Monitor or App Insights.
 
 4. If you are using Azure Monitor, then you need 4 pieces of information from the Azure portal (see link above for detailed instructions):
-    - Subscription Id (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
-    - Tenant Id (Azure Active Directory -> Properties -> Directory ID)
-    - Client Id (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
-    - Client Secret ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
+    - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
+    - **Subscription Id** (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
+    - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
+    - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
 5. Paste these four items into the fields in the Azure Monitor API Details section:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_2_azure_monitor_api_details.png)
@@ -228,42 +228,13 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 ### CHANGELOG
 
-#### v0.0.1
+#### v0.2.0
 
-- First version. Can show metrics from both the Azure Monitor service and the Application Insights service. Can combine metrics from both services on the same dashboard.
+Added raw query support for Application Insights.
 
-#### v0.0.2
+#### v0.1.1
 
-- Changes legend format for Azure Monitor to `resourceName.metricName` instead of just `metricName`.
-
-#### v0.0.3
-
-Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does not currently change anything for the user but enables new features in the future.
-
-#### v0.0.4
-
-- Multi-dimensional filtering
-- Support for the Microsoft.Sql API and for the Storage API.
-
-#### v0.0.5
-
-- Fix for breaking change in Grafana master to prevent problems in future.
-
-#### v0.0.6
-
-- Auto time grain fix.
-
-#### v0.0.7
-
-- Adds support for the CosmoDB API.
-
-#### v0.0.8
-
-- Adds support for legend formatting with aliases.
-
-#### v0.0.9
-
-- Adds support for the `unique` aggregation for Application Insights.
+Small bugfix for the query editor when adding a new panel.
 
 #### v0.1.0
 
@@ -272,10 +243,39 @@ Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does
 - Filter support for Application Insights
 - Azure Monitor API version updated and time grain changes implemented. This is a possible breaking change for some dashboards - previously a wider range of time grains was allowed so you might get the following error after upgrading: `Detected invalid time grain input`. To fix, choose a valid time grain for that metric.
 
-#### v0.1.1
+#### v0.0.9
 
-Small bugfix for the query editor when adding a new panel.
+- Adds support for the `unique` aggregation for Application Insights.
 
-#### v0.2.0
+#### v0.0.8
 
-Added raw query support for Application Insights.
+- Adds support for legend formatting with aliases.
+
+#### v0.0.7
+
+- Adds support for the CosmoDB API.
+
+#### v0.0.6
+
+- Auto time grain fix.
+
+#### v0.0.5
+
+- Fix for breaking change in Grafana master to prevent problems in future.
+
+#### v0.0.4
+
+- Multi-dimensional filtering
+- Support for the Microsoft.Sql API and for the Storage API.
+
+#### v0.0.3
+
+Uses the latest version of the Azure Monitor REST API (2017-05-01-preview). Does not currently change anything for the user but enables new features in the future.
+
+#### v0.0.2
+
+- Changes legend format for Azure Monitor to `resourceName.metricName` instead of just `metricName`.
+
+#### v0.0.1
+
+- First version. Can show metrics from both the Azure Monitor service and the Application Insights service. Can combine metrics from both services on the same dashboard.
