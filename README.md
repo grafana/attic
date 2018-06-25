@@ -2,7 +2,7 @@
 
 Azure Monitor is the platform service that provides a single source for monitoring Azure resources. Application Insights is an extensible Application Performance Management (APM) service for web developers on multiple platforms and can be used to monitor your live web application - it will automatically detect performance anomalies.
 
-The Azure Monitor Data Source plugin supports both Azure Monitor and Application Insights metrics in Grafana.
+The Azure Monitor Data Source plugin supports both Azure Monitor, Azure Log Analytics and Application Insights metrics in Grafana.
 
 ## Features
 
@@ -16,7 +16,7 @@ The Azure Monitor Data Source plugin supports both Azure Monitor and Application
 
 ## Installation
 
-This plugin requires Grafana 4.5.0 or newer.
+This plugin requires Grafana 4.5.0 or newer (5.2.0 or newer if you are querying Azure Log Analytics).
 
 ## Grafana Cloud
 
@@ -80,7 +80,8 @@ If the server where Grafana is installed has no access to the Grafana.com server
 
 The plugin can access metrics from both the Azure Monitor service and the Application Insights API. You can configure access to one service or both services.
 
-- [Guide to setting up an Azure Active Directory Application.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
+- [Guide to setting up an Azure Active Directory Application for Azure Monitor.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
+- [Guide to setting up an Azure Active Directory Application for Azure Log Analytics.](https://dev.loganalytics.io/documentation/Authorization/AAD-Setup)
 - [Quickstart Guide for Application Insights.](https://dev.applicationinsights.io/quickstart/)
 
 1. Accessed from the Grafana main menu, newly installed data sources can be added immediately within the Data Sources section. Next, click the  "Add data source" button in the upper right. The data source will be available for selection in the Type select box.
@@ -98,14 +99,18 @@ The plugin can access metrics from both the Azure Monitor service and the Applic
 5. Paste these four items into the fields in the Azure Monitor API Details section:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_2_azure_monitor_api_details.png)
 
-6. If you are are using  Application Insights, then you need two pieces of information from the Azure Portal (see link above for detailed instructions):
+6. If you are also using the Azure Log Analytics service, then you need to specify these two config values (or you can reuse the Client Id and Secret from the previous step).
+    - Client Id (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
+    - Client Secret ( Azure Active Directory -> App Registrations -> Choose your app -> Keys -> Create a key -> Use client secret)
+
+7. If you are are using  Application Insights, then you need two pieces of information from the Azure Portal (see link above for detailed instructions):
     - Application ID
     - API Key
 
-7. Paste these two items into the appropriate fields in the Application Insights API Details section:
+8. Paste these two items into the appropriate fields in the Application Insights API Details section:
     ![Application Insights API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_3_app_insights_api_details.png)
 
-8. Test that the configuration details are correct by clicking on the "Save & Test" button:
+9. Test that the configuration details are correct by clicking on the "Save & Test" button:
     ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/src/img/config_4_save_and_test.png)
 
 Alternatively on step 4 if creating a new Azure Active Directory App, use the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest):
@@ -113,20 +118,6 @@ Alternatively on step 4 if creating a new Azure Active Directory App, use the [A
 ```bash
 az ad sp create-for-rbac -n "http://localhost:3000"
 ```
-
-### Writing Analytics Queries
-
-If you change the service type to "Application Insights", the menu icon to the right adds another option, "Toggle Edit Mode". Once clicked, the query edit mode changes to give you a full text area in which to write log analytics queries. (This is identical to how the InfluxDB datasource lets you write raw queries.)
-
-Once a query is written, the column names are automatically parsed out of the response data. You can then select them in the "X-axis", "Y-axis", and "Split On" dropdown menus, or just type them out.
-
-There are some important caveats to remember:
-
-- You'll want to order your y-axis in the query, eg. `order by timestamp asc`. The graph may come out looking bizarre otherwise. It's better to have Microsoft sort it on their side where it's faster, than to implement this in the plugin.
-- If you copy a log analytics query, typically they'll end with a render instruction, like `render barchart`. This is unnecessary, but harmless.
-- Currently, four default dashboard variables are supported: `$__timeFilter()`, `$__from`, `$__to`, and `$__interval`. If you're searching in timestamped data, replace the beginning of your where clause to `where $__timeFilter()`. Dashboard changes by time region are handled as you'd expect, as long as you leave the name of the `timestamp` column alone. Likewise, `$__interval` will automatically change based on the dashboard's time region _and_ the width of the chart being displayed. Use it in bins, so `bin(timestamp,$__interval)` changes into something like `bin(timestamp,1s)`. Use `$__from` and `$__to` if you just want the formatted dates to be inserted.
-- Templated dashboard variables are not yet supported! They will come in a future version.
-
 
 ### Formatting Legend Keys with Aliases
 
@@ -176,6 +167,56 @@ Examples:
 - `client/city ne 'Boydton'`
 - `client/city ne 'Boydton' and client/city ne 'Dublin'`
 - `client/city eq 'Boydton' or client/city eq 'Dublin'`
+
+### Azure Log Analytics
+
+Queries are written in the new [Azure Log Analytics (or KustoDB) Query Language](https://docs.loganalytics.io/index). A Log Analytics Query can be formatted as Time Series data or as Table data.
+
+Time Series queries are for the Graph Panel (and other panels like the Single Stat panel) and must contain a datetime column, a metric name column and a value column. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+
+```
+AzureActivity
+| where $__timeFilter(TimeGenerated)
+| summarize count() by Category, bin(TimeGenerated, 1h)
+| order by TimeGenerated asc
+```
+
+Table queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
+
+```
+AzureActivity 
+| where $__timeFilter()
+| project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
+| order by TimeGenerated desc
+```
+
+#### Azure Log Analytics Macros
+
+To make writing queries easier there are two Grafana macros that can be used in the where clause of a query:
+
+ - `$__timeFilter()` - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+ - `$__timeFilter(datetimeColumn)` - Expands to `datetimeColumn  ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+
+#### Azure Log Analytics Builtin Variables
+
+There are also some Grafana variables that can be used in Azure Log Analytics queries:
+
+- `$__from` - Returns the From datetime from the Grafana picker. Example: `datetime(2018-06-05T18:09:58.907Z)`.
+- `$__to` - Returns the From datetime from the Grafana picker. Example: `datetime(2018-06-05T20:09:58.907Z)`.
+- `$__interval` - Grafana calculates the minimum time grain that can be used to group by time in queries. More details on how it works [here](http://docs.grafana.org/reference/templating/#the-interval-variable). It returns a time grain like `5m` or `1h` that can be used in the bin function. E.g. `summarize count() by bin(TimeGenerated, $__interval)`
+
+### Writing Analytics Queries For Application Insights
+
+If you change the service type to "Application Insights", the menu icon to the right adds another option, "Toggle Edit Mode". Once clicked, the query edit mode changes to give you a full text area in which to write log analytics queries. (This is identical to how the InfluxDB datasource lets you write raw queries.)
+
+Once a query is written, the column names are automatically parsed out of the response data. You can then select them in the "X-axis", "Y-axis", and "Split On" dropdown menus, or just type them out.
+
+There are some important caveats to remember:
+
+- You'll want to order your y-axis in the query, eg. `order by timestamp asc`. The graph may come out looking bizarre otherwise. It's better to have Microsoft sort it on their side where it's faster, than to implement this in the plugin.
+- If you copy a log analytics query, typically they'll end with a render instruction, like `render barchart`. This is unnecessary, but harmless.
+- Currently, four default dashboard variables are supported: `$__timeFilter()`, `$__from`, `$__to`, and `$__interval`. If you're searching in timestamped data, replace the beginning of your where clause to `where $__timeFilter()`. Dashboard changes by time region are handled as you'd expect, as long as you leave the name of the `timestamp` column alone. Likewise, `$__interval` will automatically change based on the dashboard's time region _and_ the width of the chart being displayed. Use it in bins, so `bin(timestamp,$__interval)` changes into something like `bin(timestamp,1s)`. Use `$__from` and `$__to` if you just want the formatted dates to be inserted.
+- Templated dashboard variables are not yet supported! They will come in a future version.
 
 ### Templating with Variables
 

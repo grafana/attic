@@ -10,7 +10,6 @@ module.exports = {
   context: path.join(__dirname, 'src'),
   entry: {
     'module': './module.ts',
-    // 'lib/monaco.min': './lib/monaco.min.js'
 	},
   devtool: 'source-map',
   output: {
@@ -18,11 +17,6 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     libraryTarget: 'amd'
   },
-  // optimization: {
-  //   splitChunks: {
-  //     chunks: 'all'
-  //   }
-  // },
   externals: [
     'lodash', 'moment',
     function(context, request, callback) {
