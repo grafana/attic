@@ -95,7 +95,7 @@
     {
       "path": "loganalyticsazure",
       "method": "GET",
-      "url": "https://api.loganalytics.io/beta/workspaces",
+      "url": "https://api.loganalytics.io/v1/workspaces",
       "tokenAuth": {
         "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
         "params": {

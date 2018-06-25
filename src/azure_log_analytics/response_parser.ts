@@ -42,11 +42,11 @@ export default class ResponseParser {
     let data: any[] = [];
     let columns: any[] = [];
     for (let i = 0; i < this.results.length; i++) {
-      if (this.results[i].result.data.Tables.length === 0) {
+      if (this.results[i].result.data.tables.length === 0) {
         continue;
       }
-      columns = this.results[i].result.data.Tables[0].Columns;
-      const rows = this.results[i].result.data.Tables[0].Rows;
+      columns = this.results[i].result.data.tables[0].columns;
+      const rows = this.results[i].result.data.tables[0].rows;
 
       if (this.results[i].query.resultFormat === 'time_series') {
         data = _.concat(data, this.parseTimeSeriesResult(this.results[i].query, columns, rows));
@@ -65,15 +65,15 @@ export default class ResponseParser {
     let valueIndex = -1;
 
     for (let i = 0; i < columns.length; i++) {
-      if (timeIndex === -1 && columns[i].ColumnType === 'datetime') {
+      if (timeIndex === -1 && columns[i].type === 'datetime') {
         timeIndex = i;
       }
 
-      if (metricIndex === -1 && columns[i].ColumnType === 'string') {
+      if (metricIndex === -1 && columns[i].type === 'string') {
         metricIndex = i;
       }
 
-      if (valueIndex === -1 && ['int', 'long', 'real', 'double'].includes(columns[i].ColumnType)) {
+      if (valueIndex === -1 && ['int', 'long', 'real', 'double'].includes(columns[i].type)) {
         valueIndex = i;
       }
     }
@@ -84,7 +84,7 @@ export default class ResponseParser {
 
     _.forEach(rows, function(row) {
       const epoch = ResponseParser.dateTimeToEpoch(row[timeIndex]);
-      const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].ColumnName;
+      const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].name;
       const bucket = ResponseParser.findOrCreateBucket(data, metricName);
       bucket.datapoints.push([row[valueIndex], epoch]);
       bucket.refId = query.refId;
@@ -98,7 +98,7 @@ export default class ResponseParser {
     const tableResult: TableResult = {
       type: 'table',
       columns: _.map(columns, col => {
-        return { text: col.ColumnName, type: col.ColumnType };
+        return { text: col.name, type: col.type };
       }),
       rows: rows,
       refId: query.refId,
