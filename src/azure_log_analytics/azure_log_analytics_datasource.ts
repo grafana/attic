@@ -38,7 +38,7 @@ export default class AzureLogAnalyticsDatasource {
     if (!workspace) {
       return Promise.resolve();
     }
-    const url = `${this.baseUrl}/${workspace}/query/schema`;
+    const url = `${this.baseUrl}/${workspace}/metadata`;
 
     return this.doRequest(url).then(response => {
       return new ResponseParser(response.data).parseSchemaResult();

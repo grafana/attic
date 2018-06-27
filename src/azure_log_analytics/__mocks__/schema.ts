@@ -161,4 +161,285 @@ export default class FakeSchemaData {
       ],
     };
   }
+
+  static getlogAnalyticsFakeMetadata() {
+    return {
+      solutions: {
+        LogManagement: {
+          displayName: 'LogManagement',
+          types: ['Event'],
+        },
+        Security: {
+          displayName: 'LogManagement2',
+          types: ['Perf'],
+        },
+      },
+      types: {
+        Event: {
+          displayName: 'Event',
+          analytics: {
+            tableName: 'Event',
+          },
+          properties: [
+            'SourceSystem',
+            'TimeGenerated',
+            'Source',
+            'EventLog',
+            'Computer',
+            'EventLevel',
+            'EventLevelName',
+            'ParameterXml',
+            'EventData',
+            'EventID',
+            'RenderedDescription',
+            'AzureDeploymentID',
+            'Role',
+            'EventCategory',
+            'UserName',
+            'Message',
+            'ManagementGroupName',
+            'Type',
+          ],
+        },
+        Perf: {
+          displayName: 'Perf',
+          analytics: {
+            tableName: 'Perf',
+          },
+          properties: [
+            'Computer',
+            'ObjectName',
+            'CounterName',
+            'InstanceName',
+            'CounterValue',
+            'TimeGenerated',
+            'SourceSystem',
+            'CounterPath',
+            'Min',
+            'Max',
+            'SampleCount',
+            'BucketStartTime',
+            'BucketEndTime',
+            'StandardDeviation',
+            'Type',
+          ],
+        },
+      },
+      queries: {
+        'f7896734-07e2-4817-bea4-4b20e8438cf9': {
+          displayName: 'Func1',
+          category: 'test',
+          analytics: {
+            functionName: 'Func1',
+            functionBody: 'AzureActivity\n| where ActivityStatus == "" \n',
+          },
+        },
+      },
+      properties: {
+        SourceSystem: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'SourceSystem',
+          },
+          displayName: 'SourceSystem',
+        },
+        TimeGenerated: {
+          analytics: {
+            columnType: 'datetime',
+            columnName: 'TimeGenerated',
+          },
+          displayName: 'TimeGenerated',
+        },
+        Source: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'Source',
+          },
+          displayName: 'Source',
+        },
+        EventLog: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'EventLog',
+          },
+          displayName: 'EventLog',
+        },
+        Computer: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'Computer',
+          },
+          displayName: 'Computer',
+        },
+        EventLevel: {
+          analytics: {
+            columnType: 'int',
+            columnName: 'EventLevel',
+          },
+          displayName: 'EventLevel',
+        },
+        EventLevelName: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'EventLevelName',
+          },
+          displayName: 'EventLevelName',
+        },
+        ParameterXml: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'ParameterXml',
+          },
+          displayName: 'ParameterXml',
+        },
+        EventData: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'EventData',
+          },
+          displayName: 'EventData',
+        },
+        EventID: {
+          analytics: {
+            columnType: 'int',
+            columnName: 'EventID',
+          },
+          displayName: 'EventID',
+        },
+        RenderedDescription: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'RenderedDescription',
+          },
+          displayName: 'RenderedDescription',
+        },
+        AzureDeploymentID: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'AzureDeploymentID',
+          },
+          displayName: 'AzureDeploymentID',
+        },
+        Role: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'Role',
+          },
+          displayName: 'Role',
+        },
+        EventCategory: {
+          analytics: {
+            columnType: 'int',
+            columnName: 'EventCategory',
+          },
+          displayName: 'EventCategory',
+        },
+        UserName: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'UserName',
+          },
+          displayName: 'UserName',
+        },
+        Message: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'Message',
+          },
+          displayName: 'Message',
+        },
+        ManagementGroupName: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'ManagementGroupName',
+          },
+          displayName: 'ManagementGroupName',
+        },
+        Type: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'Type',
+          },
+          displayName: 'Type',
+        },
+        ObjectName: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'ObjectName',
+          },
+          displayName: 'ObjectName',
+        },
+        CounterName: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'CounterName',
+          },
+          displayName: 'CounterName',
+        },
+        InstanceName: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'InstanceName',
+          },
+          displayName: 'InstanceName',
+        },
+        CounterValue: {
+          analytics: {
+            columnType: 'real',
+            columnName: 'CounterValue',
+          },
+          displayName: 'CounterValue',
+        },
+        CounterPath: {
+          analytics: {
+            columnType: 'string',
+            columnName: 'CounterPath',
+          },
+          displayName: 'CounterPath',
+        },
+        Min: {
+          analytics: {
+            columnType: 'real',
+            columnName: 'Min',
+          },
+          displayName: 'Min',
+        },
+        Max: {
+          analytics: {
+            columnType: 'real',
+            columnName: 'Max',
+          },
+          displayName: 'Max',
+        },
+        SampleCount: {
+          analytics: {
+            columnType: 'int',
+            columnName: 'SampleCount',
+          },
+          displayName: 'SampleCount',
+        },
+        BucketStartTime: {
+          analytics: {
+            columnType: 'datetime',
+            columnName: 'BucketStartTime',
+          },
+          displayName: 'BucketStartTime',
+        },
+        BucketEndTime: {
+          analytics: {
+            columnType: 'datetime',
+            columnName: 'BucketEndTime',
+          },
+          displayName: 'BucketEndTime',
+        },
+        StandardDeviation: {
+          analytics: {
+            columnType: 'real',
+            columnName: 'StandardDeviation',
+          },
+          displayName: 'StandardDeviation',
+        },
+      },
+    };
+  }
 }

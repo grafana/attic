@@ -176,16 +176,23 @@ describe('AzureLogAnalyticsDatasource', () => {
   describe('When performing getSchema', () => {
     beforeEach(() => {
       ctx.backendSrv.datasourceRequest = options => {
-        expect(options.url).toContain('query/schema');
-        return ctx.$q.when({ data: FakeSchemaData.getLogAnalyticsFakeSchema(), status: 200 });
+        expect(options.url).toContain('metadata');
+        return ctx.$q.when({ data: FakeSchemaData.getlogAnalyticsFakeMetadata(), status: 200 });
       };
     });
 
     it('should return a schema with a table and rows', () => {
       return ctx.ds.azureLogAnalyticsDatasource.getSchema('myWorkspace').then(result => {
-        expect(Object.keys(result.Databases.LogManagement.Tables).length).toBe(1);
-        expect(result.Databases.LogManagement.Tables.AzureNetworkAnalytics_CL.Name).toBe('AzureNetworkAnalytics_CL');
-        expect(result.Databases.LogManagement.Tables.AzureNetworkAnalytics_CL.OrderedColumns.length).toBe(114);
+        expect(Object.keys(result.Databases.Default.Tables).length).toBe(2);
+        expect(result.Databases.Default.Tables.Perf.Name).toBe('Perf');
+        expect(result.Databases.Default.Tables.Event.Name).toBe('Event');
+        expect(result.Databases.Default.Tables.Perf.OrderedColumns.length).toBe(15);
+        expect(result.Databases.Default.Tables.Event.OrderedColumns.length).toBe(18);
+        expect(result.Databases.Default.Tables.Perf.OrderedColumns[0].Name).toBe('Computer');
+        expect(result.Databases.Default.Tables.Perf.OrderedColumns[0].Type).toBe('string');
+
+        expect(Object.keys(result.Databases.Default.Functions).length).toBe(1);
+        expect(result.Databases.Default.Functions.Func1.Name).toBe('Func1');
       });
     });
   });

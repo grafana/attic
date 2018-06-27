@@ -100,7 +100,7 @@ function link(scope, elem, attrs) {
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
         const model = codeEditor.getModel();
         workerAccessor(model.uri).then(worker => {
-          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', 'LogManagement');
+          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', 'Default');
         });
       });
     });

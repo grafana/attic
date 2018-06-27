@@ -15,12 +15,12 @@ export interface TableColumn {
 }
 
 export interface KustoSchema {
-  Databases: { [key: string]: KustoDatabase; };
+  Databases: { [key: string]: KustoDatabase };
   Plugins: any[];
 }
 export interface KustoDatabase {
   Name: string;
-  Tables: { [key: string]: KustoTable; };
+  Tables: { [key: string]: KustoTable };
   Functions: any;
 }
 
@@ -32,6 +32,16 @@ export interface KustoTable {
 export interface KustoColumn {
   Name: string;
   Type: string;
+}
+
+export interface KustoFunction {
+  Name: string;
+  DocString: string;
+  Body: string;
+  Folder: string;
+  FunctionKind: string;
+  InputParameters: any[];
+  OutputColumns: any[];
 }
 
 export default class ResponseParser {
@@ -102,72 +112,74 @@ export default class ResponseParser {
       }),
       rows: rows,
       refId: query.refId,
-      query: query.query
+      query: query.query,
     };
 
     return tableResult;
   }
 
   parseSchemaResult(): KustoSchema {
-    const databases: { [key: string]: KustoDatabase; }  = {};
-
-    this.createSchemaTableBuckets(databases);
-
-    this.createSchemaTableColumns(databases);
-
     return {
       Plugins: [
         {
           Name: 'pivot',
         },
       ],
-      Databases: databases,
+      Databases: this.createSchemaDatabaseWithTables(),
     };
   }
 
-  createSchemaTableBuckets(databases: { [key: string]: KustoDatabase; }) {
-    _.forEach(this.results.Tables[1].Rows, row => {
-      const db = this.findOrCreateSchemaDatabaseBucket(row[3], databases);
-      db.Tables[row[1]] = {
-        Name: row[1],
+  createSchemaDatabaseWithTables(): { [key: string]: KustoDatabase } {
+    const databases = {
+      Default: {
+        Name: 'Default',
+        Tables: this.createSchemaTables(),
+        Functions: this.createSchemaFunctions(),
+      },
+    };
+
+    return databases;
+  }
+
+  createSchemaTables(): { [key: string]: KustoTable } {
+    const tables: { [key: string]: KustoTable } = {};
+
+    for (let key in this.results.types) {
+      tables[key] = {
+        Name: this.results.types[key].analytics.tableName,
         OrderedColumns: [],
       };
-    });
-  }
-
-  createSchemaTableColumns(databases: { [key: string]: KustoDatabase; }) {
-    _.forEach(this.results.Tables[0].Rows, row => {
-      const table = this.findTable(row[0], databases);
-      table.OrderedColumns.push({
-        Name: row[1],
-        Type: row[2],
+      _.forEach(this.results.types[key].properties, prop => {
+        tables[key].OrderedColumns.push(this.findMetadataProp(prop));
       });
-    });
-  }
-
-  findTable(tableName: string, databases: { [key: string]: KustoDatabase; }): KustoTable {
-    for (let db in databases) {
-      const key = _.find(Object.keys(databases[db].Tables), tbl => {
-        return tbl === tableName;
-      });
-      if (key.length > 0) {
-        return databases[db].Tables[key];
-      }
     }
 
-    throw Error('Error parsing database schema for Log Analytics tables. Table not found.');
+    return tables;
   }
 
-  findOrCreateSchemaDatabaseBucket(dbName: string, databases: { [key: string]: KustoDatabase; }) {
-    if (databases[dbName]) {
-      return databases[dbName];
+  findMetadataProp(propName: string): KustoColumn {
+    return {
+      Name: propName,
+      Type: this.results.properties[propName].analytics.columnType,
+    };
+  }
+
+  createSchemaFunctions(): { [key: string]: KustoFunction } {
+    const functions: { [key: string]: KustoFunction } = {};
+
+    for (let key in this.results.queries) {
+      functions[this.results.queries[key].analytics.functionName] = {
+        Name: this.results.queries[key].analytics.functionName,
+        Body: this.results.queries[key].analytics.functionBody,
+        DocString: this.results.queries[key].displayName,
+        Folder: this.results.queries[key].category,
+        FunctionKind: 'Unknown',
+        InputParameters: [],
+        OutputColumns: [],
+      };
     }
 
-    return (databases[dbName] = {
-      Name: dbName,
-      Tables: {},
-      Functions: {}
-    });
+    return functions;
   }
 
   static findOrCreateBucket(data, target) {
