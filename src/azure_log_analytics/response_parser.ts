@@ -21,7 +21,7 @@ export interface KustoSchema {
 export interface KustoDatabase {
   Name: string;
   Tables: { [key: string]: KustoTable };
-  Functions: any;
+  Functions: { [key: string]: KustoFunction };
 }
 
 export interface KustoTable {

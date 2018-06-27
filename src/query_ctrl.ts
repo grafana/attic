@@ -4,7 +4,7 @@ import _ from 'lodash';
 import {QueryCtrl} from 'app/plugins/sdk';
 import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
-import './monaco_editor';
+import './monaco/monaco_editor';
 
 export interface ResultFormat {
   text: string;

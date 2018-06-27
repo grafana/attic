@@ -2,7 +2,7 @@ jest.mock('./css/query_editor.css', () => {
   return {};
 });
 
-jest.mock('./monaco_editor');
+jest.mock('./monaco/monaco_editor');
 
 import {AzureMonitorQueryCtrl} from '../src/query_ctrl';
 import TemplateSrvStub from '../specs/lib/template_srv_stub';
