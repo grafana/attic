@@ -10,6 +10,7 @@ export default class AzureLogAnalyticsDatasource {
   baseUrl: string;
   applicationId: string;
   azureMonitorUrl: string;
+  firstWorkspace: string;
 
   /** @ngInject **/
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
@@ -51,11 +52,12 @@ export default class AzureLogAnalyticsDatasource {
     }).map(target => {
       const item = target.azureLogAnalytics;
 
-      const querystringBuilder = new LogAnalyticsQuerystringBuilder(item.query, options, 'TimeGenerated');
+      const querystringBuilder = new LogAnalyticsQuerystringBuilder(
+        this.templateSrv.replace(item.query, options.scopedVars), options, 'TimeGenerated'
+      );
       const generated = querystringBuilder.generate();
-      const querystring = this.templateSrv.replace(generated.uriString, options.scopedVars);
 
-      const url = `${this.baseUrl}/${item.workspace}/query?${querystring}`;
+      const url = `${this.baseUrl}/${item.workspace}/query?${generated.uriString}`;
 
       return {
         refId: target.refId,
@@ -69,14 +71,48 @@ export default class AzureLogAnalyticsDatasource {
       };
     });
 
-    if (queries.length === 0) {
-      return this.$q.when({ data: [] });
+    if (!queries || queries.length === 0) {
+      return;
     }
 
     const promises = this.doQueries(queries);
 
     return this.$q.all(promises).then(results => {
       return new ResponseParser(results).parseQueryResult();
+    });
+  }
+
+  metricFindQuery(query: string) {
+    return this.getFirstWorkspace().then(workspace => {
+      const querystringBuilder = new LogAnalyticsQuerystringBuilder(
+        this.templateSrv.replace(query, {}), null, 'TimeGenerated'
+      );
+      const querystring = querystringBuilder.generate().uriString;
+
+      const url = `${this.baseUrl}/${workspace}/query?${querystring}`;
+      const queries: any[] = [];
+      queries.push({
+        datasourceId: this.id,
+        url: url,
+        resultFormat: 'table'
+      });
+
+      const promises = this.doQueries(queries);
+
+      return this.$q.all(promises).then(results => {
+        return new ResponseParser(results).parseToVariables();
+      });
+    });
+  }
+
+  getFirstWorkspace() {
+    if (this.firstWorkspace) {
+      return Promise.resolve(this.firstWorkspace);
+    }
+
+    return this.getWorkspaces().then(workspaces => {
+      this.firstWorkspace = workspaces[0].value;
+      return this.firstWorkspace;
     });
   }
 

@@ -103,8 +103,8 @@ export default class AzureMonitorDatasource {
       };
     });
 
-    if (queries.length === 0) {
-      return this.$q.when({ data: [] });
+    if (!queries || queries.length === 0) {
+      return;
     }
 
     const promises = this.doQueries(queries);
@@ -159,7 +159,7 @@ export default class AzureMonitorDatasource {
       return this.getMetricNames(resourceGroup, metricDefinition, resourceName);
     }
 
-    return Promise.resolve([]);
+    return undefined;
   }
 
   toVariable(metric: string) {

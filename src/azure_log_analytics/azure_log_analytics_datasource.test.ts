@@ -13,7 +13,7 @@ describe('AzureLogAnalyticsDatasource', () => {
   beforeEach(() => {
     ctx.$q = Q;
     ctx.instanceSettings = {
-      jsonData: { },
+      jsonData: {},
       url: 'http://azureloganalyticsapi',
     };
 
@@ -28,7 +28,7 @@ describe('AzureLogAnalyticsDatasource', () => {
       },
       rangeRaw: {
         from: 'now-4h',
-        to: 'now'
+        to: 'now',
       },
       targets: [
         {
@@ -37,9 +37,10 @@ describe('AzureLogAnalyticsDatasource', () => {
           queryType: 'Azure Log Analytics',
           azureLogAnalytics: {
             resultFormat: 'time_series',
-            query: 'AzureActivity | where TimeGenerated > ago(2h) ' +
-            '| summarize count() by Category, bin(TimeGenerated, 5min) ' +
-            '| project TimeGenerated, Category, count_  | order by TimeGenerated asc'
+            query:
+              'AzureActivity | where TimeGenerated > ago(2h) ' +
+              '| summarize count() by Category, bin(TimeGenerated, 5min) ' +
+              '| project TimeGenerated, Category, count_  | order by TimeGenerated asc',
           },
         },
       ],
@@ -52,36 +53,24 @@ describe('AzureLogAnalyticsDatasource', () => {
           columns: [
             {
               name: 'TimeGenerated',
-              type: 'datetime'
+              type: 'datetime',
             },
             {
               name: 'Category',
-              type: 'string'
+              type: 'string',
             },
             {
               name: 'count_',
-              type: 'long'
-            }
+              type: 'long',
+            },
           ],
           rows: [
-            [
-              '2018-06-02T20:20:00Z',
-              'Administrative',
-              2
-            ],
-            [
-              '2018-06-02T20:25:00Z',
-              'Administrative',
-              22
-            ],
-            [
-              '2018-06-02T20:30:00Z',
-              'Policy',
-              20
-            ]
-          ]
-        }
-      ]
+            ['2018-06-02T20:20:00Z', 'Administrative', 2],
+            ['2018-06-02T20:25:00Z', 'Administrative', 22],
+            ['2018-06-02T20:30:00Z', 'Policy', 20],
+          ],
+        },
+      ],
     };
 
     describe('in time series format', () => {
@@ -115,21 +104,16 @@ describe('AzureLogAnalyticsDatasource', () => {
                 columns: [
                   {
                     name: 'Category',
-                    type: 'string'
+                    type: 'string',
                   },
                   {
                     name: 'count_',
-                    type: 'long'
-                  }
+                    type: 'long',
+                  },
                 ],
-                rows: [
-                  [
-                    'Administrative',
-                    2
-                  ]
-                ]
-              }
-            ]
+                rows: [['Administrative', 2]],
+              },
+            ],
           };
           ctx.backendSrv.datasourceRequest = options => {
             expect(options.url).toContain('query=AzureActivity');
@@ -194,6 +178,57 @@ describe('AzureLogAnalyticsDatasource', () => {
         expect(Object.keys(result.Databases.Default.Functions).length).toBe(1);
         expect(result.Databases.Default.Functions.Func1.Name).toBe('Func1');
       });
+    });
+  });
+
+  describe('When performing metricFindQuery', () => {
+    const tableResponseWithOneColumn = {
+      tables: [
+        {
+          name: 'PrimaryResult',
+          columns: [
+            {
+              name: 'Category',
+              type: 'string',
+            },
+          ],
+          rows: [['Administrative'], ['Policy']],
+        },
+      ],
+    };
+
+    const workspaceResponse = {
+      value: [
+        {
+          name: 'aworkspace',
+          properties: {
+            source: 'Azure',
+            customerId: 'abc1b44e-3e57-4410-b027-6cc0ae6dee67',
+          },
+        },
+      ],
+    };
+
+    let queryResults;
+
+    beforeEach(async () => {
+      ctx.backendSrv.datasourceRequest = options => {
+        if (options.url.indexOf('Microsoft.OperationalInsights/workspaces') > -1) {
+          return ctx.$q.when({ data: workspaceResponse, status: 200 });
+        } else {
+          return ctx.$q.when({ data: tableResponseWithOneColumn, status: 200 });
+        }
+      };
+
+      queryResults = await ctx.ds.metricFindQuery('workspace("aworkspace").AzureActivity  | distinct Category');
+    });
+
+    it('should return a list of categories in the correct format', () => {
+      expect(queryResults.length).toBe(2);
+      expect(queryResults[0].text).toBe('Administrative');
+      expect(queryResults[0].value).toBe('Administrative');
+      expect(queryResults[1].text).toBe('Policy');
+      expect(queryResults[1].value).toBe('Policy');
     });
   });
 });

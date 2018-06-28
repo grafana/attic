@@ -47,15 +47,28 @@ export default class Datasource {
     azureLogAnalyticsTargets.targets = _.filter(azureLogAnalyticsTargets.targets, ['queryType', 'Azure Log Analytics']);
 
     if (azureMonitorOptions.targets.length > 0) {
-      promises.push(this.azureMonitorDatasource.query(azureMonitorOptions));
+      const amPromise = this.azureMonitorDatasource.query(azureMonitorOptions);
+      if (amPromise) {
+        promises.push(amPromise);
+      }
     }
 
     if (appInsightsTargets.targets.length > 0) {
-      promises.push(this.appInsightsDatasource.query(appInsightsTargets));
+      const aiPromise = this.appInsightsDatasource.query(appInsightsTargets);
+      if (aiPromise) {
+        promises.push(aiPromise);
+      }
     }
 
     if (azureLogAnalyticsTargets.targets.length > 0) {
-      promises.push(this.azureLogAnalyticsDatasource.query(azureLogAnalyticsTargets));
+      const alaPromise = this.azureLogAnalyticsDatasource.query(azureLogAnalyticsTargets);
+      if (alaPromise) {
+        promises.push(alaPromise);
+      }
+    }
+
+    if (promises.length === 0) {
+      return this.$q.when({ data: [] });
     }
 
     return Promise.all(promises).then(results => {
@@ -80,6 +93,11 @@ export default class Datasource {
     const amResult = this.azureMonitorDatasource.metricFindQuery(query);
     if (amResult) {
       return amResult;
+    }
+
+    const alaResult = this.azureLogAnalyticsDatasource.metricFindQuery(query);
+    if (alaResult) {
+      return alaResult;
     }
 
     return Promise.resolve([]);

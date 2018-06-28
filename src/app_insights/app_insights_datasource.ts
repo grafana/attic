@@ -36,11 +36,12 @@ export default class AppInsightsDatasource {
     }).map(target => {
       const item = target.appInsights;
       if (item.rawQuery) {
-        const querystringBuilder = new LogAnalyticsQuerystringBuilder(item.rawQueryString, options, 'timestamp');
+        const querystringBuilder = new LogAnalyticsQuerystringBuilder(
+          this.templateSrv.replace(item.rawQueryString, options.scopedVars), options, 'timestamp'
+        );
         const generated = querystringBuilder.generate();
-        const querystring = this.templateSrv.replace(generated.uriString, options.scopedVars);
 
-        const url = `${this.baseUrl}/query?${querystring}`;
+        const url = `${this.baseUrl}/query?${generated.uriString}`;
 
         return {
           refId: target.refId,
@@ -96,8 +97,8 @@ export default class AppInsightsDatasource {
       }
     });
 
-    if (queries.length === 0) {
-      return this.$q.when({ data: [] });
+    if (!queries || queries.length === 0) {
+      return;
     }
 
     const promises = this.doQueries(queries);

@@ -1,6 +1,12 @@
 import moment from 'moment';
 import _ from 'lodash';
 
+export interface DataTarget {
+  target: string;
+  datapoints: any[];
+  refId: string;
+  query: any;
+}
 export interface TableResult {
   columns: TableColumn[];
   rows: any[];
@@ -44,12 +50,17 @@ export interface KustoFunction {
   OutputColumns: any[];
 }
 
+export interface Variable {
+  text: string;
+  value: string;
+}
+
 export default class ResponseParser {
   columns: Array<string>;
   constructor(private results) {}
 
-  parseQueryResult() {
-    let data: any[] = [];
+  parseQueryResult(): any {
+    let data: TableResult | DataTarget[] = [];
     let columns: any[] = [];
     for (let i = 0; i < this.results.length; i++) {
       if (this.results[i].result.data.tables.length === 0) {
@@ -68,8 +79,8 @@ export default class ResponseParser {
     return data;
   }
 
-  parseTimeSeriesResult(query, columns, rows) {
-    const data: any[] = [];
+  parseTimeSeriesResult(query, columns, rows): DataTarget[] {
+    const data: DataTarget[] = [];
     let timeIndex = -1;
     let metricIndex = -1;
     let valueIndex = -1;
@@ -116,6 +127,22 @@ export default class ResponseParser {
     };
 
     return tableResult;
+  }
+
+  parseToVariables(): Variable[] {
+    const queryResult = this.parseQueryResult();
+
+    const variables: Variable[] = [];
+    _.forEach(queryResult, result => {
+      _.forEach(_.flattenDeep(result.rows), row => {
+        variables.push({
+          text: row,
+          value: row,
+        });
+      });
+    });
+
+    return variables;
   }
 
   parseSchemaResult(): KustoSchema {
@@ -182,7 +209,7 @@ export default class ResponseParser {
     return functions;
   }
 
-  static findOrCreateBucket(data, target) {
+  static findOrCreateBucket(data, target): DataTarget {
     let dataTarget = _.find(data, ['target', target]);
     if (!dataTarget) {
       dataTarget = { target: target, datapoints: [], refId: '', query: '' };
