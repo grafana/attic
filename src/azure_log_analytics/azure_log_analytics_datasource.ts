@@ -53,7 +53,9 @@ export default class AzureLogAnalyticsDatasource {
       const item = target.azureLogAnalytics;
 
       const querystringBuilder = new LogAnalyticsQuerystringBuilder(
-        this.templateSrv.replace(item.query, options.scopedVars), options, 'TimeGenerated'
+        this.templateSrv.replace(item.query, options.scopedVars, this.interpolateVariable),
+        options,
+        'TimeGenerated'
       );
       const generated = querystringBuilder.generate();
 
@@ -85,7 +87,9 @@ export default class AzureLogAnalyticsDatasource {
   metricFindQuery(query: string) {
     return this.getFirstWorkspace().then(workspace => {
       const querystringBuilder = new LogAnalyticsQuerystringBuilder(
-        this.templateSrv.replace(query, {}), null, 'TimeGenerated'
+        this.templateSrv.replace(query, {}, this.interpolateVariable),
+        null,
+        'TimeGenerated'
       );
       const querystring = querystringBuilder.generate().uriString;
 
@@ -94,7 +98,7 @@ export default class AzureLogAnalyticsDatasource {
       queries.push({
         datasourceId: this.id,
         url: url,
-        resultFormat: 'table'
+        resultFormat: 'table',
       });
 
       const promises = this.doQueries(queries);
@@ -103,6 +107,29 @@ export default class AzureLogAnalyticsDatasource {
         return new ResponseParser(results).parseToVariables();
       });
     });
+  }
+
+  interpolateVariable(value, variable) {
+    if (typeof value === 'string') {
+      if (variable.multi || variable.includeAll) {
+        return "'" + value + "'";
+      } else {
+        return value;
+      }
+    }
+
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    var quotedValues = _.map(value, function(val) {
+      if (typeof value === 'number') {
+        return value;
+      }
+
+      return "'" + val + "'";
+    });
+    return quotedValues.join(',');
   }
 
   getFirstWorkspace() {
