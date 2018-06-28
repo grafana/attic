@@ -29,9 +29,10 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     },
     azureLogAnalytics: {
       query: [
+        '//change this to create your own time series query',
         '<table name>',
         '| where $__timeFilter(TimeGenerated)',
-        '| summarize count() by Category, bin(TimeGenerated, $__interval)',
+        '| summarize count() by <group by column>, bin(TimeGenerated, $__interval)',
         '| order by TimeGenerated asc'].join('\n'),
       resultFormat: 'time_series',
       workspace: ''
