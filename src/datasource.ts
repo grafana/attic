@@ -77,7 +77,7 @@ export default class Datasource {
   }
 
   annotationQuery(options) {
-    throw new Error('Annotation Support not implemented yet.');
+    return this.azureLogAnalyticsDatasource.annotationQuery(options);
   }
 
   metricFindQuery(query: string) {
@@ -173,5 +173,10 @@ export default class Datasource {
 
   getAppInsightsColumns(refId) {
     return this.appInsightsDatasource.logAnalyticsColumns[refId];
+  }
+
+  /*Azure Log Analytics */
+  getAzureLogAnalyticsWorkspaces() {
+    return this.azureLogAnalyticsDatasource.getWorkspaces();
   }
 }

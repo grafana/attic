@@ -55,6 +55,13 @@ export interface Variable {
   value: string;
 }
 
+export interface AnnotationItem {
+    annotation: any;
+    time: number;
+    text: string;
+    tags: string[];
+}
+
 export default class ResponseParser {
   columns: Array<string>;
   constructor(private results) {}
@@ -143,6 +150,43 @@ export default class ResponseParser {
     });
 
     return variables;
+  }
+
+  transformToAnnotations(options: any) {
+    const queryResult = this.parseQueryResult();
+
+    const list: AnnotationItem[] = [];
+
+    _.forEach(queryResult, result => {
+      let timeIndex = -1;
+      let textIndex = -1;
+      let tagsIndex = -1;
+
+      for (let i = 0; i < result.columns.length; i++) {
+        if (timeIndex === -1 && result.columns[i].type === 'datetime') {
+          timeIndex = i;
+        }
+
+        if (textIndex === -1 && result.columns[i].text.toLowerCase() === 'text') {
+          textIndex = i;
+        }
+
+        if (tagsIndex === -1 && result.columns[i].text.toLowerCase() === 'tags') {
+          tagsIndex = i;
+        }
+      }
+
+      _.forEach(result.rows, row => {
+        list.push({
+          annotation: options.annotation,
+          time: Math.floor(ResponseParser.dateTimeToEpoch(row[timeIndex])),
+          text: row[textIndex] ? row[textIndex].toString() : '',
+          tags: row[tagsIndex] ? row[tagsIndex].trim().split(/\s*,\s*/) : [],
+        });
+      });
+    });
+
+    return list;
   }
 
   parseSchemaResult(): KustoSchema {

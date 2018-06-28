@@ -231,4 +231,81 @@ describe('AzureLogAnalyticsDatasource', () => {
       expect(queryResults[1].value).toBe('Policy');
     });
   });
+
+  describe('When performing annotationQuery', () => {
+    const tableResponse = {
+      tables: [
+        {
+          name: 'PrimaryResult',
+          columns: [
+            {
+              name: 'TimeGenerated',
+              type: 'datetime',
+            },
+            {
+              name: 'Text',
+              type: 'string',
+            },
+            {
+              name: 'Tags',
+              type: 'string',
+            },
+          ],
+          rows: [['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'], ['2018-06-02T20:28:00Z', 'Computer2', 'tag2']],
+        },
+      ],
+    };
+
+    const workspaceResponse = {
+      value: [
+        {
+          name: 'aworkspace',
+          properties: {
+            source: 'Azure',
+            customerId: 'abc1b44e-3e57-4410-b027-6cc0ae6dee67',
+          },
+        },
+      ],
+    };
+
+    let annotationResults;
+
+    beforeEach(async () => {
+      ctx.backendSrv.datasourceRequest = options => {
+        if (options.url.indexOf('Microsoft.OperationalInsights/workspaces') > -1) {
+          return ctx.$q.when({ data: workspaceResponse, status: 200 });
+        } else {
+          return ctx.$q.when({ data: tableResponse, status: 200 });
+        }
+      };
+
+      annotationResults = await ctx.ds.annotationQuery({
+        annotation: {
+          rawQuery: 'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
+          workspace: 'abc1b44e-3e57-4410-b027-6cc0ae6dee67',
+        },
+        range: {
+          from: moment.utc('2017-08-22T20:00:00Z'),
+          to: moment.utc('2017-08-22T23:59:00Z'),
+        },
+        rangeRaw: {
+          from: 'now-4h',
+          to: 'now',
+        },
+      });
+    });
+
+    it('should return a list of categories in the correct format', () => {
+      expect(annotationResults.length).toBe(2);
+
+      expect(annotationResults[0].time).toBe(1527970800000);
+      expect(annotationResults[0].text).toBe('Computer1');
+      expect(annotationResults[0].tags[0]).toBe('tag1');
+      expect(annotationResults[0].tags[1]).toBe('tag2');
+
+      expect(annotationResults[1].time).toBe(1527971280000);
+      expect(annotationResults[1].text).toBe('Computer2');
+      expect(annotationResults[1].tags[0]).toBe('tag2');
+    });
+  });
 });

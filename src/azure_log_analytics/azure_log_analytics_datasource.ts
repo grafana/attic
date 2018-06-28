@@ -86,20 +86,7 @@ export default class AzureLogAnalyticsDatasource {
 
   metricFindQuery(query: string) {
     return this.getFirstWorkspace().then(workspace => {
-      const querystringBuilder = new LogAnalyticsQuerystringBuilder(
-        this.templateSrv.replace(query, {}, this.interpolateVariable),
-        null,
-        'TimeGenerated'
-      );
-      const querystring = querystringBuilder.generate().uriString;
-
-      const url = `${this.baseUrl}/${workspace}/query?${querystring}`;
-      const queries: any[] = [];
-      queries.push({
-        datasourceId: this.id,
-        url: url,
-        resultFormat: 'table',
-      });
+      const queries: any[] = this.buildQuery(query, null, workspace);
 
       const promises = this.doQueries(queries);
 
@@ -107,6 +94,23 @@ export default class AzureLogAnalyticsDatasource {
         return new ResponseParser(results).parseToVariables();
       });
     });
+  }
+
+  private buildQuery(query: string, options: any, workspace: any) {
+    const querystringBuilder = new LogAnalyticsQuerystringBuilder(
+      this.templateSrv.replace(query, {}, this.interpolateVariable),
+      options,
+      'TimeGenerated'
+    );
+    const querystring = querystringBuilder.generate().uriString;
+    const url = `${this.baseUrl}/${workspace}/query?${querystring}`;
+    const queries: any[] = [];
+    queries.push({
+      datasourceId: this.id,
+      url: url,
+      resultFormat: 'table',
+    });
+    return queries;
   }
 
   interpolateVariable(value, variable) {
@@ -140,6 +144,23 @@ export default class AzureLogAnalyticsDatasource {
     return this.getWorkspaces().then(workspaces => {
       this.firstWorkspace = workspaces[0].value;
       return this.firstWorkspace;
+    });
+  }
+
+  annotationQuery(options) {
+    if (!options.annotation.rawQuery) {
+      return this.$q.reject({
+        message: 'Query missing in annotation definition',
+      });
+    }
+
+    const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.workspace);
+
+    const promises = this.doQueries(queries);
+
+    return this.$q.all(promises).then(results => {
+      const annotations = new ResponseParser(results).transformToAnnotations(options);
+      return annotations;
     });
   }
 
