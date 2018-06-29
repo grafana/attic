@@ -7,7 +7,7 @@ module.exports = {
   },
   "moduleNameMapper": {
     'app/core/utils/kbn': '<rootDir>/src/__mocks__/kbn.ts',
-    'app/plugins/sdk': '<rootDir>/node_modules/grafana-sdk-mocks/app/plugins/sdk.ts',
+    'app/plugins/sdk': '<rootDir>/src/__mocks__/sdk.ts',
   },
   "transformIgnorePatterns": [
     "<rootDir>/node_modules/(?!grafana-sdk-mocks)"

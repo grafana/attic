@@ -99,13 +99,13 @@ export default class ResponseParser {
     return moment(dateTime).valueOf();
   }
 
-  static getKeyForAggregationField(dataObj) {
+  static getKeyForAggregationField(dataObj): string {
     const keys = _.keys(dataObj);
     if (keys.length < 2) {
-      return;
+      return '';
     }
 
-    return _.intersection(keys, ['total', 'average', 'maximum', 'minimum', 'count']);
+    return _.intersection(keys, ['total', 'average', 'maximum', 'minimum', 'count'])[0];
   }
 
   static parseResponseValues(result: any, textFieldName: string, valueFieldName: string) {

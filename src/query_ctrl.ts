@@ -1,7 +1,7 @@
 ///<reference path="../node_modules/monaco-editor/monaco.d.ts" />
 
 import _ from 'lodash';
-import {QueryCtrl} from 'app/plugins/sdk';
+import {QueryCtrl} from 'grafana/app/plugins/sdk';
 import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
 import './monaco/monaco_editor';
@@ -74,7 +74,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     this.lastQueryError = undefined;
     this.lastQuery = '';
 
-    let anySeriesFromQuery = _.find(dataList, { refId: this.target.refId });
+    let anySeriesFromQuery: any = _.find(dataList, { refId: this.target.refId });
     if (anySeriesFromQuery) {
       this.lastQuery = anySeriesFromQuery.query;
     }

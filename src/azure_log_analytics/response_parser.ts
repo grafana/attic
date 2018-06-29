@@ -1,5 +1,5 @@
-import moment from 'moment';
 import _ from 'lodash';
+import moment from 'moment';
 
 export interface DataTarget {
   target: string;
@@ -67,7 +67,7 @@ export default class ResponseParser {
   constructor(private results) {}
 
   parseQueryResult(): any {
-    let data: TableResult | DataTarget[] = [];
+    let data: any[] = [];
     let columns: any[] = [];
     for (let i = 0; i < this.results.length; i++) {
       if (this.results[i].result.data.tables.length === 0) {
@@ -142,7 +142,7 @@ export default class ResponseParser {
     const variables: Variable[] = [];
     _.forEach(queryResult, result => {
       _.forEach(_.flattenDeep(result.rows), row => {
-        variables.push({
+        variables.push(<Variable>{
           text: row,
           value: row,
         });

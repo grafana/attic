@@ -1,5 +1,3 @@
-///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-
 import _ from 'lodash';
 import AppInsightsQuerystringBuilder from './app_insights_querystring_builder';
 import LogAnalyticsQuerystringBuilder from '../log_analytics/querystring_builder';

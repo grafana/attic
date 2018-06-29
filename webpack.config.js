@@ -20,9 +20,9 @@ module.exports = {
   externals: [
     'lodash', 'moment',
     function(context, request, callback) {
-      var prefix = 'app/';
+      var prefix = 'grafana/';
       if (request.indexOf(prefix) === 0) {
-        return callback(null, request);
+        return callback(null, request.substr(prefix.length));
       }
       callback();
     }

@@ -2,7 +2,7 @@ import angular from 'angular';
 import '../lib/bridge.js';
 import '../lib/monaco.min.js';
 import KustoCodeEditor from './kusto_code_editor';
-import config from 'app/core/config';
+import config from 'grafana/app/core/config';
 
 let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height: 250px"></div>`;
 

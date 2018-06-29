@@ -5,8 +5,8 @@ export default class ResponseParser {
   constructor(private results) {}
 
   parseQueryResult() {
-    let data = [];
-    let columns = [];
+    let data: any = [];
+    let columns: any = [];
     for (let i = 0; i < this.results.length; i++) {
       if (this.results[i].query.raw) {
         const xaxis = this.results[i].query.xaxis;
@@ -76,7 +76,7 @@ export default class ResponseParser {
 
       for (let i = 0; i < value.segments.length; i++) {
         const epoch = ResponseParser.dateTimeToEpoch(value.segments[i].end);
-        const aggField = ResponseParser.getKeyForAggregationField(value.segments[i][metricName]);
+        const aggField: string = ResponseParser.getKeyForAggregationField(value.segments[i][metricName]);
 
         dataTarget.datapoints.push([value.segments[i][metricName][aggField], epoch]);
       }
@@ -162,9 +162,9 @@ export default class ResponseParser {
     })[0];
   }
 
-  static getKeyForAggregationField(dataObj) {
+  static getKeyForAggregationField(dataObj): string {
     const keys = _.keys(dataObj);
-    return _.intersection(keys, ['sum', 'avg', 'min', 'max', 'count', 'unique']);
+    return _.intersection(keys, ['sum', 'avg', 'min', 'max', 'count', 'unique'])[0];
   }
 
   static dateTimeToEpoch(dateTime) {
