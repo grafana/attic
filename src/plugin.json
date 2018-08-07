@@ -97,7 +97,7 @@
       "method": "GET",
       "url": "https://api.loganalytics.io/v1/workspaces",
       "tokenAuth": {
-        "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
+        "url": "https://login.microsoftonline.com/{{.JsonData.logAnalyticsTenantId}}/oauth2/token",
         "params": {
           "grant_type":  "client_credentials",
           "client_id": "{{.JsonData.logAnalyticsClientId}}",
@@ -109,7 +109,7 @@
   ],
 
   "dependencies": {
-    "grafanaVersion": "4.5.x",
+    "grafanaVersion": "5.2.x",
     "plugins": [ ]
   },
 

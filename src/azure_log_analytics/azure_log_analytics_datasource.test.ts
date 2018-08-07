@@ -13,11 +13,44 @@ describe('AzureLogAnalyticsDatasource', () => {
   beforeEach(() => {
     ctx.$q = Q;
     ctx.instanceSettings = {
-      jsonData: {},
+      jsonData: { logAnalyticsSubscriptionId: 'xxx' },
       url: 'http://azureloganalyticsapi',
     };
 
     ctx.ds = new AzureMonitorDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.templateSrv, ctx.$q);
+  });
+
+  describe('When performing testDatasource', () => {
+    describe('and an error is returned', () => {
+      const error = {
+        data: {
+          error: {
+            code: 'InvalidApiVersionParameter',
+            message: `An error message.`,
+          },
+        },
+        status: 400,
+        statusText: 'Bad Request',
+      };
+
+      beforeEach(() => {
+        ctx.instanceSettings.jsonData.logAnalyticsSubscriptionId = 'xxx';
+        ctx.instanceSettings.jsonData.logAnalyticsTenantId = 'xxx';
+        ctx.instanceSettings.jsonData.logAnalyticsClientId = 'xxx';
+        ctx.backendSrv.datasourceRequest = () => {
+          return ctx.$q.reject(error);
+        };
+      });
+
+      it('should return error status and a detailed error message', () => {
+        return ctx.ds.testDatasource().then(results => {
+          expect(results.status).toEqual('error');
+          expect(results.message).toEqual(
+            '1. Azure Log Analytics: Bad Request: InvalidApiVersionParameter. An error message. '
+          );
+        });
+      });
+    });
   });
 
   describe('When performing query', () => {

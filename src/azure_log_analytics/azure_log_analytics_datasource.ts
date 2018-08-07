@@ -9,16 +9,21 @@ export default class AzureLogAnalyticsDatasource {
   applicationId: string;
   azureMonitorUrl: string;
   firstWorkspace: string;
+  subscriptionId: string;
 
   /** @ngInject **/
-  constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
+  constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
     this.baseUrl = `/loganalyticsazure`;
     this.url = instanceSettings.url;
 
-    const azureSubscription = instanceSettings.jsonData.subscriptionId;
+    this.subscriptionId = instanceSettings.jsonData.logAnalyticsSubscriptionId;
     const azureCloud = instanceSettings.jsonData.cloudName || 'azuremonitor';
-    this.azureMonitorUrl = `/${azureCloud}/subscriptions/${azureSubscription}`;
+    this.azureMonitorUrl = `/${azureCloud}/subscriptions/${this.subscriptionId}`;
+  }
+
+  isConfigured(): boolean {
+    return !!this.subscriptionId && this.subscriptionId.length > 0;
   }
 
   getWorkspaces() {
@@ -193,5 +198,70 @@ export default class AzureLogAnalyticsDatasource {
 
         throw error;
       });
+  }
+
+  testDatasource() {
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsSubscriptionId)) {
+      return {
+        status: 'error',
+        message: 'The Subscription Id field is required.',
+      };
+    }
+
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsTenantId)) {
+      return {
+        status: 'error',
+        message: 'The Tenant Id field is required.',
+      };
+    }
+
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsClientId)) {
+      return {
+        status: 'error',
+        message: 'The Client Id field is required.',
+      };
+    }
+
+    return this.getFirstWorkspace().then(ws => {
+      const url = `${this.baseUrl}/${ws}/metadata`;
+
+      return this.doRequest(url);
+    }).then(response => {
+      if (response.status === 200) {
+        return {
+          status: 'success',
+          message: 'Successfully queried the Azure Log Analytics service.',
+          title: 'Success',
+        };
+      }
+
+      return {
+        status: 'error',
+        message: 'Returned http status code ' + response.status,
+      };
+    })
+    .catch(error => {
+      let message = 'Azure Log Analytics: ';
+      message += error.statusText ? error.statusText + ': ' : '';
+
+      if (error.data && error.data.error && error.data.error.code) {
+        message += error.data.error.code + '. ' + error.data.error.message;
+      } else if (error.data && error.data.error) {
+        message += error.data.error;
+      } else if (error.data) {
+        message += error.data;
+      } else {
+        message += 'Cannot connect to Azure Log Analytics REST API.';
+      }
+
+      return {
+        status: 'error',
+        message: message,
+      };
+    });
+  }
+
+  isValidConfigField(field: string) {
+    return field && field.length > 0;
   }
 }

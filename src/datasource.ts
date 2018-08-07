@@ -114,6 +114,10 @@ export default class Datasource {
       promises.push(this.appInsightsDatasource.testDatasource());
     }
 
+    if (this.azureLogAnalyticsDatasource.isConfigured()) {
+      promises.push(this.azureLogAnalyticsDatasource.testDatasource());
+    }
+
     if (promises.length === 0) {
       return {
         status: 'error',

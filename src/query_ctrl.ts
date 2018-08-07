@@ -13,7 +13,6 @@ export interface ResultFormat {
 
 export class AzureMonitorQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
-  lastQueryError?: string;
 
   defaultDropdownValue = 'select';
 
@@ -54,6 +53,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   showHelp: boolean;
   showLastQuery: boolean;
   lastQuery: string;
+  lastQueryError?: string;
 
   /** @ngInject **/
   constructor($scope, $injector, private templateSrv) {

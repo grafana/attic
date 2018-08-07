@@ -24,8 +24,8 @@ export default class AppInsightsDatasource {
     this.url = instanceSettings.url;
   }
 
-  isConfigured() {
-    return this.applicationId && this.applicationId.length > 0;
+  isConfigured(): boolean {
+    return !!this.applicationId && this.applicationId.length > 0;
   }
 
   query(options) {

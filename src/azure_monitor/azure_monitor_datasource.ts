@@ -28,8 +28,8 @@ export default class AzureMonitorDatasource {
     this.supportedMetricNamespaces = new SupportedNamespaces(this.cloudName).get();
   }
 
-  isConfigured() {
-    return this.subscriptionId && this.subscriptionId.length > 0;
+  isConfigured(): boolean {
+    return !!this.subscriptionId && this.subscriptionId.length > 0;
   }
 
   query(options) {

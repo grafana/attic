@@ -1,2 +1,2 @@
-test: karma start
-build: grunt watch
+test: jest --config jest.config.js --watch
+build: webpack --config webpack.config.prod.js
