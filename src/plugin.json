@@ -93,6 +93,20 @@
       ]
     },
     {
+      "path": "workspacesloganalytics",
+      "method": "GET",
+      "url": "https://management.azure.com",
+      "tokenAuth": {
+        "url": "https://login.microsoftonline.com/{{.JsonData.logAnalyticsTenantId}}/oauth2/token",
+        "params": {
+          "grant_type":  "client_credentials",
+          "client_id": "{{.JsonData.logAnalyticsClientId}}",
+          "client_secret": "{{.SecureJsonData.logAnalyticsClientSecret}}",
+          "resource": "https://management.azure.com/"
+        }
+      }
+    },
+    {
       "path": "loganalyticsazure",
       "method": "GET",
       "url": "https://api.loganalytics.io/v1/workspaces",

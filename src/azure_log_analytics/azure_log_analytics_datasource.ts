@@ -16,14 +16,25 @@ export default class AzureLogAnalyticsDatasource {
     this.id = instanceSettings.id;
     this.baseUrl = `/loganalyticsazure`;
     this.url = instanceSettings.url;
-
-    this.subscriptionId = instanceSettings.jsonData.logAnalyticsSubscriptionId;
-    const azureCloud = instanceSettings.jsonData.cloudName || 'azuremonitor';
-    this.azureMonitorUrl = `/${azureCloud}/subscriptions/${this.subscriptionId}`;
+    this.setWorkspaceUrl();
   }
 
   isConfigured(): boolean {
-    return !!this.subscriptionId && this.subscriptionId.length > 0;
+    return (
+      !!this.instanceSettings.jsonData.logAnalyticsSubscriptionId &&
+      this.instanceSettings.jsonData.logAnalyticsSubscriptionId.length > 0
+    );
+  }
+
+  setWorkspaceUrl() {
+    if (!!this.instanceSettings.jsonData.subscriptionId) {
+      this.subscriptionId = this.instanceSettings.jsonData.subscriptionId;
+      const azureCloud = this.instanceSettings.jsonData.cloudName || 'azuremonitor';
+      this.azureMonitorUrl = `/${azureCloud}/subscriptions/${this.subscriptionId}`;
+    } else {
+      this.subscriptionId = this.instanceSettings.jsonData.logAnalyticsSubscriptionId;
+      this.azureMonitorUrl = `/workspacesloganalytics/subscriptions/${this.subscriptionId}`;
+    }
   }
 
   getWorkspaces() {
@@ -222,43 +233,53 @@ export default class AzureLogAnalyticsDatasource {
       };
     }
 
-    return this.getFirstWorkspace().then(ws => {
-      const url = `${this.baseUrl}/${ws}/metadata`;
+    return this.getFirstWorkspace()
+      .then(ws => {
+        const url = `${this.baseUrl}/${ws}/metadata`;
 
-      return this.doRequest(url);
-    }).then(response => {
-      if (response.status === 200) {
+        return this.doRequest(url);
+      })
+      .then(response => {
+        if (response.status === 200) {
+          return {
+            status: 'success',
+            message: 'Successfully queried the Azure Log Analytics service.',
+            title: 'Success',
+          };
+        }
+
         return {
-          status: 'success',
-          message: 'Successfully queried the Azure Log Analytics service.',
-          title: 'Success',
+          status: 'error',
+          message: 'Returned http status code ' + response.status,
         };
-      }
+      })
+      .catch(error => {
+        let message = 'Azure Log Analytics: ';
+        if (error.config && error.config.url && error.config.url.indexOf('workspacesloganalytics') > -1) {
+          message = 'Azure Log Analytics requires access to Azure Monitor but had the following error: ';
+        }
 
-      return {
-        status: 'error',
-        message: 'Returned http status code ' + response.status,
-      };
-    })
-    .catch(error => {
-      let message = 'Azure Log Analytics: ';
-      message += error.statusText ? error.statusText + ': ' : '';
+        message = this.getErrorMessage(message, error);
 
-      if (error.data && error.data.error && error.data.error.code) {
-        message += error.data.error.code + '. ' + error.data.error.message;
-      } else if (error.data && error.data.error) {
-        message += error.data.error;
-      } else if (error.data) {
-        message += error.data;
-      } else {
-        message += 'Cannot connect to Azure Log Analytics REST API.';
-      }
+        return {
+          status: 'error',
+          message: message,
+        };
+      });
+  }
 
-      return {
-        status: 'error',
-        message: message,
-      };
-    });
+  private getErrorMessage(message: string, error: any) {
+    message += error.statusText ? error.statusText + ': ' : '';
+    if (error.data && error.data.error && error.data.error.code) {
+      message += error.data.error.code + '. ' + error.data.error.message;
+    } else if (error.data && error.data.error) {
+      message += error.data.error;
+    } else if (error.data) {
+      message += error.data;
+    } else {
+      message += 'Cannot connect to Azure Log Analytics REST API.';
+    }
+    return message;
   }
 
   isValidConfigField(field: string) {
