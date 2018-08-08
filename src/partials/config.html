@@ -118,6 +118,19 @@
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.current.secureJsonFields.logAnalyticsClientSecret = false">reset</a>
   </div>
 </div>
+<div class="gf-form-group">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-9">Default Workspace</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.logAnalyticsDefaultWorkspace" ng-options="f.value as f.text for f in ctrl.workspaces"></select>
+      </div>
+      <info-popover mode="right-normal">
+        <p>Choose the default/preferred Workspace for Azure Log Analytics queries.</p>
+      </info-popover>
+    </div>
+  </div>
+</div>
 
 <h3 class="page-heading">Application Insights Details</h3>
 

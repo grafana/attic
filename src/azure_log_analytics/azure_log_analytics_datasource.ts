@@ -8,7 +8,7 @@ export default class AzureLogAnalyticsDatasource {
   baseUrl: string;
   applicationId: string;
   azureMonitorUrl: string;
-  firstWorkspace: string;
+  defaultOrFirstWorkspace: string;
   subscriptionId: string;
 
   /** @ngInject **/
@@ -18,6 +18,7 @@ export default class AzureLogAnalyticsDatasource {
       ? '/sameasloganalyticsazure'
       : `/loganalyticsazure`;
     this.url = instanceSettings.url;
+    this.defaultOrFirstWorkspace = this.instanceSettings.jsonData.logAnalyticsDefaultWorkspace;
 
     this.setWorkspaceUrl();
   }
@@ -102,7 +103,7 @@ export default class AzureLogAnalyticsDatasource {
   }
 
   metricFindQuery(query: string) {
-    return this.getFirstWorkspace().then(workspace => {
+    return this.getDefaultOrFirstWorkspace().then(workspace => {
       const queries: any[] = this.buildQuery(query, null, workspace);
 
       const promises = this.doQueries(queries);
@@ -153,14 +154,14 @@ export default class AzureLogAnalyticsDatasource {
     return quotedValues.join(',');
   }
 
-  getFirstWorkspace() {
-    if (this.firstWorkspace) {
-      return Promise.resolve(this.firstWorkspace);
+  getDefaultOrFirstWorkspace() {
+    if (this.defaultOrFirstWorkspace) {
+      return Promise.resolve(this.defaultOrFirstWorkspace);
     }
 
     return this.getWorkspaces().then(workspaces => {
-      this.firstWorkspace = workspaces[0].value;
-      return this.firstWorkspace;
+      this.defaultOrFirstWorkspace = workspaces[0].value;
+      return this.defaultOrFirstWorkspace;
     });
   }
 
@@ -236,7 +237,7 @@ export default class AzureLogAnalyticsDatasource {
       };
     }
 
-    return this.getFirstWorkspace()
+    return this.getDefaultOrFirstWorkspace()
       .then(ws => {
         const url = `${this.baseUrl}/${ws}/metadata`;
 
