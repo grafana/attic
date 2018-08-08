@@ -20,6 +20,63 @@ describe('AzureLogAnalyticsDatasource', () => {
     ctx.ds = new AzureMonitorDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.templateSrv, ctx.$q);
   });
 
+  describe('When the config option "Same as Azure Monitor" has been chosen', () => {
+    const tableResponseWithOneColumn = {
+      tables: [
+        {
+          name: 'PrimaryResult',
+          columns: [
+            {
+              name: 'Category',
+              type: 'string',
+            },
+          ],
+          rows: [['Administrative'], ['Policy']],
+        },
+      ],
+    };
+
+    const workspaceResponse = {
+      value: [
+        {
+          name: 'aworkspace',
+          properties: {
+            source: 'Azure',
+            customerId: 'abc1b44e-3e57-4410-b027-6cc0ae6dee67',
+          },
+        },
+      ],
+    };
+
+    let workspacesUrl;
+    let azureLogAnalyticsUrl;
+
+    beforeEach(async () => {
+      ctx.instanceSettings.jsonData.subscriptionId = 'xxx';
+      ctx.instanceSettings.jsonData.tenantId = 'xxx';
+      ctx.instanceSettings.jsonData.clientId = 'xxx';
+      ctx.instanceSettings.jsonData.azureLogAnalyticsSameAs = true;
+      ctx.ds = new AzureMonitorDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.templateSrv, ctx.$q);
+
+      ctx.backendSrv.datasourceRequest = options => {
+        if (options.url.indexOf('Microsoft.OperationalInsights/workspaces') > -1) {
+          workspacesUrl = options.url;
+          return ctx.$q.when({ data: workspaceResponse, status: 200 });
+        } else {
+          azureLogAnalyticsUrl = options.url;
+          return ctx.$q.when({ data: tableResponseWithOneColumn, status: 200 });
+        }
+      };
+
+      await ctx.ds.metricFindQuery('workspace("aworkspace").AzureActivity  | distinct Category');
+    });
+
+    it('should use the sameasloganalyticsazure plugin route', () => {
+      expect(workspacesUrl).toContain('azuremonitor');
+      expect(azureLogAnalyticsUrl).toContain('sameasloganalyticsazure');
+    });
+  });
+
   describe('When performing testDatasource', () => {
     describe('and an error is returned', () => {
       const error = {

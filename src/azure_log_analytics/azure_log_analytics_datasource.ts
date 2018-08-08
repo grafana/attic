@@ -14,8 +14,11 @@ export default class AzureLogAnalyticsDatasource {
   /** @ngInject **/
   constructor(private instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.id = instanceSettings.id;
-    this.baseUrl = `/loganalyticsazure`;
+    this.baseUrl = this.instanceSettings.jsonData.azureLogAnalyticsSameAs
+      ? '/sameasloganalyticsazure'
+      : `/loganalyticsazure`;
     this.url = instanceSettings.url;
+
     this.setWorkspaceUrl();
   }
 
@@ -23,11 +26,11 @@ export default class AzureLogAnalyticsDatasource {
     return (
       !!this.instanceSettings.jsonData.logAnalyticsSubscriptionId &&
       this.instanceSettings.jsonData.logAnalyticsSubscriptionId.length > 0
-    );
+    ) || !!this.instanceSettings.jsonData.azureLogAnalyticsSameAs;
   }
 
   setWorkspaceUrl() {
-    if (!!this.instanceSettings.jsonData.subscriptionId) {
+    if (!!this.instanceSettings.jsonData.subscriptionId || !!this.instanceSettings.jsonData.azureLogAnalyticsSameAs) {
       this.subscriptionId = this.instanceSettings.jsonData.subscriptionId;
       const azureCloud = this.instanceSettings.jsonData.cloudName || 'azuremonitor';
       this.azureMonitorUrl = `/${azureCloud}/subscriptions/${this.subscriptionId}`;
