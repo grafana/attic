@@ -164,282 +164,142 @@ export default class FakeSchemaData {
 
   static getlogAnalyticsFakeMetadata() {
     return {
-      solutions: {
-        LogManagement: {
-          displayName: 'LogManagement',
-          types: ['Event'],
-        },
-        Security: {
-          displayName: 'LogManagement2',
-          types: ['Perf'],
-        },
-      },
-      types: {
-        Event: {
-          displayName: 'Event',
-          analytics: {
-            tableName: 'Event',
-          },
-          properties: [
-            'SourceSystem',
-            'TimeGenerated',
-            'Source',
-            'EventLog',
-            'Computer',
-            'EventLevel',
-            'EventLevelName',
-            'ParameterXml',
-            'EventData',
-            'EventID',
-            'RenderedDescription',
-            'AzureDeploymentID',
-            'Role',
-            'EventCategory',
-            'UserName',
-            'Message',
-            'ManagementGroupName',
-            'Type',
+      tables: [
+        {
+          id: 't/Alert',
+          name: 'Alert',
+          timespanColumn: 'TimeGenerated',
+          columns: [
+            { name: 'TimeGenerated', type: 'datetime' },
+            { name: 'AlertSeverity', type: 'string' },
+            { name: 'SourceDisplayName', type: 'string' },
+            { name: 'AlertName', type: 'string' },
+            { name: 'AlertDescription', type: 'string' },
+            { name: 'SourceSystem', type: 'string' },
+            { name: 'QueryExecutionStartTime', type: 'datetime' },
+            { name: 'QueryExecutionEndTime', type: 'datetime' },
+            { name: 'Query', type: 'string' },
+            { name: 'RemediationJobId', type: 'string' },
+            { name: 'RemediationRunbookName', type: 'string' },
+            { name: 'AlertRuleId', type: 'string' },
+            { name: 'AlertRuleInstanceId', type: 'string' },
+            { name: 'ThresholdOperator', type: 'string' },
+            { name: 'ThresholdValue', type: 'int' },
+            { name: 'LinkToSearchResults', type: 'string' },
+            { name: 'ServiceDeskConnectionName', type: 'string' },
+            { name: 'ServiceDeskId', type: 'string' },
+            { name: 'ServiceDeskWorkItemLink', type: 'string' },
+            { name: 'ServiceDeskWorkItemType', type: 'string' },
+            { name: 'ResourceId', type: 'string' },
+            { name: 'ResourceType', type: 'string' },
+            { name: 'ResourceValue', type: 'string' },
+            { name: 'RootObjectName', type: 'string' },
+            { name: 'ObjectDisplayName', type: 'string' },
+            { name: 'Computer', type: 'string' },
+            { name: 'AlertPriority', type: 'string' },
+            { name: 'SourceFullName', type: 'string' },
+            { name: 'AlertId', type: 'string' },
+            { name: 'RepeatCount', type: 'int' },
+            { name: 'AlertState', type: 'string' },
+            { name: 'ResolvedBy', type: 'string' },
+            { name: 'LastModifiedBy', type: 'string' },
+            { name: 'TimeRaised', type: 'datetime' },
+            { name: 'TimeResolved', type: 'datetime' },
+            { name: 'TimeLastModified', type: 'datetime' },
+            { name: 'AlertContext', type: 'string' },
+            { name: 'TicketId', type: 'string' },
+            { name: 'Custom1', type: 'string' },
+            { name: 'Custom2', type: 'string' },
+            { name: 'Custom3', type: 'string' },
+            { name: 'Custom4', type: 'string' },
+            { name: 'Custom5', type: 'string' },
+            { name: 'Custom6', type: 'string' },
+            { name: 'Custom7', type: 'string' },
+            { name: 'Custom8', type: 'string' },
+            { name: 'Custom9', type: 'string' },
+            { name: 'Custom10', type: 'string' },
+            { name: 'ManagementGroupName', type: 'string' },
+            { name: 'PriorityNumber', type: 'int' },
+            { name: 'HostName', type: 'string' },
+            { name: 'StateType', type: 'string' },
+            { name: 'AlertTypeDescription', type: 'string' },
+            { name: 'AlertTypeNumber', type: 'int' },
+            { name: 'AlertError', type: 'string' },
+            { name: 'StatusDescription', type: 'string' },
+            { name: 'AlertStatus', type: 'int' },
+            { name: 'TriggerId', type: 'string' },
+            { name: 'Url', type: 'string' },
+            { name: 'ValueDescription', type: 'string' },
+            { name: 'AlertValue', type: 'int' },
+            { name: 'Comments', type: 'string' },
+            { name: 'TemplateId', type: 'string' },
+            { name: 'FlagsDescription', type: 'string' },
+            { name: 'Flags', type: 'int' },
+            { name: 'ValueFlagsDescription', type: 'string' },
+            { name: 'ValueFlags', type: 'int' },
+            { name: 'Expression', type: 'string' },
+            { name: 'Type', type: 'string' },
           ],
         },
-        Perf: {
-          displayName: 'Perf',
-          analytics: {
-            tableName: 'Perf',
-          },
-          properties: [
-            'Computer',
-            'ObjectName',
-            'CounterName',
-            'InstanceName',
-            'CounterValue',
-            'TimeGenerated',
-            'SourceSystem',
-            'CounterPath',
-            'Min',
-            'Max',
-            'SampleCount',
-            'BucketStartTime',
-            'BucketEndTime',
-            'StandardDeviation',
-            'Type',
+        {
+          id: 't/AzureActivity',
+          name: 'AzureActivity',
+          timespanColumn: 'TimeGenerated',
+          columns: [
+            { name: 'OperationName', type: 'string' },
+            { name: 'Level', type: 'string' },
+            { name: 'ActivityStatus', type: 'string' },
+            { name: 'ActivitySubstatus', type: 'string' },
+            { name: 'ResourceGroup', type: 'string' },
+            { name: 'SubscriptionId', type: 'string' },
+            { name: 'CorrelationId', type: 'string' },
+            { name: 'Caller', type: 'string' },
+            { name: 'CallerIpAddress', type: 'string' },
+            { name: 'Category', type: 'string' },
+            { name: 'HTTPRequest', type: 'string' },
+            { name: 'Properties', type: 'string' },
+            { name: 'EventSubmissionTimestamp', type: 'datetime' },
+            { name: 'Authorization', type: 'string' },
+            { name: 'ResourceId', type: 'string' },
+            { name: 'OperationId', type: 'string' },
+            { name: 'ResourceProvider', type: 'string' },
+            { name: 'Resource', type: 'string' },
+            { name: 'TimeGenerated', type: 'datetime' },
+            { name: 'SourceSystem', type: 'string' },
+            { name: 'Type', type: 'string' },
           ],
         },
-      },
-      queries: {
-        'f7896734-07e2-4817-bea4-4b20e8438cf9': {
+      ],
+      tableGroups: [
+        {
+          id: 'oms/LogManagement',
+          name: 'LogManagement',
+          source: 'oms',
+          tables: ['t/Alert', 't/AzureActivity'],
+        },
+      ],
+      functions: [
+        {
+          id: 'f/Func1',
+          name: 'Func1',
           displayName: 'Func1',
+          body: 'AzureActivity\n| where ActivityStatus == "" \n',
           category: 'test',
-          analytics: {
-            functionName: 'Func1',
-            functionBody: 'AzureActivity\n| where ActivityStatus == "" \n',
-          },
         },
-      },
-      properties: {
-        SourceSystem: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'SourceSystem',
-          },
-          displayName: 'SourceSystem',
+      ],
+      applications: [],
+      workspaces: [
+        {
+          id: 'a2c1b44e-3e57-4410-b027-999999999999',
+          name: 'danieltest',
+          resourceId:
+            '/subscriptions/44693801-6ee6-49de-9b2d-999999999999/resourceGroups/danieltest/providers/' +
+            'microsoft.operationalinsights/workspaces/danieltest',
+          tables: [],
+          tableGroups: ['oms/LogManagement'],
+          functions: ['f/Func1'],
         },
-        TimeGenerated: {
-          analytics: {
-            columnType: 'datetime',
-            columnName: 'TimeGenerated',
-          },
-          displayName: 'TimeGenerated',
-        },
-        Source: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'Source',
-          },
-          displayName: 'Source',
-        },
-        EventLog: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'EventLog',
-          },
-          displayName: 'EventLog',
-        },
-        Computer: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'Computer',
-          },
-          displayName: 'Computer',
-        },
-        EventLevel: {
-          analytics: {
-            columnType: 'int',
-            columnName: 'EventLevel',
-          },
-          displayName: 'EventLevel',
-        },
-        EventLevelName: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'EventLevelName',
-          },
-          displayName: 'EventLevelName',
-        },
-        ParameterXml: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'ParameterXml',
-          },
-          displayName: 'ParameterXml',
-        },
-        EventData: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'EventData',
-          },
-          displayName: 'EventData',
-        },
-        EventID: {
-          analytics: {
-            columnType: 'int',
-            columnName: 'EventID',
-          },
-          displayName: 'EventID',
-        },
-        RenderedDescription: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'RenderedDescription',
-          },
-          displayName: 'RenderedDescription',
-        },
-        AzureDeploymentID: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'AzureDeploymentID',
-          },
-          displayName: 'AzureDeploymentID',
-        },
-        Role: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'Role',
-          },
-          displayName: 'Role',
-        },
-        EventCategory: {
-          analytics: {
-            columnType: 'int',
-            columnName: 'EventCategory',
-          },
-          displayName: 'EventCategory',
-        },
-        UserName: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'UserName',
-          },
-          displayName: 'UserName',
-        },
-        Message: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'Message',
-          },
-          displayName: 'Message',
-        },
-        ManagementGroupName: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'ManagementGroupName',
-          },
-          displayName: 'ManagementGroupName',
-        },
-        Type: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'Type',
-          },
-          displayName: 'Type',
-        },
-        ObjectName: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'ObjectName',
-          },
-          displayName: 'ObjectName',
-        },
-        CounterName: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'CounterName',
-          },
-          displayName: 'CounterName',
-        },
-        InstanceName: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'InstanceName',
-          },
-          displayName: 'InstanceName',
-        },
-        CounterValue: {
-          analytics: {
-            columnType: 'real',
-            columnName: 'CounterValue',
-          },
-          displayName: 'CounterValue',
-        },
-        CounterPath: {
-          analytics: {
-            columnType: 'string',
-            columnName: 'CounterPath',
-          },
-          displayName: 'CounterPath',
-        },
-        Min: {
-          analytics: {
-            columnType: 'real',
-            columnName: 'Min',
-          },
-          displayName: 'Min',
-        },
-        Max: {
-          analytics: {
-            columnType: 'real',
-            columnName: 'Max',
-          },
-          displayName: 'Max',
-        },
-        SampleCount: {
-          analytics: {
-            columnType: 'int',
-            columnName: 'SampleCount',
-          },
-          displayName: 'SampleCount',
-        },
-        BucketStartTime: {
-          analytics: {
-            columnType: 'datetime',
-            columnName: 'BucketStartTime',
-          },
-          displayName: 'BucketStartTime',
-        },
-        BucketEndTime: {
-          analytics: {
-            columnType: 'datetime',
-            columnName: 'BucketEndTime',
-          },
-          displayName: 'BucketEndTime',
-        },
-        StandardDeviation: {
-          analytics: {
-            columnType: 'real',
-            columnName: 'StandardDeviation',
-          },
-          displayName: 'StandardDeviation',
-        },
-      },
+      ],
     };
   }
 }

@@ -215,35 +215,35 @@ export default class ResponseParser {
   createSchemaTables(): { [key: string]: KustoTable } {
     const tables: { [key: string]: KustoTable } = {};
 
-    for (let key in this.results.types) {
-      tables[key] = {
-        Name: this.results.types[key].analytics.tableName,
+    for (let table of this.results.tables) {
+      tables[table.name] = {
+        Name: table.name,
         OrderedColumns: [],
       };
-      _.forEach(this.results.types[key].properties, prop => {
-        tables[key].OrderedColumns.push(this.findMetadataProp(prop));
-      });
+      for (let col of table.columns) {
+        tables[table.name].OrderedColumns.push(this.convertToKustoColumn(col));
+      }
     }
 
     return tables;
   }
 
-  findMetadataProp(propName: string): KustoColumn {
+  convertToKustoColumn(col: any): KustoColumn {
     return {
-      Name: propName,
-      Type: this.results.properties[propName].analytics.columnType,
+      Name: col.name,
+      Type: col.type,
     };
   }
 
   createSchemaFunctions(): { [key: string]: KustoFunction } {
     const functions: { [key: string]: KustoFunction } = {};
 
-    for (let key in this.results.queries) {
-      functions[this.results.queries[key].analytics.functionName] = {
-        Name: this.results.queries[key].analytics.functionName,
-        Body: this.results.queries[key].analytics.functionBody,
-        DocString: this.results.queries[key].displayName,
-        Folder: this.results.queries[key].category,
+    for (let func of this.results.functions) {
+      functions[func.name] = {
+        Name: func.name,
+        Body: func.body,
+        DocString: func.displayName,
+        Folder: func.category,
         FunctionKind: 'Unknown',
         InputParameters: [],
         OutputColumns: [],

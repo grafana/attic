@@ -28,10 +28,14 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     },
     azureLogAnalytics: {
       query: [
-        '//change this to create your own time series query',
-        '<table name>',
-        '| where $__timeFilter(TimeGenerated)',
-        '| summarize count() by <group by column>, bin(TimeGenerated, $__interval)',
+        '//change this example to create your own time series query',
+        '<table name>                                                              ' +
+          '//the table to query (e.g. Usage, Heartbeat, Perf)',
+        '| where $__timeFilter(TimeGenerated)                                      ' +
+          '//this is a macro used to show the full chart’s time range, choose the datetime column here',
+        '| summarize count() by <group by column>, bin(TimeGenerated, $__interval) ' +
+          '//change “group by column” to a column in your table, such as “Computer”. ' +
+          'The $__interval macro is used to auto-select the time grain. Can also use 1h, 5m etc.',
         '| order by TimeGenerated asc',
       ].join('\n'),
       resultFormat: 'time_series',

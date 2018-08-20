@@ -258,12 +258,12 @@ describe('AzureLogAnalyticsDatasource', () => {
     it('should return a schema with a table and rows', () => {
       return ctx.ds.azureLogAnalyticsDatasource.getSchema('myWorkspace').then(result => {
         expect(Object.keys(result.Databases.Default.Tables).length).toBe(2);
-        expect(result.Databases.Default.Tables.Perf.Name).toBe('Perf');
-        expect(result.Databases.Default.Tables.Event.Name).toBe('Event');
-        expect(result.Databases.Default.Tables.Perf.OrderedColumns.length).toBe(15);
-        expect(result.Databases.Default.Tables.Event.OrderedColumns.length).toBe(18);
-        expect(result.Databases.Default.Tables.Perf.OrderedColumns[0].Name).toBe('Computer');
-        expect(result.Databases.Default.Tables.Perf.OrderedColumns[0].Type).toBe('string');
+        expect(result.Databases.Default.Tables.Alert.Name).toBe('Alert');
+        expect(result.Databases.Default.Tables.AzureActivity.Name).toBe('AzureActivity');
+        expect(result.Databases.Default.Tables.Alert.OrderedColumns.length).toBe(69);
+        expect(result.Databases.Default.Tables.AzureActivity.OrderedColumns.length).toBe(21);
+        expect(result.Databases.Default.Tables.Alert.OrderedColumns[0].Name).toBe('TimeGenerated');
+        expect(result.Databases.Default.Tables.Alert.OrderedColumns[0].Type).toBe('datetime');
 
         expect(Object.keys(result.Databases.Default.Functions).length).toBe(1);
         expect(result.Databases.Default.Functions.Func1.Name).toBe('Func1');
