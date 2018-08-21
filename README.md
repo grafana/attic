@@ -228,9 +228,13 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 ### CHANGELOG
 
-#### v0.2.0
+#### v0.2.0 (not released)
 
 Added raw query support for Application Insights.
+
+#### v0.1.2
+
+Fix for long metric names which means that the Azure WebApp Slots metrics now work. [#27](https://github.com/grafana/azure-monitor-datasource/issues/27)
 
 #### v0.1.1
 
