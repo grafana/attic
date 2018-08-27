@@ -216,25 +216,9 @@ export default class AzureLogAnalyticsDatasource {
   }
 
   testDatasource() {
-    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsSubscriptionId)) {
-      return {
-        status: 'error',
-        message: 'The Subscription Id field is required.',
-      };
-    }
-
-    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsTenantId)) {
-      return {
-        status: 'error',
-        message: 'The Tenant Id field is required.',
-      };
-    }
-
-    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsClientId)) {
-      return {
-        status: 'error',
-        message: 'The Client Id field is required.',
-      };
+    const validationError = this.isValidConfig();
+    if (validationError) {
+      return validationError;
     }
 
     return this.getDefaultOrFirstWorkspace()
@@ -284,6 +268,35 @@ export default class AzureLogAnalyticsDatasource {
       message += 'Cannot connect to Azure Log Analytics REST API.';
     }
     return message;
+  }
+
+  isValidConfig() {
+    if (this.instanceSettings.jsonData.azureLogAnalyticsSameAs) {
+      return undefined;
+    }
+
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsSubscriptionId)) {
+      return {
+        status: 'error',
+        message: 'The Subscription Id field is required.',
+      };
+    }
+
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsTenantId)) {
+      return {
+        status: 'error',
+        message: 'The Tenant Id field is required.',
+      };
+    }
+
+    if (!this.isValidConfigField(this.instanceSettings.jsonData.logAnalyticsClientId)) {
+      return {
+        status: 'error',
+        message: 'The Client Id field is required.',
+      };
+    }
+
+    return undefined;
   }
 
   isValidConfigField(field: string) {
