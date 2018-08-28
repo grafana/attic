@@ -23,7 +23,7 @@
         <label class="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
       </div>
     </div>
-    <monaco-editor content="ctrl.annotation.rawQuery" on-change="ctrl.panelCtrl.refresh()" get-schema="ctrl.datasource.azureLogAnalyticsDatasource.getSchema(ctrl.annotation.workspace)"></monaco-editor>
+    <kusto-monaco-editor content="ctrl.annotation.rawQuery" on-change="ctrl.panelCtrl.refresh()" get-schema="ctrl.datasource.azureLogAnalyticsDatasource.getSchema(ctrl.annotation.workspace)"></kusto-monaco-editor>
   </div>
 
   <div class="gf-form-inline" ng-show="ctrl.annotation.queryType !== 'Azure Log Analytics'">

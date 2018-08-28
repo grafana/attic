@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { QueryCtrl } from 'grafana/app/plugins/sdk';
 import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
-import './monaco/monaco_editor';
+import './monaco/kusto_monaco_editor';
 
 export interface ResultFormat {
   text: string;

@@ -1,3 +1,5 @@
+///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
+
 import angular from 'angular';
 import '../lib/bridge.js';
 import '../lib/monaco.min.js';
@@ -100,7 +102,8 @@ function link(scope, elem, attrs) {
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
         const model = codeEditor.getModel();
         workerAccessor(model.uri).then(worker => {
-          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', 'Default');
+          const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
+          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
         });
       });
     });
@@ -144,7 +147,7 @@ function link(scope, elem, attrs) {
 }
 
 /** @ngInject */
-export function monacoEditorDirective() {
+export function kustoMonacoEditorDirective() {
   return {
     restrict: 'E',
     template: editorTemplate,
@@ -158,4 +161,4 @@ export function monacoEditorDirective() {
   };
 }
 
-angular.module('grafana.controllers').directive('monacoEditor', monacoEditorDirective);
+angular.module('grafana.controllers').directive('kustoMonacoEditor', kustoMonacoEditorDirective);
