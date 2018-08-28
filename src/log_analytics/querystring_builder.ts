@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export default class LogAnalyticsQuerystringBuilder {
   constructor(public rawQueryString, public options, public defaultTimeField) {}
 
@@ -25,7 +27,7 @@ export default class LogAnalyticsQuerystringBuilder {
 
   getFrom(options) {
     var from = options.range.from;
-    return `datetime(${from.toISOString()})`;
+    return `datetime(${moment(from).startOf('minute').toISOString()})`;
   }
 
   getUntil(options) {
@@ -33,7 +35,7 @@ export default class LogAnalyticsQuerystringBuilder {
       return "now()";
     } else {
       var until = options.range.to;
-      return `datetime(${until.toISOString()})`;
+      return `datetime(${moment(until).startOf('minute').toISOString()})`;
     }
   }
 

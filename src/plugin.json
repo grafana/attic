@@ -125,7 +125,11 @@
           "resource": "https://api.loganalytics.io"
         }
       },
-      "headers": [{ "name": "x-ms-app", "content": "Grafana" }]
+      "headers": [
+        { "name": "x-ms-app", "content": "Grafana" },
+        { "name": "Cache-Control", "content": "public, max-age=60" },
+        { "name": "Accept-Encoding", "content": "gzip" }
+      ]
     },
     {
       "path": "sameasloganalyticsazure",
@@ -140,7 +144,11 @@
           "resource": "https://api.loganalytics.io"
         }
       },
-      "headers": [{ "name": "x-ms-app", "content": "Grafana" }]
+      "headers": [
+        { "name": "x-ms-app", "content": "Grafana" },
+        { "name": "Cache-Control", "content": "public, max-age=60" },
+        { "name": "Accept-Encoding", "content": "gzip" }
+      ]
     }
   ],
 

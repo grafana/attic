@@ -4,7 +4,7 @@ jest.mock('./css/query_editor.css', () => {
 
 jest.mock('./monaco/kusto_monaco_editor');
 
-import {AzureMonitorQueryCtrl} from '../src/query_ctrl';
+import { AzureMonitorQueryCtrl } from '../src/query_ctrl';
 import TemplateSrvStub from '../specs/lib/template_srv_stub';
 import Q from 'q';
 
@@ -13,11 +13,11 @@ describe('AzureMonitorQueryCtrl', function() {
 
   beforeEach(function() {
     AzureMonitorQueryCtrl.prototype.panelCtrl = {
-      events: {on: () => {}},
-      panel: {scopedVars: []}
+      events: { on: () => {} },
+      panel: { scopedVars: [] },
     };
     queryCtrl = new AzureMonitorQueryCtrl({}, {}, new TemplateSrvStub());
-    queryCtrl.datasource = {$q: Q, appInsightsDatasource: {isConfigured: () => false}};
+    queryCtrl.datasource = { $q: Q, appInsightsDatasource: { isConfigured: () => false } };
   });
 
   describe('init query_ctrl variables', function() {
@@ -40,10 +40,7 @@ describe('AzureMonitorQueryCtrl', function() {
 
   describe('when the query type is Azure Monitor', function() {
     describe('and getOptions for the Resource Group dropdown is called', function() {
-      const response = [
-        {text: 'nodeapp', value: 'nodeapp'},
-        {text: 'otherapp', value: 'otherapp'},
-      ];
+      const response = [{ text: 'nodeapp', value: 'nodeapp' }, { text: 'otherapp', value: 'otherapp' }];
 
       beforeEach(function() {
         queryCtrl.datasource.getResourceGroups = function() {
@@ -52,7 +49,7 @@ describe('AzureMonitorQueryCtrl', function() {
         queryCtrl.datasource.azureMonitorDatasource = {
           isConfigured: function() {
             return true;
-          }
+          },
         };
       });
 
@@ -66,8 +63,8 @@ describe('AzureMonitorQueryCtrl', function() {
     describe('when getOptions for the Metric Definition dropdown is called', function() {
       describe('and resource group has a value', function() {
         const response = [
-          {text: 'Microsoft.Compute/virtualMachines', value: 'Microsoft.Compute/virtualMachines'},
-          {text: 'Microsoft.Network/publicIPAddresses', value: 'Microsoft.Network/publicIPAddresses'},
+          { text: 'Microsoft.Compute/virtualMachines', value: 'Microsoft.Compute/virtualMachines' },
+          { text: 'Microsoft.Network/publicIPAddresses', value: 'Microsoft.Network/publicIPAddresses' },
         ];
 
         beforeEach(function() {
@@ -95,15 +92,11 @@ describe('AzureMonitorQueryCtrl', function() {
           expect(queryCtrl.getMetricDefinitions('')).toBe(undefined);
         });
       });
-
     });
 
     describe('when getOptions for the ResourceNames dropdown is called', function() {
       describe('and resourceGroup and metricDefinition have values', function() {
-        const response = [
-          {text: 'test1', value: 'test1'},
-          {text: 'test2', value: 'test2'},
-        ];
+        const response = [{ text: 'test1', value: 'test1' }, { text: 'test2', value: 'test2' }];
 
         beforeEach(function() {
           queryCtrl.target.azureMonitor.resourceGroup = 'test';
@@ -137,10 +130,7 @@ describe('AzureMonitorQueryCtrl', function() {
 
     describe('when getOptions for the Metric Names dropdown is called', function() {
       describe('and resourceGroup, metricDefinition and resourceName have values', function() {
-        const response = [
-          {text: 'metric1', value: 'metric1'},
-          {text: 'metric2', value: 'metric2'},
-        ];
+        const response = [{ text: 'metric1', value: 'metric1' }, { text: 'metric2', value: 'metric2' }];
 
         beforeEach(function() {
           queryCtrl.target.azureMonitor.resourceGroup = 'test';
@@ -180,7 +170,7 @@ describe('AzureMonitorQueryCtrl', function() {
         primaryAggType: 'Average',
         supportAggOptions: ['Average', 'Total'],
         supportedTimeGrains: ['PT1M', 'P1D'],
-        dimensions: []
+        dimensions: [],
       };
 
       beforeEach(function() {
@@ -209,10 +199,7 @@ describe('AzureMonitorQueryCtrl', function() {
 
   describe('and query type is Application Insights', function() {
     describe('when getOptions for the Metric Names dropdown is called', function() {
-      const response = [
-        {text: 'metric1', value: 'metric1'},
-        {text: 'metric2', value: 'metric2'},
-      ];
+      const response = [{ text: 'metric1', value: 'metric1' }, { text: 'metric2', value: 'metric2' }];
 
       beforeEach(function() {
         queryCtrl.datasource.appInsightsDatasource.isConfigured = () => true;
@@ -269,5 +256,4 @@ describe('AzureMonitorQueryCtrl', function() {
       });
     });
   });
-
 });
