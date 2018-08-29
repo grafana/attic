@@ -38,7 +38,7 @@ describe('KustoCodeEditor', () => {
         expect(completionItems.length).toBe(1);
 
         expect(completionItems[0].label).toBe('where $__timeFilter(timeColumn)');
-        expect(completionItems[0].insertText.value).toBe('where \\$__timeFilter($0)');
+        expect(completionItems[0].insertText.value).toBe('where \\$__timeFilter(${0:TimeGenerated})');
       });
     });
 
@@ -53,7 +53,7 @@ describe('KustoCodeEditor', () => {
         expect(completionItems.length).toBe(4);
 
         expect(completionItems[0].label).toBe('$__timeFilter(timeColumn)');
-        expect(completionItems[0].insertText.value).toBe('\\$__timeFilter($0)');
+        expect(completionItems[0].insertText.value).toBe('\\$__timeFilter(${0:TimeGenerated})');
 
         expect(completionItems[1].label).toBe('$__from');
         expect(completionItems[1].insertText.value).toBe('\\$__from');

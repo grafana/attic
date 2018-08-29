@@ -8,6 +8,7 @@ export default class KustoCodeEditor {
   newLineRegex = /\r?\n/;
   startsWithKustoPipeRegex = /^\|\s*/g;
   kustoPipeRegexStrict = /^\|\s*$/g;
+  defaultTimeField = 'TimeGenerated';
 
   constructor(private codeEditor: monaco.editor.ICodeEditor) {}
 
@@ -19,7 +20,7 @@ export default class KustoCodeEditor {
     this.codeEditor.setValue(value);
   }
 
-  getCompletionItems(model, position) {
+  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
     const timeFilterDocs =
       '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
       '- `$__timeFilter()` -> Uses the TimeGenerated column\n\n' +
@@ -32,13 +33,13 @@ export default class KustoCodeEditor {
       endColumn: position.column,
     });
 
-    if (!_.includes(textUntilPosition, 'where')) {
+    if (!_.includes(textUntilPosition.toLowerCase(), 'where')) {
       return [
         {
           label: 'where $__timeFilter(timeColumn)',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: {
-            value: `where \\$__timeFilter($0)`,
+            value: 'where \\$__timeFilter(${0:' + this.defaultTimeField + '})',
           },
           documentation: {
             value: timeFilterDocs,
@@ -53,7 +54,7 @@ export default class KustoCodeEditor {
           label: '$__timeFilter(timeColumn)',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: {
-            value: `\\$__timeFilter($0)`,
+            value: '\\$__timeFilter(${0:' + this.defaultTimeField + '})',
           },
           documentation: {
             value: timeFilterDocs,
@@ -100,6 +101,37 @@ export default class KustoCodeEditor {
     }
 
     return [];
+  }
+
+  getSignatureHelp(model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken) {
+    var textUntilPosition = model.getValueInRange({
+      startLineNumber: position.lineNumber,
+      startColumn: position.column - 14,
+      endLineNumber: position.lineNumber,
+      endColumn: position.column,
+    });
+
+    if (textUntilPosition !== '$__timeFilter(') {
+      return <monaco.languages.SignatureHelp>{};
+    }
+
+    const signature: monaco.languages.SignatureHelp = {
+      activeParameter: 0,
+      activeSignature: 0,
+      signatures: [
+        {
+          label: '$__timeFilter(timeColumn)',
+          parameters: [
+            {
+              label: 'timeColumn',
+              documentation: 'Default is TimeGenerated column. Datetime column to filter data using the selected date range. ',
+            },
+          ],
+        },
+      ],
+    };
+
+    return signature;
   }
 
   onDidChangeCursorSelection(event) {

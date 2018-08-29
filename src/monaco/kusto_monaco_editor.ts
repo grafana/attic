@@ -75,10 +75,16 @@ function link(scope, elem, attrs) {
     const kustoCodeEditor = new KustoCodeEditor(codeEditor);
 
     let completionItemProvider;
+    let signatureHelpProvider;
     if (monaco.editor.getModels().length === 1) {
       completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
-      triggerCharacters: ['.', " "],
-        provideCompletionItems: kustoCodeEditor.getCompletionItems,
+        triggerCharacters: ['.', ' '],
+        provideCompletionItems: kustoCodeEditor.getCompletionItems.bind(kustoCodeEditor),
+      });
+
+      signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
+        signatureHelpTriggerCharacters: ['(', ')'],
+        provideSignatureHelp: kustoCodeEditor.getSignatureHelp,
       });
     }
 
@@ -136,6 +142,13 @@ function link(scope, elem, attrs) {
           completionItemProvider.dispose();
         } catch (e) {
           console.error('Failed to dispose the completion item provider.', e);
+        }
+      }
+      if (signatureHelpProvider) {
+        try {
+          signatureHelpProvider.dispose();
+        } catch (e) {
+          console.error('Failed to dispose the signature help provider.', e);
         }
       }
       if (codeEditor) {
