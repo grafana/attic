@@ -19,32 +19,32 @@ function link(scope, elem, attrs) {
   };
 
   function initMonaco(containerDiv) {
-    const themeName = config.bootData.user.lightTheme ? 'grafana-light': 'vs-dark';
+    const themeName = config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
 
     monaco.editor.defineTheme('grafana-light', {
       base: 'vs',
       inherit: true,
       rules: [
-          { token: 'comment', foreground: '008000' },
-          { token: 'variable.predefined', foreground: '800080' },
-          { token: 'function', foreground: '0000FF' },
-          { token: 'operator.sql', foreground: 'FF4500' },
-          { token: 'string', foreground: 'B22222' },
-          { token: 'operator.scss', foreground: '0000FF' },
-          { token: 'variable', foreground: 'C71585' },
-          { token: 'variable.parameter', foreground: '9932CC' },
-          { token: '', foreground: '000000' },
-          { token: 'type', foreground: '0000FF' },
-          { token: 'tag', foreground: '0000FF' },
-          { token: 'annotation', foreground: '2B91AF' },
-          { token: 'keyword', foreground: '0000FF' },
-          { token: 'number', foreground: '191970' },
-          { token: 'annotation', foreground: '9400D3' },
-          { token: 'invalid', background: 'cd3131' },
+        { token: 'comment', foreground: '008000' },
+        { token: 'variable.predefined', foreground: '800080' },
+        { token: 'function', foreground: '0000FF' },
+        { token: 'operator.sql', foreground: 'FF4500' },
+        { token: 'string', foreground: 'B22222' },
+        { token: 'operator.scss', foreground: '0000FF' },
+        { token: 'variable', foreground: 'C71585' },
+        { token: 'variable.parameter', foreground: '9932CC' },
+        { token: '', foreground: '000000' },
+        { token: 'type', foreground: '0000FF' },
+        { token: 'tag', foreground: '0000FF' },
+        { token: 'annotation', foreground: '2B91AF' },
+        { token: 'keyword', foreground: '0000FF' },
+        { token: 'number', foreground: '191970' },
+        { token: 'annotation', foreground: '9400D3' },
+        { token: 'invalid', background: 'cd3131' },
       ],
       colors: {
         'textCodeBlock.background': '#FFFFFF',
-      }
+      },
     });
 
     const codeEditor = monaco.editor.create(containerDiv, {
@@ -59,7 +59,7 @@ function link(scope, elem, attrs) {
       dragAndDrop: false,
       occurrencesHighlight: false,
       minimap: {
-          enabled: false
+        enabled: false,
       },
       renderIndentGuides: false,
       wordWrap: 'on',
@@ -73,21 +73,26 @@ function link(scope, elem, attrs) {
     });
 
     const kustoCodeEditor = new KustoCodeEditor(codeEditor);
-    const completionItems = kustoCodeEditor.getCompletionItems();
 
-    const completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
-      provideCompletionItems: () => {
-        return completionItems;
-      }
-    });
+    let completionItemProvider;
+    if (monaco.editor.getModels().length === 1) {
+      completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
+      triggerCharacters: ['.', " "],
+        provideCompletionItems: kustoCodeEditor.getCompletionItems,
+      });
+    }
 
     codeEditor.createContextKey('readyToExecute', true);
     /* tslint:disable:no-bitwise */
-    codeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
-      const newValue = codeEditor.getValue();
-      scope.content = newValue;
-      scope.onChange();
-    }, 'readyToExecute');
+    codeEditor.addCommand(
+      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+      () => {
+        const newValue = codeEditor.getValue();
+        scope.content = newValue;
+        scope.onChange();
+      },
+      'readyToExecute'
+    );
     /* tslint:enable:no-bitwise */
 
     codeEditor.onDidChangeCursorSelection(event => {
