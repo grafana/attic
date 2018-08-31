@@ -47,6 +47,12 @@ function link(scope, elem, attrs) {
       },
     });
 
+    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
+      includeControlCommands: true,
+      newlineAfterPipe: true,
+      useIntellisenseV2: false,
+    });
+
     const codeEditor = monaco.editor.create(containerDiv, {
       value: scope.content || 'Write your query here',
       language: 'kusto',
@@ -66,13 +72,7 @@ function link(scope, elem, attrs) {
     });
     codeEditor.layout();
 
-    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
-      includeControlCommands: true,
-      newlineAfterPipe: true,
-      useIntellisenseV2: false,
-    });
-
-    const kustoCodeEditor = new KustoCodeEditor(codeEditor);
+    const kustoCodeEditor = new KustoCodeEditor(codeEditor, scope.defaultTimeField);
 
     let completionItemProvider;
     let signatureHelpProvider;
@@ -171,9 +171,9 @@ export function kustoMonacoEditorDirective() {
     template: editorTemplate,
     scope: {
       content: '=',
-      datasource: '=',
       onChange: '&',
       getSchema: '&',
+      defaultTimeField: '@',
     },
     link: link,
   };

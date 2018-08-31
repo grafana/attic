@@ -8,9 +8,8 @@ export default class KustoCodeEditor {
   newLineRegex = /\r?\n/;
   startsWithKustoPipeRegex = /^\|\s*/g;
   kustoPipeRegexStrict = /^\|\s*$/g;
-  defaultTimeField = 'TimeGenerated';
 
-  constructor(private codeEditor: monaco.editor.ICodeEditor) {}
+  constructor(private codeEditor: monaco.editor.ICodeEditor, private defaultTimeField: string) {}
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
     return <any>srv;

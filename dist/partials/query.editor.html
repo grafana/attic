@@ -117,7 +117,7 @@
       </div>
     </div>
 
-    <kusto-monaco-editor content="ctrl.target.azureLogAnalytics.query" on-change="ctrl.refresh()" get-schema="ctrl.getAzureLogAnalyticsSchema()"></kusto-monaco-editor>
+    <kusto-monaco-editor content="ctrl.target.azureLogAnalytics.query" on-change="ctrl.refresh()" get-schema="ctrl.getAzureLogAnalyticsSchema()" default-time-field="TimeGenerated"></kusto-monaco-editor>
 
     <div class="gf-form-inline">
       <div class="gf-form">

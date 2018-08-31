@@ -10,6 +10,7 @@ export class AzureMonitorAnnotationsQueryCtrl {
   constructor() {
     this.annotation.queryType = this.annotation.queryType || 'Azure Log Analytics';
     this.annotation.rawQuery = this.annotation.rawQuery || this.defaultQuery;
+    this.getWorkspaces();
   }
 
   getWorkspaces() {
