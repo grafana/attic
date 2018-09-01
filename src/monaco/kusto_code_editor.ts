@@ -78,7 +78,7 @@ export default class KustoCodeEditor {
 
       this.signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
         signatureHelpTriggerCharacters: ['(', ')'],
-        provideSignatureHelp: this.getSignatureHelp,
+        provideSignatureHelp: this.getSignatureHelp.bind(this),
       });
     }
 
@@ -159,6 +159,10 @@ export default class KustoCodeEditor {
       endLineNumber: position.lineNumber,
       endColumn: position.column,
     });
+
+    if (!_.includes(textUntilPosition, '|')) {
+      return [];
+    }
 
     if (!_.includes(textUntilPosition.toLowerCase(), 'where')) {
       return [

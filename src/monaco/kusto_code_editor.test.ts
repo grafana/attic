@@ -28,6 +28,18 @@ describe('KustoCodeEditor', () => {
       editor.codeEditor = new StandaloneMock();
     });
 
+    describe('when no where clause and no | in model text', () => {
+      beforeEach(() => {
+        lineContent = ' ';
+        const position = {lineNumber: 2, column: 2};
+        completionItems = editor.getCompletionItems(model, position);
+      });
+
+      it('should not return any grafana macros', () => {
+        expect(completionItems.length).toBe(0);
+      });
+    });
+
     describe('when no where clause in model text', () => {
       beforeEach(() => {
         lineContent = '| ';
