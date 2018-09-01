@@ -150,7 +150,7 @@ export default class KustoCodeEditor {
   getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
     const timeFilterDocs =
       '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
-      '- `$__timeFilter()` -> Uses the TimeGenerated column\n\n' +
+      '- `$__timeFilter()` -> Uses the ' + this.defaultTimeField + ' column\n\n' +
       '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.';
 
     var textUntilPosition = model.getValueInRange({
@@ -196,7 +196,7 @@ export default class KustoCodeEditor {
           documentation: {
             value:
               'Built-in variable that returns the from value of the selected timerange in Grafana.\n\n' +
-              'Example: `where TimeGenerated > $__from` ',
+              'Example: `where ' + this.defaultTimeField + ' > $__from` ',
           },
         },
         {
@@ -208,7 +208,7 @@ export default class KustoCodeEditor {
           documentation: {
             value:
               'Built-in variable that returns the to value of the selected timerange in Grafana.\n\n' +
-              'Example: `where TimeGenerated < $__to` ',
+              'Example: `where ' + this.defaultTimeField + ' < $__to` ',
           },
         },
         {
@@ -220,7 +220,7 @@ export default class KustoCodeEditor {
           documentation: {
             value:
               '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
-              'Used with the bin() function - `bin(TimeGenerated, $__interval)` \n\n' +
+              'Used with the bin() function - `bin(' + this.defaultTimeField + ', $__interval)` \n\n' +
               '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
           },
         },
@@ -252,7 +252,7 @@ export default class KustoCodeEditor {
             {
               label: 'timeColumn',
               documentation:
-                'Default is TimeGenerated column. Datetime column to filter data using the selected date range. ',
+                'Default is ' + this.defaultTimeField + ' column. Datetime column to filter data using the selected date range. ',
             },
           ],
         },
