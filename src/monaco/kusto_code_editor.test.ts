@@ -24,7 +24,8 @@ describe('KustoCodeEditor', () => {
       };
 
       const StandaloneMock = jest.fn<monaco.editor.ICodeEditor>();
-      editor = new KustoCodeEditor(new StandaloneMock(), 'TimeGenerated');
+      editor = new KustoCodeEditor(null, 'TimeGenerated', () => {}, {});
+      editor.codeEditor = new StandaloneMock();
     });
 
     describe('when no where clause in model text', () => {
@@ -132,7 +133,8 @@ describe('KustoCodeEditor', () => {
           },
         }));
 
-        editor = new KustoCodeEditor(new StandaloneMock(), 'TimeGenerated');
+        editor = new KustoCodeEditor(null, 'TimeGenerated', () => {}, {});
+        editor.codeEditor = new StandaloneMock();
         editor.triggerSuggestions = () => {
           suggestionTriggered = true;
         };

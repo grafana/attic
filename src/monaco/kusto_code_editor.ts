@@ -1,15 +1,143 @@
 import _ from 'lodash';
+
 export interface SuggestionController {
   _model: any;
 }
 
 export default class KustoCodeEditor {
+  codeEditor: monaco.editor.IStandaloneCodeEditor;
+  completionItemProvider: monaco.IDisposable;
+  signatureHelpProvider: monaco.IDisposable;
+
   splitWithNewLineRegex = /[^\n]+\n?|\n/g;
   newLineRegex = /\r?\n/;
   startsWithKustoPipeRegex = /^\|\s*/g;
   kustoPipeRegexStrict = /^\|\s*$/g;
 
-  constructor(private codeEditor: monaco.editor.ICodeEditor, private defaultTimeField: string) {}
+  constructor(private containerDiv: any, private defaultTimeField: string, private getSchema: () => any, private config: any) {}
+
+  initMonaco(scope) {
+    const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
+
+    monaco.editor.defineTheme('grafana-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '008000' },
+        { token: 'variable.predefined', foreground: '800080' },
+        { token: 'function', foreground: '0000FF' },
+        { token: 'operator.sql', foreground: 'FF4500' },
+        { token: 'string', foreground: 'B22222' },
+        { token: 'operator.scss', foreground: '0000FF' },
+        { token: 'variable', foreground: 'C71585' },
+        { token: 'variable.parameter', foreground: '9932CC' },
+        { token: '', foreground: '000000' },
+        { token: 'type', foreground: '0000FF' },
+        { token: 'tag', foreground: '0000FF' },
+        { token: 'annotation', foreground: '2B91AF' },
+        { token: 'keyword', foreground: '0000FF' },
+        { token: 'number', foreground: '191970' },
+        { token: 'annotation', foreground: '9400D3' },
+        { token: 'invalid', background: 'cd3131' },
+      ],
+      colors: {
+        'textCodeBlock.background': '#FFFFFF',
+      },
+    });
+
+    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
+      includeControlCommands: true,
+      newlineAfterPipe: true,
+      useIntellisenseV2: false,
+    });
+
+    this.codeEditor = monaco.editor.create(this.containerDiv, {
+      value: scope.content || 'Write your query here',
+      language: 'kusto',
+      selectionHighlight: false,
+      theme: themeName,
+      folding: true,
+      lineNumbers: 'off',
+      lineHeight: 16,
+      suggestFontSize: 13,
+      dragAndDrop: false,
+      occurrencesHighlight: false,
+      minimap: {
+        enabled: false,
+      },
+      renderIndentGuides: false,
+      wordWrap: 'on',
+    });
+    this.codeEditor.layout();
+
+    if (monaco.editor.getModels().length === 1) {
+      this.completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
+        triggerCharacters: ['.', ' '],
+        provideCompletionItems: this.getCompletionItems.bind(this),
+      });
+
+      this.signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
+        signatureHelpTriggerCharacters: ['(', ')'],
+        provideSignatureHelp: this.getSignatureHelp,
+      });
+    }
+
+    this.codeEditor.createContextKey('readyToExecute', true);
+
+    this.codeEditor.onDidChangeCursorSelection(event => {
+      this.onDidChangeCursorSelection(event);
+    });
+
+    this.getSchema().then(schema => {
+      if (!schema) {
+        return;
+      }
+
+      monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
+        const model = this.codeEditor.getModel();
+        workerAccessor(model.uri).then(worker => {
+          const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
+          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
+        });
+      });
+    });
+  }
+
+  setOnDidChangeModelContent(listener) {
+    this.codeEditor.onDidChangeModelContent(listener);
+  }
+
+  disposeMonaco() {
+    if (this.completionItemProvider) {
+      try {
+        this.completionItemProvider.dispose();
+      } catch (e) {
+        console.error('Failed to dispose the completion item provider.', e);
+      }
+    }
+    if (this.signatureHelpProvider) {
+      try {
+        this.signatureHelpProvider.dispose();
+      } catch (e) {
+        console.error('Failed to dispose the signature help provider.', e);
+      }
+    }
+    if (this.codeEditor) {
+      try {
+        this.codeEditor.dispose();
+      } catch (e) {
+        console.error('Failed to dispose the editor component.', e);
+      }
+    }
+  }
+
+  addCommand(keybinding: number, commandFunc: monaco.editor.ICommandHandler) {
+    this.codeEditor.addCommand(keybinding, commandFunc, 'readyToExecute');
+  }
+
+  getValue() {
+    return this.codeEditor.getValue();
+  }
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
     return <any>srv;
@@ -123,7 +251,8 @@ export default class KustoCodeEditor {
           parameters: [
             {
               label: 'timeColumn',
-              documentation: 'Default is TimeGenerated column. Datetime column to filter data using the selected date range. ',
+              documentation:
+                'Default is TimeGenerated column. Datetime column to filter data using the selected date range. ',
             },
           ],
         },

@@ -11,117 +11,37 @@ let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height:
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
   setTimeout(() => {
-    initMonaco(containerDiv);
+    initMonaco(containerDiv, scope);
   }, 1);
 
   containerDiv.onblur = () => {
     scope.onChange();
   };
 
-  function initMonaco(containerDiv) {
-    const themeName = config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
+  function initMonaco(containerDiv, scope) {
+    const kustoCodeEditor = new KustoCodeEditor(
+      containerDiv,
+      scope.defaultTimeField,
+      scope.getSchema,
+      config
+    );
 
-    monaco.editor.defineTheme('grafana-light', {
-      base: 'vs',
-      inherit: true,
-      rules: [
-        { token: 'comment', foreground: '008000' },
-        { token: 'variable.predefined', foreground: '800080' },
-        { token: 'function', foreground: '0000FF' },
-        { token: 'operator.sql', foreground: 'FF4500' },
-        { token: 'string', foreground: 'B22222' },
-        { token: 'operator.scss', foreground: '0000FF' },
-        { token: 'variable', foreground: 'C71585' },
-        { token: 'variable.parameter', foreground: '9932CC' },
-        { token: '', foreground: '000000' },
-        { token: 'type', foreground: '0000FF' },
-        { token: 'tag', foreground: '0000FF' },
-        { token: 'annotation', foreground: '2B91AF' },
-        { token: 'keyword', foreground: '0000FF' },
-        { token: 'number', foreground: '191970' },
-        { token: 'annotation', foreground: '9400D3' },
-        { token: 'invalid', background: 'cd3131' },
-      ],
-      colors: {
-        'textCodeBlock.background': '#FFFFFF',
-      },
-    });
+    kustoCodeEditor.initMonaco(scope);
 
-    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
-      includeControlCommands: true,
-      newlineAfterPipe: true,
-      useIntellisenseV2: false,
-    });
-
-    const codeEditor = monaco.editor.create(containerDiv, {
-      value: scope.content || 'Write your query here',
-      language: 'kusto',
-      selectionHighlight: false,
-      theme: themeName,
-      folding: true,
-      lineNumbers: 'off',
-      lineHeight: 16,
-      suggestFontSize: 13,
-      dragAndDrop: false,
-      occurrencesHighlight: false,
-      minimap: {
-        enabled: false,
-      },
-      renderIndentGuides: false,
-      wordWrap: 'on',
-    });
-    codeEditor.layout();
-
-    const kustoCodeEditor = new KustoCodeEditor(codeEditor, scope.defaultTimeField);
-
-    let completionItemProvider;
-    let signatureHelpProvider;
-    if (monaco.editor.getModels().length === 1) {
-      completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
-        triggerCharacters: ['.', ' '],
-        provideCompletionItems: kustoCodeEditor.getCompletionItems.bind(kustoCodeEditor),
-      });
-
-      signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
-        signatureHelpTriggerCharacters: ['(', ')'],
-        provideSignatureHelp: kustoCodeEditor.getSignatureHelp,
-      });
-    }
-
-    codeEditor.createContextKey('readyToExecute', true);
     /* tslint:disable:no-bitwise */
-    codeEditor.addCommand(
+    kustoCodeEditor.addCommand(
       monaco.KeyMod.Shift | monaco.KeyCode.Enter,
       () => {
-        const newValue = codeEditor.getValue();
+        const newValue = kustoCodeEditor.getValue();
         scope.content = newValue;
         scope.onChange();
       },
-      'readyToExecute'
     );
     /* tslint:enable:no-bitwise */
 
-    codeEditor.onDidChangeCursorSelection(event => {
-      kustoCodeEditor.onDidChangeCursorSelection(event);
-    });
-
-    scope.getSchema().then(schema => {
-      if (!schema) {
-        return;
-      }
-
-      monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
-        const model = codeEditor.getModel();
-        workerAccessor(model.uri).then(worker => {
-          const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
-          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
-        });
-      });
-    });
-
     // Sync with outer scope - update editor content if model has been changed from outside of directive.
     scope.$watch('content', (newValue, oldValue) => {
-      let editorValue = codeEditor.getValue();
+      let editorValue = kustoCodeEditor.getValue();
       if (newValue !== editorValue && newValue !== oldValue) {
         scope.$$postDigest(function() {
           kustoCodeEditor.setEditorContent(newValue);
@@ -129,38 +49,16 @@ function link(scope, elem, attrs) {
       }
     });
 
-    codeEditor.onDidChangeModelContent(() => {
+    kustoCodeEditor.setOnDidChangeModelContent(() => {
       scope.$apply(() => {
-        let newValue = codeEditor.getValue();
+        let newValue = kustoCodeEditor.getValue();
         scope.content = newValue;
       });
     });
 
     scope.$on('$destroy', () => {
-      if (completionItemProvider) {
-        try {
-          completionItemProvider.dispose();
-        } catch (e) {
-          console.error('Failed to dispose the completion item provider.', e);
-        }
-      }
-      if (signatureHelpProvider) {
-        try {
-          signatureHelpProvider.dispose();
-        } catch (e) {
-          console.error('Failed to dispose the signature help provider.', e);
-        }
-      }
-      if (codeEditor) {
-        try {
-          codeEditor.dispose();
-        } catch (e) {
-          console.error('Failed to dispose the editor component.', e);
-        }
-      }
+      kustoCodeEditor.disposeMonaco();
     });
-
-    return codeEditor;
   }
 }
 
