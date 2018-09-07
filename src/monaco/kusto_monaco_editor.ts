@@ -1,7 +1,6 @@
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
 
 import angular from 'angular';
-import '../lib/bridge.js';
 import '../lib/monaco.min.js';
 import KustoCodeEditor from './kusto_code_editor';
 import config from 'grafana/app/core/config';
