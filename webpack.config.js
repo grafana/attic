@@ -10,6 +10,7 @@ module.exports = {
   context: path.join(__dirname, 'src'),
   entry: {
     'module': './module.ts',
+    'lib/monaco.min': './lib/monaco.min.js',
 	},
   devtool: 'source-map',
   output: {
@@ -18,7 +19,7 @@ module.exports = {
     libraryTarget: 'amd'
   },
   externals: [
-    'lodash', 'moment',
+    'lodash', 'moment', 'System',
     function(context, request, callback) {
       var prefix = 'grafana/';
       if (request.indexOf(prefix) === 0) {
