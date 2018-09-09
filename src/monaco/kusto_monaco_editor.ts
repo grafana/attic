@@ -1,7 +1,6 @@
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
 
 import angular from 'angular';
-// import '../lib/monaco.min.js';
 import KustoCodeEditor from './kusto_code_editor';
 import config from 'grafana/app/core/config';
 
@@ -11,7 +10,7 @@ function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
 
   if (!(global as any).monaco) {
-    (global as any).System.import('/public/plugins/grafana-azure-monitor-datasource/lib/monaco.min.js').then(() => {
+    (global as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
       }, 1);
@@ -72,6 +71,7 @@ export function kustoMonacoEditorDirective() {
       onChange: '&',
       getSchema: '&',
       defaultTimeField: '@',
+      pluginBaseUrl: '@',
     },
     link: link,
   };
