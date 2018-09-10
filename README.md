@@ -2,7 +2,7 @@
 
 Azure Monitor is the platform service that provides a single source for monitoring Azure resources. Application Insights is an extensible Application Performance Management (APM) service for web developers on multiple platforms and can be used to monitor your live web application - it will automatically detect performance anomalies.
 
-The Azure Monitor Data Source plugin supports both Azure Monitor, Azure Log Analytics and Application Insights metrics in Grafana.
+The Azure Monitor Data Source plugin supports Azure Monitor, Azure Log Analytics and Application Insights metrics in Grafana.
 
 ## Features
 
@@ -12,6 +12,7 @@ The Azure Monitor Data Source plugin supports both Azure Monitor, Azure Log Anal
 - Application Insights metrics
   - Write raw [log analytics queries](https://docs.loganalytics.io/docs/Language-Reference), and select x-axis, y-axis, and grouped values manually.
   - Automatic time grain support
+- Support for Log Analytics (both for Azure Monitor and Application Insights)
 - You can combine metrics from both services in the same graph.
 
 ## Installation
@@ -26,7 +27,6 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
     ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-monitor-datasource/master/dist/img/grafana_cloud_install.png)
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Monitor data source will be installed.
-
 
 ### Installation Instructions on the Grafana Docs Site
 
@@ -271,7 +271,9 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 #### v0.2.0 (not released)
 
-Added raw query support for Application Insights.
+- Added raw query support for Application Insights.
+- Add support for Azure Log Analytics with Monaco Editor and intellisense.
+- Basic support for Application Insights Log Analytics.
 
 #### v0.1.2
 
