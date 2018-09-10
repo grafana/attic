@@ -1,13 +1,17 @@
 import AzureLogAnalyticsDatasource from './azure_log_analytics/azure_log_analytics_datasource';
+import config from 'grafana/app/core/config';
+import { isVersionGtOrEq } from './version';
 
 export class AzureMonitorConfigCtrl {
   static templateUrl = 'partials/config.html';
   current: any;
   azureLogAnalyticsDatasource: any;
   workspaces: any[];
+  hasRequiredGrafanaVersion: boolean;
 
   /** @ngInject **/
   constructor($scope, backendSrv, $q) {
+    this.hasRequiredGrafanaVersion = this.hasMinVersion();
     this.current.jsonData.cloudName = this.current.jsonData.cloudName || 'azuremonitor';
     this.current.jsonData.azureLogAnalyticsSameAs = this.current.jsonData.azureLogAnalyticsSameAs || false;
 
@@ -16,6 +20,14 @@ export class AzureMonitorConfigCtrl {
       this.azureLogAnalyticsDatasource = new AzureLogAnalyticsDatasource(this.current, backendSrv, null, $q);
       this.getWorkspaces();
     }
+  }
+
+  hasMinVersion(): boolean {
+    return isVersionGtOrEq(config.buildInfo.latestVersion, '5.3') || config.buildInfo.version === '5.3.0-beta1';
+  }
+
+  showMinVersionWarning() {
+    return !this.hasMinVersion() && this.current.secureJsonFields.logAnalyticsClientSecret;
   }
 
   getWorkspaces() {
