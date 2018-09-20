@@ -25,9 +25,10 @@ export default class AzureLogAnalyticsDatasource {
 
   isConfigured(): boolean {
     return (
-      !!this.instanceSettings.jsonData.logAnalyticsSubscriptionId &&
-      this.instanceSettings.jsonData.logAnalyticsSubscriptionId.length > 0
-    ) || !!this.instanceSettings.jsonData.azureLogAnalyticsSameAs;
+      (!!this.instanceSettings.jsonData.logAnalyticsSubscriptionId &&
+        this.instanceSettings.jsonData.logAnalyticsSubscriptionId.length > 0) ||
+      !!this.instanceSettings.jsonData.azureLogAnalyticsSameAs
+    );
   }
 
   setWorkspaceUrl() {
@@ -108,9 +109,24 @@ export default class AzureLogAnalyticsDatasource {
 
       const promises = this.doQueries(queries);
 
-      return this.$q.all(promises).then(results => {
-        return new ResponseParser(results).parseToVariables();
-      });
+      return this.$q
+        .all(promises)
+        .then(results => {
+          return new ResponseParser(results).parseToVariables();
+        })
+        .catch(err => {
+          if (
+            err.error &&
+            err.error.data &&
+            err.error.data.error &&
+            err.error.data.error.innererror &&
+            err.error.data.error.innererror.innererror
+          ) {
+            throw { message: err.error.data.error.innererror.innererror.message };
+          } else if (err.error && err.error.data && err.error.data.error) {
+            throw { message: err.error.data.error.message };
+          }
+        });
     });
   }
 
