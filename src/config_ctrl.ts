@@ -23,11 +23,11 @@ export class AzureMonitorConfigCtrl {
   }
 
   hasMinVersion(): boolean {
-    return isVersionGtOrEq(config.buildInfo.latestVersion, '5.3') || config.buildInfo.version === '5.3.0-beta1';
+    return isVersionGtOrEq(config.buildInfo.latestVersion, '5.2');
   }
 
   showMinVersionWarning() {
-    return !this.hasMinVersion() && this.current.secureJsonFields.logAnalyticsClientSecret;
+    return !this.hasRequiredGrafanaVersion && this.current.secureJsonFields.logAnalyticsClientSecret;
   }
 
   getWorkspaces() {
