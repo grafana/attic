@@ -18,12 +18,15 @@ export class AzureMonitorAnnotationsQueryCtrl {
       return this.workspaces;
     }
 
-    return this.datasource.getAzureLogAnalyticsWorkspaces().then(list => {
-      this.workspaces = list;
-      if (list.length > 0 && !this.annotation.workspace) {
-        this.annotation.workspace = list[0].value;
-      }
-      return this.workspaces;
-    }).catch(() => {});
+    return this.datasource
+      .getAzureLogAnalyticsWorkspaces()
+      .then(list => {
+        this.workspaces = list;
+        if (list.length > 0 && !this.annotation.workspace) {
+          this.annotation.workspace = list[0].value;
+        }
+        return this.workspaces;
+      })
+      .catch(() => {});
   }
 }
