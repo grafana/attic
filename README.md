@@ -269,7 +269,7 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 ### CHANGELOG
 
-#### v0.2.0 (not released)
+#### v0.2.0
 
 - Added raw query support for Application Insights.
 - Add support for Azure Log Analytics with Monaco Editor and intellisense.
