@@ -6,6 +6,14 @@ export default class LogAnalyticsQuerystringBuilder {
   generate() {
     var queryString = this.rawQueryString;
     const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\)]*)\)/gi;
+    queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
+      if (p1 === 'contains') {
+        return this.getMultiContains(p2);
+      }
+
+      return match;
+    });
+
     if (this.options) {
       queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
         if (p1 === 'timeFilter') {
@@ -22,20 +30,24 @@ export default class LogAnalyticsQuerystringBuilder {
     queryString = encodeURIComponent(queryString);
     let uriString = `query=${queryString}`;
 
-    return { uriString, rawQuery};
+    return { uriString, rawQuery };
   }
 
   getFrom(options) {
     var from = options.range.from;
-    return `datetime(${moment(from).startOf('minute').toISOString()})`;
+    return `datetime(${moment(from)
+      .startOf('minute')
+      .toISOString()})`;
   }
 
   getUntil(options) {
     if (options.rangeRaw.to === 'now') {
-      return "now()";
+      return 'now()';
     } else {
       var until = options.range.to;
-      return `datetime(${moment(until).startOf('minute').toISOString()})`;
+      return `datetime(${moment(until)
+        .startOf('minute')
+        .toISOString()})`;
     }
   }
 
@@ -46,5 +58,17 @@ export default class LogAnalyticsQuerystringBuilder {
     } else {
       return `${timeField}  >= ${this.getFrom(options)} and ${timeField} <= ${this.getUntil(options)}`;
     }
+  }
+
+  getMultiContains(inputs: string) {
+    const firstCommaIndex = inputs.indexOf(',');
+    const field = inputs.substring(0, firstCommaIndex);
+    const templateVar = inputs.substring(inputs.indexOf(',') + 1);
+
+    if (templateVar && templateVar.toLowerCase().trim() === 'all') {
+      return '1 == 1';
+    }
+
+    return `${field.trim()} in (${templateVar.trim()})`;
   }
 }
