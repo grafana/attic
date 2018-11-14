@@ -9,7 +9,7 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": ["azure", "monitor", "Application Insights"],
+    "keywords": ["azure", "monitor", "Application Insights", "Log Analytics", "App Insights"],
     "logos": {
       "small": "img/logo.jpg",
       "large": "img/logo.jpg"
@@ -23,8 +23,8 @@
       { "name": "Azure Monitor Network", "path": "img/azure_monitor_network.png" },
       { "name": "Azure Monitor CPU", "path": "img/azure_monitor_cpu.png" }
     ],
-    "version": "0.2.0",
-    "updated": "2018-08-21"
+    "version": "0.2.1",
+    "updated": "2018-11-14"
   },
 
   "routes": [
