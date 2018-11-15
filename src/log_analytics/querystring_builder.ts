@@ -14,6 +14,8 @@ export default class LogAnalyticsQuerystringBuilder {
       return match;
     });
 
+    queryString = queryString.replace(/\$__escapeMulti\(('[^]*')\)/gi, (match, p1) => this.escape(p1));
+
     if (this.options) {
       queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
         if (p1 === 'timeFilter') {
@@ -70,5 +72,14 @@ export default class LogAnalyticsQuerystringBuilder {
     }
 
     return `${field.trim()} in (${templateVar.trim()})`;
+  }
+
+  escape(inputs: string) {
+    console.log('hejsassan');
+    return inputs
+      .substring(1, inputs.length - 1)
+      .split(`','`)
+      .map(v => `@'${v}'`)
+      .join(', ');
   }
 }
