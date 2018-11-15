@@ -5,10 +5,12 @@ export default class LogAnalyticsQuerystringBuilder {
 
   generate() {
     var queryString = this.rawQueryString;
-    const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\)]*)\)/gi;
+    const macroRegexp = /\$__([_a-zA-Z0-9]+)\(('[^]*'|[^\)]*)\)/gi;
     queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
       if (p1 === 'contains') {
         return this.getMultiContains(p2);
+      } else if (p1 === 'escape') {
+        return this.escape(p2);
       }
 
       return match;
@@ -70,5 +72,12 @@ export default class LogAnalyticsQuerystringBuilder {
     }
 
     return `${field.trim()} in (${templateVar.trim()})`;
+  }
+
+  escape(inputs: string) {
+    return inputs
+      .split(',')
+      .map(v => `@${v}`)
+      .join(', ');
   }
 }
