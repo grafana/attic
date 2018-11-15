@@ -36533,14 +36533,15 @@ var LogAnalyticsQuerystringBuilder = /** @class */function () {
     LogAnalyticsQuerystringBuilder.prototype.generate = function () {
         var _this = this;
         var queryString = this.rawQueryString;
-        var macroRegexp = /\$__([_a-zA-Z0-9]+)\(('[^]*'|[^\)]*)\)/gi;
+        var macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\)]*)\)/gi;
         queryString = queryString.replace(macroRegexp, function (match, p1, p2) {
             if (p1 === 'contains') {
                 return _this.getMultiContains(p2);
-            } else if (p1 === 'escapeMulti') {
-                return _this.escape(p2);
             }
             return match;
+        });
+        queryString = queryString.replace(/\$__escapeMulti\(('[^]*')\)/gi, function (match, p1) {
+            return _this.escape(p1);
         });
         if (this.options) {
             queryString = queryString.replace(macroRegexp, function (match, p1, p2) {
@@ -36588,8 +36589,9 @@ var LogAnalyticsQuerystringBuilder = /** @class */function () {
         return field.trim() + " in (" + templateVar.trim() + ")";
     };
     LogAnalyticsQuerystringBuilder.prototype.escape = function (inputs) {
-        return inputs.split(',').map(function (v) {
-            return "@" + v;
+        console.log('hejsassan');
+        return inputs.substring(1, inputs.length - 1).split("','").map(function (v) {
+            return "@'" + v + "'";
         }).join(', ');
     };
     return LogAnalyticsQuerystringBuilder;

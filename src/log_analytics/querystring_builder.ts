@@ -6,16 +6,16 @@ export default class LogAnalyticsQuerystringBuilder {
 
   generate() {
     var queryString = this.rawQueryString;
-    const macroRegexp = /\$__([_a-zA-Z0-9]+)\(('[^]*'|[^\)]*)\)/gi;
+    const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\)]*)\)/gi;
     queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
       if (p1 === 'contains') {
         return this.getMultiContains(p2);
-      } else if (p1 === 'escapeMulti') {
-        return this.escape(p2);
       }
 
       return match;
     });
+
+    queryString = queryString.replace(/\$__escapeMulti\(('[^]*')\)/gi, (match, p1) => this.escape(p1));
 
     if (this.options) {
       queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
@@ -76,9 +76,11 @@ export default class LogAnalyticsQuerystringBuilder {
   }
 
   escape(inputs: string) {
+    console.log('hejsassan');
     return inputs
-      .split(',')
-      .map(v => `@${v}`)
+      .substring(1, inputs.length - 1)
+      .split(`','`)
+      .map(v => `@'${v}'`)
       .join(', ');
   }
 }

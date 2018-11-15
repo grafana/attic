@@ -141,4 +141,27 @@ describe('LogAnalyticsDatasource', () => {
       );
     });
   });
+
+  describe('when using $__escape and multi template variable has one selected value that contains comma', () => {
+    beforeEach(() => {
+      builder.rawQueryString = `$__escapeMulti('\\grafana-vm,\Network(eth0)\Total Bytes Received')`;
+    });
+
+    it('should replace $__escape(val) with KQL style escaped string', () => {
+      const query = builder.generate().uriString;
+      expect(query).toContain(`%40'%5Cgrafana-vm%2CNetwork(eth0)Total%20Bytes%20Received'`);
+    });
+  });
+
+  describe(`when using $__escape and multi template variable value is not wrapped in single '`, () => {
+    beforeEach(() => {
+      builder.rawQueryString = `$__escapeMulti(\\grafana-vm,\Network(eth0)\Total Bytes Received)`;
+    });
+
+    it('should not replace macro', () => {
+      const query = builder.generate().uriString;
+      console.log('teströva', decodeURIComponent(query));
+      expect(query).toContain(`%24__escapeMulti(%5Cgrafana-vm%2CNetwork(eth0)Total%20Bytes%20Received)`);
+    });
+  });
 });
