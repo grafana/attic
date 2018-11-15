@@ -9,7 +9,8 @@ export default class LogAnalyticsQuerystringBuilder {
     queryString = queryString.replace(macroRegexp, (match, p1, p2) => {
       if (p1 === 'contains') {
         return this.getMultiContains(p2);
-      } else if (p1 === 'escape') {
+      } else if (p1 === 'escapeMulti') {
+        console.log('hejsan2', this.escape(p2));
         return this.escape(p2);
       }
 

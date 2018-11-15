@@ -11,12 +11,12 @@ describe('LogAnalyticsDatasource', () => {
         interval: '5m',
         range: {
           from: moment().subtract(24, 'hours'),
-          to: moment()
+          to: moment(),
         },
         rangeRaw: {
           from: 'now-24h',
-          to: 'now'
-        }
+          to: 'now',
+        },
       },
       'TimeGenerated'
     );
@@ -115,6 +115,31 @@ describe('LogAnalyticsDatasource', () => {
 
       expect(query).toContain('where%20myTime%20%3E%3D%20datetime(');
       expect(query).toContain('myTime%20%3C%3D%20datetime(');
+    });
+  });
+
+  describe('when using $__escape and multi template variable has one selected value', () => {
+    beforeEach(() => {
+      builder.rawQueryString = `$__escapeMulti('\\grafana-vm\Network(eth0)\Total Bytes Received')`;
+    });
+
+    it('should replace $__escape(val) with KQL style escaped string', () => {
+      const query = builder.generate().uriString;
+      expect(query).toContain(`%40'%5Cgrafana-vmNetwork(eth0)Total%20Bytes%20Received'`);
+    });
+  });
+
+  describe('when using $__escape and multi template variable has multiple selected values', () => {
+    beforeEach(() => {
+      builder.rawQueryString = `CounterPath in ($__escapeMulti('\\grafana-vm\Network(eth0)\Total','\\grafana-vm\Network(eth0)\Total'))`;
+    });
+
+    it('should replace $__escape(val) with multiple KQL style escaped string', () => {
+      const query = builder.generate().uriString;
+      console.log('hej', decodeURIComponent(query));
+      expect(query).toContain(
+        `CounterPath%20in%20(%40'%5Cgrafana-vmNetwork(eth0)Total'%2C%20%40'%5Cgrafana-vmNetwork(eth0)Total')`
+      );
     });
   });
 });
