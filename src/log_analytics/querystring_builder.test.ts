@@ -160,7 +160,6 @@ describe('LogAnalyticsDatasource', () => {
 
     it('should not replace macro', () => {
       const query = builder.generate().uriString;
-      console.log('teströva', decodeURIComponent(query));
       expect(query).toContain(`%24__escapeMulti(%5Cgrafana-vm%2CNetwork(eth0)Total%20Bytes%20Received)`);
     });
   });

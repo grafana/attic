@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { interpolateInferno } from 'd3';
 
 export default class LogAnalyticsQuerystringBuilder {
   constructor(public rawQueryString, public options, public defaultTimeField) {}
