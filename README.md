@@ -273,6 +273,10 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 ### CHANGELOG
 
+#### v0.2.2
+
+- Adds support for the $__escapeMulti macro for multi value template variables in the Azure Log Analytics datasource
+
 #### v0.2.1
 
 - Adds support for $__contain macro for multi value template variables in the Azure Log Analytics datasource
