@@ -136,10 +136,8 @@ describe('LogAnalyticsDatasource', () => {
 
     it('should replace $__escape(val) with multiple KQL style escaped string', () => {
       const query = builder.generate().uriString;
-      console.log('hej', decodeURIComponent(query));
       expect(query).toContain(
         `CounterPath%20in%20(%40'%5Cgrafana-vmNetwork(eth0)Total'%2C%20%40'%5Cgrafana-vmNetwork(eth0)Total')`
       );
     });
   });
-});

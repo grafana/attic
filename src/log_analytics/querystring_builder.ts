@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { interpolateInferno } from 'd3';
 
 export default class LogAnalyticsQuerystringBuilder {
   constructor(public rawQueryString, public options, public defaultTimeField) {}
@@ -10,7 +11,6 @@ export default class LogAnalyticsQuerystringBuilder {
       if (p1 === 'contains') {
         return this.getMultiContains(p2);
       } else if (p1 === 'escapeMulti') {
-        console.log('hejsan2', this.escape(p2));
         return this.escape(p2);
       }
 
