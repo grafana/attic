@@ -10,7 +10,7 @@ function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
 
   if (!(global as any).monaco) {
-    (global as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
+    (global as any).System.import(`./${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
       }, 1);
