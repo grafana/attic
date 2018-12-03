@@ -75,7 +75,7 @@ export default class AppInsightsDatasource {
         querystringBuilder.setFilter(this.templateSrv.replace((item.filter || '')));
 
         const url = `${this.baseUrl}/metrics/${this.templateSrv.replace(
-          item.metricName,
+          encodeURI(item.metricName),
           options.scopedVars
         )}?${querystringBuilder.generate()}`;
 
