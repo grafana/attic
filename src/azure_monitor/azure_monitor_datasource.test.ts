@@ -6,15 +6,15 @@ import moment from 'moment';
 describe('AzureMonitorDatasource', function() {
   let ctx: any = {
     backendSrv: {},
-    templateSrv: new TemplateSrvStub()
+    templateSrv: new TemplateSrvStub(),
   };
 
   beforeEach(function() {
     ctx.$q = Q;
     ctx.instanceSettings = {
       url: 'http://azuremonitor.com',
-      jsonData: { subscriptionId: '9935389e-9122-4ef9-95f9-1513dd24753f'},
-      cloudName: 'azuremonitor'
+      jsonData: { subscriptionId: '9935389e-9122-4ef9-95f9-1513dd24753f' },
+      cloudName: 'azuremonitor',
     };
 
     ctx.ds = new AzureMonitorDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.templateSrv, ctx.$q);
@@ -26,11 +26,11 @@ describe('AzureMonitorDatasource', function() {
         data: {
           error: {
             code: 'InvalidApiVersionParameter',
-            message: `An error message.`
-          }
+            message: `An error message.`,
+          },
         },
         status: 400,
-        statusText: 'Bad Request'
+        statusText: 'Bad Request',
       };
 
       beforeEach(function() {
@@ -44,7 +44,9 @@ describe('AzureMonitorDatasource', function() {
       it('should return error status and a detailed error message', function() {
         return ctx.ds.testDatasource().then(function(results) {
           expect(results.status).toEqual('error');
-          expect(results.message).toEqual('1. Azure Monitor: Bad Request: InvalidApiVersionParameter. An error message. ');
+          expect(results.message).toEqual(
+            '1. Azure Monitor: Bad Request: InvalidApiVersionParameter. An error message. '
+          );
         });
       });
     });
@@ -52,20 +54,17 @@ describe('AzureMonitorDatasource', function() {
     describe('and a list of resource groups is returned', function() {
       const response = {
         data: {
-          value: [
-            { name: 'grp1' },
-            { name: 'grp2' },
-          ]
+          value: [{ name: 'grp1' }, { name: 'grp2' }],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.instanceSettings.jsonData.tenantId = 'xxx';
         ctx.instanceSettings.jsonData.clientId = 'xxx';
         ctx.backendSrv.datasourceRequest = function(options) {
-          return ctx.$q.when({data: response, status: 200});
+          return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
@@ -94,50 +93,53 @@ describe('AzureMonitorDatasource', function() {
             metricDefinition: 'Microsoft.Compute/virtualMachines',
             metricName: 'Percentage CPU',
             timeGrain: 'PT1H',
-            alias: ''
-          }
-        }
-      ]
+            alias: '',
+          },
+        },
+      ],
     };
 
     describe('and data field is average', function() {
       const response = {
-          value: [
-            {
-              timeseries: [
-                {
-                  data: [
-                    {
-                      timeStamp: '2017-08-22T21:00:00Z',
-                      average: 1.0503333333333331
-                    },
-                    {
-                      timeStamp: '2017-08-22T22:00:00Z',
-                      average: 1.045083333333333
-                    },
-                    {
-                      timeStamp: '2017-08-22T23:00:00Z',
-                      average: 1.0457499999999995
-                    }
-                  ],
-                }
-              ],
-              id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
-                + '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
-              name: {
-                value: 'Percentage CPU',
-                localizedValue: 'Percentage CPU'
+        value: [
+          {
+            timeseries: [
+              {
+                data: [
+                  {
+                    timeStamp: '2017-08-22T21:00:00Z',
+                    average: 1.0503333333333331,
+                  },
+                  {
+                    timeStamp: '2017-08-22T22:00:00Z',
+                    average: 1.045083333333333,
+                  },
+                  {
+                    timeStamp: '2017-08-22T23:00:00Z',
+                    average: 1.0457499999999995,
+                  },
+                ],
               },
-              type: 'Microsoft.Insights/metrics',
-              unit: 'Percent'
-            }
-          ]
-        };
+            ],
+            id:
+              '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines' +
+              '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
+            name: {
+              value: 'Percentage CPU',
+              localizedValue: 'Percentage CPU',
+            },
+            type: 'Microsoft.Insights/metrics',
+            unit: 'Percent',
+          },
+        ],
+      };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).toContain('/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics');
-          return ctx.$q.when({data: response, status: 200});
+          expect(options.url).toContain(
+            '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics'
+          );
+          return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
@@ -155,42 +157,45 @@ describe('AzureMonitorDatasource', function() {
 
     describe('and data field is total', function() {
       const response = {
-          value: [
-            {
-              timeseries: [
-                {
-                  data: [
-                    {
-                      timeStamp: '2017-08-22T21:00:00Z',
-                      total: 1.0503333333333331
-                    },
-                    {
-                      timeStamp: '2017-08-22T22:00:00Z',
-                      total: 1.045083333333333
-                    },
-                    {
-                      timeStamp: '2017-08-22T23:00:00Z',
-                      total: 1.0457499999999995
-                    }
-                  ],
-                }
-              ],
-              id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
-              + '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
-              name: {
-                value: 'Percentage CPU',
-                localizedValue: 'Percentage CPU'
+        value: [
+          {
+            timeseries: [
+              {
+                data: [
+                  {
+                    timeStamp: '2017-08-22T21:00:00Z',
+                    total: 1.0503333333333331,
+                  },
+                  {
+                    timeStamp: '2017-08-22T22:00:00Z',
+                    total: 1.045083333333333,
+                  },
+                  {
+                    timeStamp: '2017-08-22T23:00:00Z',
+                    total: 1.0457499999999995,
+                  },
+                ],
               },
-              type: 'Microsoft.Insights/metrics',
-              unit: 'Percent'
-            }
-          ]
-        };
+            ],
+            id:
+              '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines' +
+              '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
+            name: {
+              value: 'Percentage CPU',
+              localizedValue: 'Percentage CPU',
+            },
+            type: 'Microsoft.Insights/metrics',
+            unit: 'Percent',
+          },
+        ],
+      };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          expect(options.url).toContain('/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics');
-          return ctx.$q.when({data: response, status: 200});
+          expect(options.url).toContain(
+            '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics'
+          );
+          return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
@@ -215,46 +220,48 @@ describe('AzureMonitorDatasource', function() {
                 data: [
                   {
                     timeStamp: '2017-08-22T21:00:00Z',
-                    total: 1.0503333333333331
+                    total: 1.0503333333333331,
                   },
                   {
                     timeStamp: '2017-08-22T22:00:00Z',
-                    total: 1.045083333333333
+                    total: 1.045083333333333,
                   },
                   {
                     timeStamp: '2017-08-22T23:00:00Z',
-                    total: 1.0457499999999995
-                  }
+                    total: 1.0457499999999995,
+                  },
                 ],
                 metadatavalues: [
                   {
-                    "name": {
-                      "value": "blobtype",
-                      "localizedValue": "blobtype"
+                    name: {
+                      value: 'blobtype',
+                      localizedValue: 'blobtype',
                     },
-                    "value": "BlockBlob"
-                  }
-                ]
-              }
+                    value: 'BlockBlob',
+                  },
+                ],
+              },
             ],
-            id: '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines'
-            + '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
+            id:
+              '/subscriptions/xxx/resourceGroups/testRG/providers/Microsoft.Compute/virtualMachines' +
+              '/testRN/providers/Microsoft.Insights/metrics/Percentage CPU',
             name: {
               value: 'Percentage CPU',
-              localizedValue: 'Percentage CPU'
+              localizedValue: 'Percentage CPU',
             },
             type: 'Microsoft.Insights/metrics',
-            unit: 'Percent'
-          }
-        ]
+            unit: 'Percent',
+          },
+        ],
       };
 
       describe('and with no alias specified', () => {
         beforeEach(function() {
           ctx.backendSrv.datasourceRequest = function(options) {
-            const expected = '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics';
+            const expected =
+              '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics';
             expect(options.url).toContain(expected);
-            return ctx.$q.when({data: response, status: 200});
+            return ctx.$q.when({ data: response, status: 200 });
           };
         });
 
@@ -272,20 +279,23 @@ describe('AzureMonitorDatasource', function() {
 
       describe('and with an alias specified', () => {
         beforeEach(function() {
-          options.targets[0].azureMonitor.alias = '{{resourcegroup}} + {{namespace}} + {{resourcename}} + ' +
+          options.targets[0].azureMonitor.alias =
+            '{{resourcegroup}} + {{namespace}} + {{resourcename}} + ' +
             '{{metric}} + {{dimensionname}} + {{dimensionvalue}}';
 
           ctx.backendSrv.datasourceRequest = function(options) {
-            const expected = '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics';
+            const expected =
+              '/testRG/providers/Microsoft.Compute/virtualMachines/testRN/providers/microsoft.insights/metrics';
             expect(options.url).toContain(expected);
-            return ctx.$q.when({data: response, status: 200});
+            return ctx.$q.when({ data: response, status: 200 });
           };
         });
 
         it('should return a list of datapoints', function() {
           return ctx.ds.query(options).then(function(results) {
             expect(results.data.length).toBe(1);
-            const expected = 'testRG + Microsoft.Compute/virtualMachines + testRN + Percentage CPU + blobtype + BlockBlob';
+            const expected =
+              'testRG + Microsoft.Compute/virtualMachines + testRN + Percentage CPU + blobtype + BlockBlob';
             expect(results.data[0].target).toEqual(expected);
             expect(results.data[0].datapoints[0][1]).toEqual(1503435600000);
             expect(results.data[0].datapoints[0][0]).toEqual(1.0503333333333331);
@@ -301,13 +311,10 @@ describe('AzureMonitorDatasource', function() {
     describe('with a metric names query', () => {
       const response = {
         data: {
-          value: [
-            { name: 'grp1' },
-            { name: 'grp2' },
-          ]
+          value: [{ name: 'grp1' }, { name: 'grp2' }],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
@@ -332,18 +339,19 @@ describe('AzureMonitorDatasource', function() {
         data: {
           value: [
             {
-              name: 'test_OsDisk_1_68102d72f11b47dc8090b770e61cb5d2',
-              type: 'Microsoft.Compute/disks',
-            }
-          ]
+              name: 'test',
+              type: 'Microsoft.Network/networkInterfaces',
+            },
+          ],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          const baseUrl =
+            'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
           expect(options.url).toBe(baseUrl + '/nodesapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
@@ -352,8 +360,8 @@ describe('AzureMonitorDatasource', function() {
       it('should return a list of metric definitions', () => {
         return ctx.ds.metricFindQuery('Namespaces(nodesapp)').then(results => {
           expect(results.length).toEqual(1);
-          expect(results[0].text).toEqual('Microsoft.Compute/disks');
-          expect(results[0].value).toEqual('Microsoft.Compute/disks');
+          expect(results[0].text).toEqual('Microsoft.Network/networkInterfaces');
+          expect(results[0].value).toEqual('Microsoft.Network/networkInterfaces');
         });
       });
     });
@@ -369,16 +377,17 @@ describe('AzureMonitorDatasource', function() {
             {
               name: 'nodeapp',
               type: 'microsoft.insights/components',
-            }
-          ]
+            },
+          ],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          const baseUrl =
+            'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
           expect(options.url).toBe(baseUrl + '/nodeapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
@@ -400,26 +409,30 @@ describe('AzureMonitorDatasource', function() {
             {
               name: {
                 value: 'Percentage CPU',
-                localizedValue: 'Percentage CPU'
+                localizedValue: 'Percentage CPU',
               },
             },
             {
               name: {
                 value: 'UsedCapacity',
-                localizedValue: 'Used capacity'
+                localizedValue: 'Used capacity',
               },
-            }
-          ]
+            },
+          ],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
-          expect(options.url).toBe(baseUrl + '/nodeapp/providers/microsoft.insights/components/rn/providers/microsoft.insights/' +
-            'metricdefinitions?api-version=2018-01-01');
+          const baseUrl =
+            'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          expect(options.url).toBe(
+            baseUrl +
+              '/nodeapp/providers/microsoft.insights/components/rn/providers/microsoft.insights/' +
+              'metricdefinitions?api-version=2018-01-01'
+          );
           return ctx.$q.when(response);
         };
       });
@@ -440,13 +453,10 @@ describe('AzureMonitorDatasource', function() {
   describe('When performing getResourceGroups', function() {
     const response = {
       data: {
-        value: [
-          { name: 'grp1' },
-          { name: 'grp2' },
-        ]
+        value: [{ name: 'grp1' }, { name: 'grp2' }],
       },
       status: 200,
-      statusText: 'OK'
+      statusText: 'OK',
     };
 
     beforeEach(function() {
@@ -471,8 +481,8 @@ describe('AzureMonitorDatasource', function() {
       data: {
         value: [
           {
-            name: 'test_OsDisk_1_68102d72f11b47dc8090b770e61cb5d2',
-            type: 'Microsoft.Compute/disks',
+            name: 'test',
+            type: 'Microsoft.Network/networkInterfaces',
           },
           {
             location: 'northeurope',
@@ -490,17 +500,18 @@ describe('AzureMonitorDatasource', function() {
           },
           {
             name: 'storageTest',
-            type: 'Microsoft.Storage/storageAccounts'
-          }
-        ]
+            type: 'Microsoft.Storage/storageAccounts',
+          },
+        ],
       },
       status: 200,
-      statusText: 'OK'
+      statusText: 'OK',
     };
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
-        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+        const baseUrl =
+          'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
         expect(options.url).toBe(baseUrl + '/nodesapp/resources?api-version=2018-01-01');
         return ctx.$q.when(response);
       };
@@ -509,8 +520,8 @@ describe('AzureMonitorDatasource', function() {
     it('should return list of Metric Definitions with no duplicates and no unsupported namespaces', function() {
       return ctx.ds.getMetricDefinitions('nodesapp').then(function(results) {
         expect(results.length).toEqual(7);
-        expect(results[0].text).toEqual('Microsoft.Compute/disks');
-        expect(results[0].value).toEqual('Microsoft.Compute/disks');
+        expect(results[0].text).toEqual('Microsoft.Network/networkInterfaces');
+        expect(results[0].value).toEqual('Microsoft.Network/networkInterfaces');
         expect(results[1].text).toEqual('Microsoft.Compute/virtualMachines');
         expect(results[1].value).toEqual('Microsoft.Compute/virtualMachines');
         expect(results[2].text).toEqual('Microsoft.Storage/storageAccounts');
@@ -539,16 +550,17 @@ describe('AzureMonitorDatasource', function() {
             {
               name: 'nodeapp',
               type: 'microsoft.insights/components',
-            }
-          ]
+            },
+          ],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          const baseUrl =
+            'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
           expect(options.url).toBe(baseUrl + '/nodeapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
@@ -574,30 +586,32 @@ describe('AzureMonitorDatasource', function() {
             {
               name: 'storagetest',
               type: 'Microsoft.Storage/storageAccounts',
-            }
-          ]
+            },
+          ],
         },
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
+          const baseUrl =
+            'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups';
           expect(options.url).toBe(baseUrl + '/nodeapp/resources?api-version=2018-01-01');
           return ctx.$q.when(response);
         };
       });
 
       it('should return list of Resource Names', function() {
-        return ctx.ds.getResourceNames('nodeapp', 'Microsoft.Storage/storageAccounts/blobServices').then(function(results) {
-          expect(results.length).toEqual(1);
-          expect(results[0].text).toEqual('storagetest/default');
-          expect(results[0].value).toEqual('storagetest/default');
-        });
+        return ctx.ds
+          .getResourceNames('nodeapp', 'Microsoft.Storage/storageAccounts/blobServices')
+          .then(function(results) {
+            expect(results.length).toEqual(1);
+            expect(results[0].text).toEqual('storagetest/default');
+            expect(results[0].value).toEqual('storagetest/default');
+          });
       });
     });
-
   });
 
   describe('When performing getMetricNames', function() {
@@ -607,53 +621,46 @@ describe('AzureMonitorDatasource', function() {
           {
             name: {
               value: 'UsedCapacity',
-              localizedValue: 'Used capacity'
+              localizedValue: 'Used capacity',
             },
             unit: 'CountPerSecond',
             primaryAggregationType: 'Total',
-            supportedAggregationTypes: [
-              'None',
-              'Average',
-              'Minimum',
-              'Maximum',
-              'Total',
-              'Count'
-            ],
+            supportedAggregationTypes: ['None', 'Average', 'Minimum', 'Maximum', 'Total', 'Count'],
             metricAvailabilities: [
-              {timeGrain: 'PT1H', retention: 'P93D'},
-              {timeGrain: 'PT6H', retention: 'P93D'},
-              {timeGrain: 'PT12H', retention: 'P93D'},
-              {timeGrain: 'P1D', retention: 'P93D'}
-            ]
+              { timeGrain: 'PT1H', retention: 'P93D' },
+              { timeGrain: 'PT6H', retention: 'P93D' },
+              { timeGrain: 'PT12H', retention: 'P93D' },
+              { timeGrain: 'P1D', retention: 'P93D' },
+            ],
           },
           {
             name: {
               value: 'FreeCapacity',
-              localizedValue: 'Free capacity'
+              localizedValue: 'Free capacity',
             },
             unit: 'CountPerSecond',
             primaryAggregationType: 'Average',
-            supportedAggregationTypes: [
-              'None',
-              'Average',
-            ],
+            supportedAggregationTypes: ['None', 'Average'],
             metricAvailabilities: [
-              {timeGrain: 'PT1H', retention: 'P93D'},
-              {timeGrain: 'PT6H', retention: 'P93D'},
-              {timeGrain: 'PT12H', retention: 'P93D'},
-              {timeGrain: 'P1D', retention: 'P93D'}
-            ]
+              { timeGrain: 'PT1H', retention: 'P93D' },
+              { timeGrain: 'PT6H', retention: 'P93D' },
+              { timeGrain: 'PT12H', retention: 'P93D' },
+              { timeGrain: 'P1D', retention: 'P93D' },
+            ],
           },
-        ]
+        ],
       },
       status: 200,
-      statusText: 'OK'
+      statusText: 'OK',
     };
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
-        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
-        const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
+        const baseUrl =
+          'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
+        const expected =
+          baseUrl +
+          '/providers/microsoft.insights/components/resource1' +
           '/providers/microsoft.insights/metricdefinitions?api-version=2018-01-01';
         expect(options.url).toBe(expected);
         return ctx.$q.when(response);
@@ -678,53 +685,46 @@ describe('AzureMonitorDatasource', function() {
           {
             name: {
               value: 'UsedCapacity',
-              localizedValue: 'Used capacity'
+              localizedValue: 'Used capacity',
             },
             unit: 'CountPerSecond',
             primaryAggregationType: 'Total',
-            supportedAggregationTypes: [
-              'None',
-              'Average',
-              'Minimum',
-              'Maximum',
-              'Total',
-              'Count'
-            ],
+            supportedAggregationTypes: ['None', 'Average', 'Minimum', 'Maximum', 'Total', 'Count'],
             metricAvailabilities: [
-              {timeGrain: 'PT1H', retention: 'P93D'},
-              {timeGrain: 'PT6H', retention: 'P93D'},
-              {timeGrain: 'PT12H', retention: 'P93D'},
-              {timeGrain: 'P1D', retention: 'P93D'}
-            ]
+              { timeGrain: 'PT1H', retention: 'P93D' },
+              { timeGrain: 'PT6H', retention: 'P93D' },
+              { timeGrain: 'PT12H', retention: 'P93D' },
+              { timeGrain: 'P1D', retention: 'P93D' },
+            ],
           },
           {
             name: {
               value: 'FreeCapacity',
-              localizedValue: 'Free capacity'
+              localizedValue: 'Free capacity',
             },
             unit: 'CountPerSecond',
             primaryAggregationType: 'Average',
-            supportedAggregationTypes: [
-              'None',
-              'Average',
-            ],
+            supportedAggregationTypes: ['None', 'Average'],
             metricAvailabilities: [
-              {timeGrain: 'PT1H', retention: 'P93D'},
-              {timeGrain: 'PT6H', retention: 'P93D'},
-              {timeGrain: 'PT12H', retention: 'P93D'},
-              {timeGrain: 'P1D', retention: 'P93D'}
-            ]
+              { timeGrain: 'PT1H', retention: 'P93D' },
+              { timeGrain: 'PT6H', retention: 'P93D' },
+              { timeGrain: 'PT12H', retention: 'P93D' },
+              { timeGrain: 'P1D', retention: 'P93D' },
+            ],
           },
-        ]
+        ],
       },
       status: 200,
-      statusText: 'OK'
+      statusText: 'OK',
     };
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
-        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
-        const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
+        const baseUrl =
+          'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
+        const expected =
+          baseUrl +
+          '/providers/microsoft.insights/components/resource1' +
           '/providers/microsoft.insights/metricdefinitions?api-version=2018-01-01';
         expect(options.url).toBe(expected);
         return ctx.$q.when(response);
@@ -732,11 +732,13 @@ describe('AzureMonitorDatasource', function() {
     });
 
     it('should return Aggregation metadata for a Metric', function() {
-      return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'UsedCapacity').then(function(results) {
-        expect(results.primaryAggType).toEqual('Total');
-        expect(results.supportedAggTypes.length).toEqual(6);
-        expect(results.supportedTimeGrains.length).toEqual(4);
-      });
+      return ctx.ds
+        .getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'UsedCapacity')
+        .then(function(results) {
+          expect(results.primaryAggType).toEqual('Total');
+          expect(results.supportedAggTypes.length).toEqual(6);
+          expect(results.supportedTimeGrains.length).toEqual(4);
+        });
     });
   });
 
@@ -747,56 +749,49 @@ describe('AzureMonitorDatasource', function() {
           {
             name: {
               value: 'Transactions',
-              localizedValue: 'Transactions'
+              localizedValue: 'Transactions',
             },
             unit: 'Count',
             primaryAggregationType: 'Total',
-            supportedAggregationTypes: [
-              'None',
-              'Average',
-              'Minimum',
-              'Maximum',
-              'Total',
-              'Count'
-            ],
+            supportedAggregationTypes: ['None', 'Average', 'Minimum', 'Maximum', 'Total', 'Count'],
             isDimensionRequired: false,
             dimensions: [
               {
-                  value: 'ResponseType',
-                  localizedValue: 'Response type'
+                value: 'ResponseType',
+                localizedValue: 'Response type',
               },
               {
-                  value: 'GeoType',
-                  localizedValue: 'Geo type'
+                value: 'GeoType',
+                localizedValue: 'Geo type',
               },
               {
-                  value: 'ApiName',
-                  localizedValue: 'API name'
-              }
-            ]
+                value: 'ApiName',
+                localizedValue: 'API name',
+              },
+            ],
           },
           {
             name: {
               value: 'FreeCapacity',
-              localizedValue: 'Free capacity'
+              localizedValue: 'Free capacity',
             },
             unit: 'CountPerSecond',
             primaryAggregationType: 'Average',
-            supportedAggregationTypes: [
-              'None',
-              'Average',
-            ]
+            supportedAggregationTypes: ['None', 'Average'],
           },
-        ]
+        ],
       },
       status: 200,
-      statusText: 'OK'
+      statusText: 'OK',
     };
 
     beforeEach(function() {
       ctx.backendSrv.datasourceRequest = function(options) {
-        const baseUrl = 'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
-        const expected = baseUrl + '/providers/microsoft.insights/components/resource1' +
+        const baseUrl =
+          'http://azuremonitor.com/azuremonitor/subscriptions/9935389e-9122-4ef9-95f9-1513dd24753f/resourceGroups/nodeapp';
+        const expected =
+          baseUrl +
+          '/providers/microsoft.insights/components/resource1' +
           '/providers/microsoft.insights/metricdefinitions?api-version=2018-01-01';
         expect(options.url).toBe(expected);
         return ctx.$q.when(response);
@@ -804,19 +799,23 @@ describe('AzureMonitorDatasource', function() {
     });
 
     it('should return dimensions for a Metric that has dimensions', function() {
-      return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'Transactions').then(function(results) {
-        expect(results.dimensions.length).toEqual(4);
-        expect(results.dimensions[0].text).toEqual('None');
-        expect(results.dimensions[0].value).toEqual('None');
-        expect(results.dimensions[1].text).toEqual('Response type');
-        expect(results.dimensions[1].value).toEqual('ResponseType');
-      });
+      return ctx.ds
+        .getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'Transactions')
+        .then(function(results) {
+          expect(results.dimensions.length).toEqual(4);
+          expect(results.dimensions[0].text).toEqual('None');
+          expect(results.dimensions[0].value).toEqual('None');
+          expect(results.dimensions[1].text).toEqual('Response type');
+          expect(results.dimensions[1].value).toEqual('ResponseType');
+        });
     });
 
     it('should return an empty array for a Metric that does not have dimensions', function() {
-      return ctx.ds.getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'FreeCapacity').then(function(results) {
-        expect(results.dimensions.length).toEqual(0);
-      });
+      return ctx.ds
+        .getMetricMetadata('nodeapp', 'microsoft.insights/components', 'resource1', 'FreeCapacity')
+        .then(function(results) {
+          expect(results.dimensions.length).toEqual(0);
+        });
     });
   });
 });

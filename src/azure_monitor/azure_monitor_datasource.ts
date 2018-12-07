@@ -49,10 +49,7 @@ export default class AzureMonitorDatasource {
       const item = target.azureMonitor;
 
       if (item.timeGrainUnit && item.timeGrain !== 'auto') {
-        item.timeGrain = TimegrainConverter.createISO8601Duration(
-          item.timeGrain,
-          item.timeGrainUnit
-        );
+        item.timeGrain = TimegrainConverter.createISO8601Duration(item.timeGrain, item.timeGrainUnit);
       }
 
       const resourceGroup = this.templateSrv.replace(item.resourceGroup, options.scopedVars);
@@ -116,17 +113,19 @@ export default class AzureMonitorDatasource {
 
   doQueries(queries) {
     return _.map(queries, query => {
-      return this.doRequest(query.url).then(result => {
-        return {
-          result: result,
-          query: query,
-        };
-      }).catch(err => {
-        throw {
-          error: err,
-          query: query
-        };
-      });
+      return this.doRequest(query.url)
+        .then(result => {
+          return {
+            result: result,
+            query: query,
+          };
+        })
+        .catch(err => {
+          throw {
+            error: err,
+            query: query,
+          };
+        });
     });
   }
 
@@ -167,14 +166,14 @@ export default class AzureMonitorDatasource {
   }
 
   getResourceGroups() {
-    const url = `${this.baseUrl}?api-version=2018-01-01`;
+    const url = `${this.baseUrl}?api-version=${this.apiVersion}`;
     return this.doRequest(url).then(result => {
       return ResponseParser.parseResponseValues(result, 'name', 'name');
     });
   }
 
   getMetricDefinitions(resourceGroup: string) {
-    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2018-01-01`;
+    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=${this.apiVersion}`;
     return this.doRequest(url)
       .then(result => {
         return ResponseParser.parseResponseValues(result, 'type', 'type');
@@ -182,7 +181,7 @@ export default class AzureMonitorDatasource {
       .then(result => {
         return _.filter(result, t => {
           for (let i = 0; i < this.supportedMetricNamespaces.length; i++) {
-            if (_.startsWith(t.value.toLowerCase(), this.supportedMetricNamespaces[i].toLowerCase())) {
+            if (t.value.toLowerCase() === this.supportedMetricNamespaces[i].toLowerCase()) {
               return true;
             }
           }
@@ -223,7 +222,7 @@ export default class AzureMonitorDatasource {
   }
 
   getResourceNames(resourceGroup: string, metricDefinition: string) {
-    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=2018-01-01`;
+    const url = `${this.baseUrl}/${resourceGroup}/resources?api-version=${this.apiVersion}`;
 
     return this.doRequest(url).then(result => {
       if (!_.startsWith(metricDefinition, 'Microsoft.Storage/storageAccounts/')) {
@@ -283,7 +282,7 @@ export default class AzureMonitorDatasource {
       };
     }
 
-    const url = `${this.baseUrl}?api-version=2018-01-01`;
+    const url = `${this.baseUrl}?api-version=${this.apiVersion}`;
     return this.doRequest(url)
       .then(response => {
         if (response.status === 200) {
