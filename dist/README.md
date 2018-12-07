@@ -273,6 +273,11 @@ The plugin is written in TypeScript and changes should be made in the `src` dire
 
 ### CHANGELOG
 
+#### v0.3.0
+
+- Update to whitelist for Azure Monitor metrics. Some new services now supported.
+- Fix for loading the Monaco editor when using Grafana behind a reverse proxy. [#75](https://github.com/grafana/azure-monitor-datasource/pull/75) Thank you, [@netiperher](https://github.com/netiperher)
+
 #### v0.2.2
 
 - Adds support for the $__escapeMulti macro for multi value template variables in the Azure Log Analytics datasource
