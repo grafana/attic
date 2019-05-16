@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { PanelProps, ReactPanelPlugin } from '@grafana/ui';
+import { PanelProps, PanelPlugin } from '@grafana/ui';
 
 export class MyPanel extends PureComponent<PanelProps> {
   render() {
@@ -9,4 +9,4 @@ export class MyPanel extends PureComponent<PanelProps> {
   }
 }
 
-export const reactPanel = new ReactPanelPlugin(MyPanel);
+export const reactPanel = new PanelPlugin(MyPanel);
