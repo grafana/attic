@@ -1,4 +1,4 @@
-# Azure Monitor Data Source For Grafana
+# Azure Monitor Data Source For Grafana (deprecated - now included in core Grafana)
 
 Azure Monitor is the platform service that provides a single source for monitoring Azure resources. Application Insights is an extensible Application Performance Management (APM) service for web developers on multiple platforms and can be used to monitor your live web application - it will automatically detect performance anomalies.
 
