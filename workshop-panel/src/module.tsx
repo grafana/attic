@@ -3,10 +3,8 @@ import { PanelProps, PanelPlugin } from '@grafana/ui';
 
 export class MyPanel extends PureComponent<PanelProps> {
   render() {
-    return (
-      <div>Hello from my panel</div>
-    )
+    return <div>Hello from my panel</div>;
   }
 }
 
-export const reactPanel = new PanelPlugin(MyPanel);
+export const plugin = new PanelPlugin(MyPanel);

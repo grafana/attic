@@ -5,7 +5,7 @@ import { ComboPanelEditor } from './components/ComboPanelEditor';
 
 import { defaults, ComboOptions } from './types';
 
-export const reactPanel = new PanelPlugin<ComboOptions>(ComboPanel);
+export const plugin = new PanelPlugin<ComboOptions>(ComboPanel);
 
-reactPanel.setEditor(ComboPanelEditor);
-reactPanel.setDefaults(defaults);
+plugin.setEditor(ComboPanelEditor);
+plugin.setDefaults(defaults);
