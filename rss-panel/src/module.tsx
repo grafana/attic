@@ -3,7 +3,7 @@ import { RssPanel } from './components/RssPanel';
 import { RssPanelEditor } from './components/RssPanelEditor';
 import { defaults, RssOptions } from './types';
 
-export const reactPanel = new PanelPlugin<RssOptions>(RssPanel);
+export const plugin = new PanelPlugin<RssOptions>(RssPanel);
 
-reactPanel.setEditor(RssPanelEditor);
-reactPanel.setDefaults(defaults);
+plugin.setEditor(RssPanelEditor);
+plugin.setDefaults(defaults);
