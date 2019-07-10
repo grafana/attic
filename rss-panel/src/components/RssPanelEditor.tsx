@@ -1,9 +1,5 @@
 import React, { PureComponent } from 'react';
-import {
-  FormField,
-  PanelOptionsGroup,
-  PanelEditorProps,
-} from '@grafana/ui';
+import { FormField, PanelOptionsGroup, PanelEditorProps } from '@grafana/ui';
 import { RssOptions } from '../types';
 
 interface State {
@@ -23,7 +19,7 @@ export class RssPanelEditor extends PureComponent<
   }
 
   onUpdatePanel = () =>
-    this.props.onChange({ ...this.props.options, feedUrl: this.state.feedUrl });
+    this.props.onOptionsChange({ ...this.props.options, feedUrl: this.state.feedUrl });
 
   onFeedUrlChange = ({ target }) => this.setState({ feedUrl: target.value });
 

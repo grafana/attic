@@ -9,7 +9,7 @@ const setup = (propOverrides?: Partial<PanelEditorProps<RssOptions>>) => {
     options: {
       feedUrl: 'some/url',
     },
-    onChange: jest.fn(),
+    onOptionsChange: jest.fn(),
   };
 
   Object.assign(props, propOverrides);
