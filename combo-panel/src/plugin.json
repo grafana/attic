@@ -1,0 +1,23 @@
+{
+  "type": "panel",
+  "name": "Combo Panel",
+  "id": "combo-panel",
+  "dataFormats": ["time_series"],
+  "info": {
+    "description": "Panel with Graph, Gauge and Text",
+    "author": {
+      "name": "Grafana Labs",
+      "url": "https://grafana.com"
+    },
+    "keywords": ["Combo Panel"],
+    "links": [],
+    "screenshots": [],
+    "version": "0.3.0",
+    "updated": "2019-02-21"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "6.x.x",
+    "plugins": []
+  }
+}
