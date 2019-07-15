@@ -1,0 +1,45 @@
+{
+  "type": "app",
+  "name": "Example",
+  "id": "grafana-example-app",
+
+  "pages": [
+    { "name": "Live stream", "component": "StreamPageCtrl", "role": "Editor"},
+    { "name": "Log view", "component": "LogsPageCtrl", "role": "Viewer"}
+  ],
+
+  "css": {
+    "dark":  "css/dark.css",
+    "light":  "css/light.css"
+  },
+
+  "info": {
+    "description": "Example app for Grafana",
+    "author": {
+      "name": "Raintank",
+      "url": "http://raintank.io"
+    },
+    "keywords": ["example app"],
+    "logos": {
+      "small": "img/small_logo.png",
+      "large": "img/large_logo.png"
+    },
+    "links": [
+      {"name": "Project site", "url": "https://github.com/grafana/example-app"},
+      {"name": "License & Terms", "url": "https://github.com/grafana/example-app/blob/master/LICENSE"}
+    ],
+    "version": "1.0.2",
+    "updated": "2015-06-06"
+  },
+
+  "includes": [
+    {"type": "dashboard", "name": "Example App Dashboard", "path": "dashboards/example_app_dashboard.json"},
+    {"type": "panel", "name": "Example App Panel"},
+    {"type": "datasource", "name": "Example App Datasource"}
+  ],
+
+  "dependencies": {
+    "grafanaVersion": "3.x.x",
+    "plugins": []
+  }
+}
